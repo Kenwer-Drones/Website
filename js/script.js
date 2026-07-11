@@ -289,7 +289,7 @@ function skyfield(id,alpha){
       const t=(p.life-p.delay)/p.dur;if(t>=1){paths[i]=np();continue}
       const draw=Math.min(t/.45,1),fade=t<.8?1:1-(t-.8)/.2;
       const steps=60,upto=Math.floor(steps*draw);if(upto<2)continue;
-      /* gradient trail — dim at the tail, bright toward the head */
+      /* gradient trail: dim at the tail, bright toward the head */
       ctx.lineWidth=1;
       let prev=bez(p,0);
       for(let s=1;s<=upto;s++){
@@ -698,7 +698,7 @@ skyfield('skycv2',.22);
 
 /* ---------- font fallback (Safari Lockdown Mode etc.) ----------
    Lockdown blocks web fonts AND most named system fonts. Detect whether
-   Anton actually rendered by comparing text width against monospace —
+   Anton actually rendered by comparing text width against monospace.
    if widths match, Anton never applied, so switch headlines to a bold
    system-font style that Lockdown allows. */
 (function(){
