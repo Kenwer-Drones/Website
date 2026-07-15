@@ -1,6 +1,23 @@
 /* ---------- reveal + split ---------- */
-const io=new IntersectionObserver(es=>{for(const e of es){if(e.isIntersecting){e.target.classList.add('in','split-in');io.unobserve(e.target)}}},{threshold:.15,rootMargin:"0px 0px -40px 0px"});
-document.querySelectorAll('.rv, #heroH, .final-h').forEach(el=>io.observe(el));
+const io=new IntersectionObserver(es=>{for(const e of es){if(e.isIntersecting){e.target.classList.add('in','split-in');io.unobserve(e.target)}}},{threshold:0,rootMargin:"0px 0px -12% 0px"});
+const revealEls=[...document.querySelectorAll('.rv, #heroH, .final-h')];
+revealEls.forEach(el=>io.observe(el));
+/* Safari safety net: anything already within the viewport that hasn't revealed
+   (observer timing/transform quirks) gets shown so no section can sit blank */
+function forceRevealInView(){
+  const vh=innerHeight||document.documentElement.clientHeight;
+  revealEls.forEach(el=>{
+    if(el.classList.contains('in'))return;
+    const r=el.getBoundingClientRect();
+    if(r.top<vh*0.92&&r.bottom>0){el.classList.add('in','split-in');io.unobserve(el);}
+  });
+}
+addEventListener('scroll',forceRevealInView,{passive:true});
+addEventListener('resize',forceRevealInView);
+addEventListener('load',()=>{forceRevealInView();setTimeout(forceRevealInView,300);});
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(forceRevealInView);
+/* also poll briefly so anchor jumps / fast scroll never leave a section blank */
+let _rvPolls=0;const _rvTimer=setInterval(()=>{forceRevealInView();if(++_rvPolls>20)clearInterval(_rvTimer);},250);
 /* ---------- align "We Design" exactly above DRONE ---------- */
 (function(){
   const h=document.getElementById('heroH');if(!h)return;
@@ -91,8 +108,8 @@ autoSlider({
 const items=[...document.querySelectorAll('.svc-item')];
 const pvT=document.getElementById('pvT'),pvD=document.getElementById('pvD'),pvM=document.getElementById('pvM'),pv=document.getElementById('svcPrev');
 const svcListEl=document.getElementById('svcList');
-function placePv(el){ /* card sits exactly beside the active item */
-  if(innerWidth<=1080||!el)return;
+function placePv(el){ /* card sits beside the active item */
+  if(!el)return;
   const t=el.offsetTop+el.offsetHeight/2-pv.offsetHeight/2;
   const max=svcListEl.offsetHeight-pv.offsetHeight+24;
   pv.style.top=Math.max(-24,Math.min(t,max))+'px';
@@ -196,6 +213,9 @@ function skyfield(id,alpha){
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const cv=document.getElementById(id);if(!cv)return;
   const ctx=cv.getContext('2d');let W,H,DPR;
+  /* live theme ink: primary = --ink-rgb, secondary = a muted mid-grey */
+  const INK=()=>getComputedStyle(document.documentElement).getPropertyValue('--ink-rgb').trim()||'237,235,228';
+  const DIM=()=>document.documentElement.classList.contains('light')?'120,120,112':'118,116,108';
   function size(){DPR=Math.min(devicePixelRatio||1,2);W=cv.clientWidth;H=cv.clientHeight;cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);seed()}
   /* ---- hidden particle field + cursor-emitted sparks ---- */
   let parts=[],sparks=[];
@@ -210,7 +230,8 @@ function skyfield(id,alpha){
         vx:(Math.random()-.5)*.12,vy:(Math.random()-.5)*.12,
         dx:0,dy:0,
         e:0, /* energy: 0 = invisible until the cursor comes near */
-        tone:bright?'237,235,228':'118,116,108',
+        tone:bright?INK():DIM(),
+        _b:bright,
         r:bright?(.8+Math.random()*1.2):(.7+Math.random()),
         a:bright?(.5+Math.random()*.35):(.3+Math.random()*.25)
       });
@@ -250,7 +271,7 @@ function skyfield(id,alpha){
   function frame(now){
     const dt=Math.min((now-last)/1000,.05);last=now;
     ctx.clearRect(0,0,W,H);
-    ctx.strokeStyle='rgba(237,235,228,.065)';ctx.lineWidth=1;
+    ctx.strokeStyle=`rgba(${INK()},.065)`;ctx.lineWidth=1;
     for(let i=1;i<7;i++){const y=H*i/7;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
     for(let i=1;i<14;i++){const x=W*i/14;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}
     /* ---- hidden field: particles bloom only near the cursor ---- */
@@ -269,7 +290,7 @@ function skyfield(id,alpha){
       if(p.x<-4)p.x=W+4;else if(p.x>W+4)p.x=-4;
       if(p.y<-4)p.y=H+4;else if(p.y>H+4)p.y=-4;
       if(p.e>.02){
-        ctx.fillStyle=`rgba(${p.tone},${p.a*p.e})`;
+        ctx.fillStyle=`rgba(${p._b?INK():DIM()},${p.a*p.e})`;
         ctx.beginPath();ctx.arc(p.x,p.y,p.r*(0.7+.5*p.e),0,7);ctx.fill();
       }
     }
@@ -281,7 +302,7 @@ function skyfield(id,alpha){
       s.vx*=damp;s.vy*=damp;
       s.x+=s.vx*dt;s.y+=s.vy*dt;
       const k=1-s.life/s.dur;
-      ctx.fillStyle=s.bright?`rgba(237,235,228,${.85*k})`:`rgba(118,116,108,${.9*k})`;
+      ctx.fillStyle=s.bright?`rgba(${INK()},${.85*k})`:`rgba(${DIM()},${.9*k})`;
       ctx.beginPath();ctx.arc(s.x,s.y,s.r*(.5+.5*k),0,7);ctx.fill();
     }
     for(let i=0;i<paths.length;i++){
@@ -289,19 +310,19 @@ function skyfield(id,alpha){
       const t=(p.life-p.delay)/p.dur;if(t>=1){paths[i]=np();continue}
       const draw=Math.min(t/.45,1),fade=t<.8?1:1-(t-.8)/.2;
       const steps=60,upto=Math.floor(steps*draw);if(upto<2)continue;
-      /* gradient trail: dim at the tail, bright toward the head */
+      /* gradient trail — dim at the tail, bright toward the head */
       ctx.lineWidth=1;
       let prev=bez(p,0);
       for(let s=1;s<=upto;s++){
         const q=bez(p,s/steps),seg=s/Math.max(upto,1);
-        ctx.strokeStyle=`rgba(237,235,228,${alpha*fade*(.3+.7*seg)})`;
+        ctx.strokeStyle=`rgba(${INK()},${alpha*fade*(.3+.7*seg)})`;
         ctx.beginPath();ctx.moveTo(prev.x,prev.y);ctx.lineTo(q.x,q.y);ctx.stroke();
         prev=q;
       }
       if(draw<1){const h=bez(p,draw);
         ctx.save();
-        ctx.shadowColor='rgba(237,235,228,.9)';ctx.shadowBlur=12;
-        ctx.fillStyle=`rgba(237,235,228,${.95*fade})`;ctx.beginPath();ctx.arc(h.x,h.y,2,0,7);ctx.fill();
+        ctx.shadowColor=`rgba(${INK()},.9)`;ctx.shadowBlur=12;
+        ctx.fillStyle=`rgba(${INK()},${.95*fade})`;ctx.beginPath();ctx.arc(h.x,h.y,2,0,7);ctx.fill();
         ctx.restore();}
     }
     if(!reduce)requestAnimationFrame(frame);
@@ -396,6 +417,17 @@ skyfield('skycv2',.22);
       if(!m.classList.contains('reveal')){m.classList.add('reveal');e.stopPropagation();}
     },true); /* capture: first tap reveals before panel pop */
   });
+  /* touch/no-hover: reveal automatically when the panel scrolls into view */
+  const noHover=matchMedia('(hover:none)').matches;
+  if(noHover&&'IntersectionObserver'in window){
+    const ioJ=new IntersectionObserver(es=>{
+      es.forEach(e=>{
+        if(e.isIntersecting)e.target.classList.add('reveal');
+        else{e.target.classList.remove('reveal');if(open&&e.target.contains(open))close();}
+      });
+    },{rootMargin:'-30% 0px -30% 0px',threshold:0});
+    medias.forEach(m=>ioJ.observe(m));
+  }
   panels.forEach(p=>{
     p.addEventListener('click',e=>{
       e.stopPropagation();
@@ -512,18 +544,39 @@ skyfield('skycv2',.22);
   const items=[...document.querySelectorAll('.faq-item')];
   if(!items.length)return;
   function clear(){items.forEach(it=>it.classList.remove('hv0','hv1','hv2'))}
-  items.forEach((it,i)=>{
-    it.addEventListener('mouseenter',()=>{
-      clear();
-      it.classList.add('hv0');
-      if(items[i-1])items[i-1].classList.add('hv1');
-      if(items[i+1])items[i+1].classList.add('hv1');
-      if(items[i-2])items[i-2].classList.add('hv2');
-      if(items[i+2])items[i+2].classList.add('hv2');
-    });
-  });
-  const list=items[0].parentElement;
-  list.addEventListener('mouseleave',clear);
+  function glow(i){
+    clear();
+    items[i].classList.add('hv0');
+    if(items[i-1])items[i-1].classList.add('hv1');
+    if(items[i+1])items[i+1].classList.add('hv1');
+    if(items[i-2])items[i-2].classList.add('hv2');
+    if(items[i+2])items[i+2].classList.add('hv2');
+  }
+  const noHover=matchMedia('(hover:none)').matches;
+  if(noHover){
+    /* touch: highlight the item nearest screen-centre as you scroll */
+    let tick=false;
+    function onScroll(){
+      if(tick)return;tick=true;
+      requestAnimationFrame(()=>{
+        tick=false;
+        const mid=innerHeight/2;let best=-1,bd=1e9;
+        items.forEach((it,i)=>{
+          const r=it.getBoundingClientRect();
+          if(r.bottom<0||r.top>innerHeight)return;
+          const d=Math.abs((r.top+r.bottom)/2-mid);
+          if(d<bd){bd=d;best=i}
+        });
+        if(best>=0)glow(best);else clear();
+      });
+    }
+    addEventListener('scroll',onScroll,{passive:true});
+    onScroll();
+  }else{
+    items.forEach((it,i)=>it.addEventListener('mouseenter',()=>glow(i)));
+    const list=items[0].parentElement;
+    list.addEventListener('mouseleave',clear);
+  }
 })();
 
 /* ---------- footer field: living constellation that locks into an objective, then the mark ---------- */
@@ -531,6 +584,12 @@ skyfield('skycv2',.22);
   const band=document.getElementById('halftone'),cv=document.getElementById('droneCv');
   if(!cv)return;
   const ctx=cv.getContext('2d',{alpha:false});
+  const themeBG=()=>{const c=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();return c||'#0C0C0B'};
+  const themeInk=()=>getComputedStyle(document.documentElement).getPropertyValue('--ink-rgb').trim()||'237,235,228';
+  const themeDot=()=>document.documentElement.classList.contains('light')?'#20211E':'#F4F2EC';
+  const hexA=(hex,a)=>{hex=hex.replace('#','');if(hex.length===3)hex=hex.split('').map(c=>c+c).join('');
+    const r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16);
+    return `rgba(${r},${g},${b},${a})`;};
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const LOGO='M 6.4,11.2 C 5.9,11.7 5.9,104.0 6.5,105.2 C 6.7,105.8 6.9,106.5 6.9,106.9 C 6.9,107.8 7.6,109.4 8.5,110.4 C 9.0,110.9 9.3,111.5 9.3,111.6 C 9.3,112.0 14.0,116.7 15.7,117.9 C 16.3,118.4 17.9,119.4 19.1,120.2 C 20.4,121.1 21.8,122.1 22.4,122.6 C 23.3,123.3 23.8,123.7 26.4,125.6 C 26.9,125.9 27.8,126.6 28.5,127.1 C 29.7,128.1 31.4,129.4 32.8,130.4 C 33.3,130.7 34.2,131.4 34.8,131.9 C 37.5,134.0 38.6,134.8 41.0,136.4 C 42.4,137.4 43.8,138.5 44.2,138.9 C 44.5,139.3 45.9,140.3 47.1,141.1 C 48.4,141.9 50.1,143.2 50.9,143.9 C 51.7,144.7 52.8,145.6 53.3,146.0 C 54.3,146.8 54.6,147.3 54.0,147.3 C 53.6,147.3 47.6,144.3 46.7,143.6 C 46.2,143.3 44.1,142.1 41.9,141.0 C 39.8,139.9 37.8,138.8 37.5,138.7 C 37.3,138.4 36.0,137.7 34.7,137.0 C 33.4,136.3 32.2,135.6 31.9,135.4 C 31.7,135.2 29.4,134.0 26.7,132.6 C 24.1,131.3 21.8,130.1 21.6,129.8 C 16.8,125.5 8.6,127.4 6.6,133.3 C 6.0,135.4 5.7,176.9 6.4,177.6 C 6.6,177.8 23.2,177.9 79.0,177.9 C 160.0,177.9 153.4,177.7 154.6,180.1 C 155.7,182.4 162.0,187.5 163.8,187.5 C 164.0,187.5 164.9,187.9 165.8,188.3 C 168.5,189.5 176.2,189.5 178.8,188.3 C 179.8,187.9 180.7,187.5 180.9,187.5 C 181.5,187.5 187.5,183.1 187.5,182.7 C 187.5,182.5 188.0,181.8 188.7,181.1 C 189.4,180.4 189.9,179.7 189.9,179.6 C 189.9,179.4 190.2,178.9 190.5,178.5 C 190.9,178.1 191.8,176.0 192.5,173.7 C 194.6,167.6 194.5,164.2 192.2,159.1 C 191.8,158.3 191.5,157.5 191.5,157.3 C 191.5,157.1 191.2,156.5 190.7,155.9 C 190.3,155.4 189.9,154.8 189.9,154.6 C 189.9,154.4 189.6,154.1 189.3,153.8 C 189.0,153.5 188.6,152.9 188.4,152.4 C 188.2,151.9 187.6,151.2 186.9,150.8 C 186.3,150.4 185.4,149.8 185.0,149.4 C 183.1,147.7 178.6,145.9 175.9,145.9 C 174.1,145.9 173.0,145.6 172.7,144.9 C 172.6,144.7 172.4,119.2 172.3,88.2 C 172.2,42.6 172.1,31.8 171.8,30.8 C 170.7,27.1 170.4,26.1 169.7,24.7 C 169.3,23.9 168.7,22.8 168.3,22.4 C 167.9,21.9 167.5,21.4 167.5,21.2 C 167.5,20.7 163.1,16.3 161.4,15.3 C 159.1,13.7 157.9,13.2 151.5,11.4 C 149.6,10.8 81.7,10.7 80.3,11.3 C 79.8,11.5 78.9,11.7 78.4,11.7 C 76.8,11.7 72.1,13.4 70.3,14.6 C 69.5,15.3 68.2,16.1 67.6,16.6 C 65.8,17.9 64.4,19.2 64.4,19.6 C 64.4,19.8 63.9,20.5 63.3,21.2 C 61.7,22.9 58.8,28.8 58.8,30.3 C 58.8,30.9 58.6,31.8 58.4,32.4 C 57.9,33.7 57.9,40.0 58.4,41.3 C 58.6,41.8 58.8,42.7 58.8,43.4 C 58.8,44.1 59.2,45.2 60.0,46.9 C 60.7,48.3 61.2,49.5 61.2,49.7 C 61.2,49.9 61.6,50.8 62.0,51.7 C 62.5,52.7 62.8,53.6 62.8,53.7 C 62.8,53.9 63.2,54.8 63.6,55.7 C 64.1,56.7 64.4,57.6 64.4,57.7 C 64.4,57.9 65.0,59.1 65.6,60.5 C 66.3,61.9 66.8,63.1 66.8,63.3 C 66.8,63.5 67.4,64.7 68.0,66.1 C 68.7,67.5 69.2,68.7 69.2,68.9 C 69.2,69.0 69.6,69.9 70.0,70.9 C 70.5,71.8 70.8,72.7 70.8,72.9 C 70.8,73.1 71.3,74.3 72.0,75.7 C 72.7,77.1 73.2,78.3 73.2,78.5 C 73.2,78.6 73.6,79.5 74.0,80.5 C 74.5,81.4 74.8,82.3 74.8,82.5 C 74.8,82.6 75.2,83.5 75.6,84.5 C 76.1,85.4 76.4,86.3 76.4,86.5 C 76.4,86.7 76.9,87.9 77.6,89.3 C 78.3,90.6 78.8,91.9 78.8,92.1 C 78.8,92.2 79.3,93.5 80.0,94.9 C 80.7,96.2 81.2,97.5 81.2,97.7 C 81.2,97.8 81.7,99.1 82.4,100.4 C 83.0,101.8 83.7,103.6 84.0,104.5 C 84.3,105.4 85.0,107.2 85.7,108.6 C 86.3,109.9 86.8,111.2 86.8,111.5 C 86.8,111.7 87.1,112.4 87.5,113.2 C 88.2,114.7 88.3,114.8 87.7,114.8 C 87.5,114.8 86.9,113.8 86.2,112.5 C 85.6,111.3 84.9,110.0 84.5,109.6 C 84.2,109.2 83.0,107.2 82.0,105.0 C 80.9,102.9 79.9,101.0 79.7,100.9 C 79.5,100.7 78.8,99.4 78.1,98.1 C 77.4,96.7 76.7,95.4 76.4,95.2 C 76.1,94.9 75.8,94.2 75.6,93.6 C 75.5,93.0 75.2,92.3 74.9,92.1 C 74.7,91.9 74.0,90.6 73.3,89.3 C 72.7,87.9 71.9,86.7 71.7,86.5 C 71.5,86.3 70.4,84.3 69.3,82.1 C 68.2,79.9 67.1,77.9 66.9,77.7 C 66.7,77.5 65.8,75.9 64.9,74.1 C 64.0,72.3 63.1,70.7 62.9,70.5 C 62.7,70.3 61.6,68.3 60.5,66.1 C 59.4,63.9 58.3,61.9 58.1,61.7 C 57.9,61.5 57.2,60.3 56.5,58.9 C 55.9,57.6 55.2,56.3 54.9,56.1 C 54.7,56.0 53.5,53.6 52.1,50.9 C 50.8,48.2 49.5,45.9 49.3,45.7 C 49.1,45.5 48.6,44.6 48.1,43.7 C 47.7,42.8 47.2,41.9 47.0,41.8 C 46.7,41.6 45.5,39.2 44.1,36.5 C 42.8,33.8 41.5,31.5 41.3,31.3 C 41.1,31.1 40.6,30.3 40.2,29.3 C 39.7,28.4 39.2,27.5 39.0,27.3 C 38.7,27.2 38.0,25.9 37.4,24.5 C 36.7,23.2 36.0,21.9 35.8,21.8 C 35.5,21.6 34.8,20.3 34.2,19.0 C 32.3,15.1 29.7,13.0 25.1,11.4 C 23.1,10.7 7.0,10.5 6.4,11.2';
   let W=0,H=0,dpr=1,parts=[],forms=[],t=0,last=0,running=false,visible=false;
@@ -589,7 +648,7 @@ skyfield('skycv2',.22);
     if(rawV>0.02&&formV<=0.02){fi=(fi+1)%forms.length;assign(forms[fi]);pulsed=false;}  /* new lock -> pick form */
     formV=rawV*(1-scatter);scatter=Math.max(0,scatter-dt*0.8);
     if(formV>0.9&&!pulsed){pulseV=1;pulsed=true;}
-    ctx.fillStyle='rgba(6,6,6,0.16)';ctx.fillRect(0,0,W,H);
+    ctx.fillStyle=hexA(themeBG(),0.16);ctx.fillRect(0,0,W,H);
 
     /* integrate */
     for(const pt of parts){
@@ -612,22 +671,22 @@ skyfield('skycv2',.22);
       for(let ax=-1;ax<=1;ax++)for(let ay=-1;ay<=1;ay++){
         const arr=grid.get(key(gx+ax,gy+ay));if(!arr)continue;
         for(const j of arr){if(j<=i)continue;const q=parts[j],dx=p.x-q.x,dy=p.y-q.y,d=Math.hypot(dx,dy);
-          if(d<LINK){ctx.strokeStyle='rgba(237,235,228,'+(lineA*(1-d/LINK)).toFixed(3)+')';ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();}}
+          if(d<LINK){ctx.strokeStyle='rgba('+themeInk()+','+(lineA*(1-d/LINK)).toFixed(3)+')';ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();}}
       }
     }
     /* nodes */
     for(const p of parts){const sp=Math.min(1,(Math.abs(p.vx)+Math.abs(p.vy))*0.5);
-      ctx.globalAlpha=0.7+sp*0.3+formV*0.3;ctx.fillStyle='#F4F2EC';
+      ctx.globalAlpha=0.7+sp*0.3+formV*0.3;ctx.fillStyle=themeDot();
       const r=1+formV*0.7;ctx.beginPath();ctx.arc(p.x,p.y,r,0,7);ctx.fill();}
     ctx.globalAlpha=1;
     /* objective lock pulse */
     if(pulseV>0){pulseV-=dt*1.1;const cx=W/2,cy=H*0.5,R=Math.min(W,H)*0.30*(1.4-pulseV);
-      ctx.strokeStyle='rgba(237,235,228,'+(pulseV*0.5).toFixed(3)+')';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.stroke();}
+      ctx.strokeStyle='rgba('+themeInk()+','+(pulseV*0.5).toFixed(3)+')';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.stroke();}
     requestAnimationFrame(frame);
   }
-  function start(){if(!running){running=true;last=performance.now();ctx.fillStyle='#060606';ctx.fillRect(0,0,W,H);requestAnimationFrame(frame);}}
+  function start(){if(!running){running=true;last=performance.now();ctx.fillStyle=themeBG();ctx.fillRect(0,0,W,H);requestAnimationFrame(frame);}}
 
-  if(reduce){size();ctx.fillStyle='#060606';ctx.fillRect(0,0,W,H);ctx.fillStyle='#EDEBE4';forms[0].forEach(p=>{ctx.beginPath();ctx.arc(p[0],p[1],1.3,0,7);ctx.fill();});return;}
+  if(reduce){size();ctx.fillStyle=themeBG();ctx.fillRect(0,0,W,H);ctx.fillStyle=themeDot();forms[0].forEach(p=>{ctx.beginPath();ctx.arc(p[0],p[1],1.3,0,7);ctx.fill();});return;}
   new IntersectionObserver(es=>{visible=es[0].isIntersecting;if(visible){size();start();}},{threshold:.04}).observe(band);
   addEventListener('resize',size);size();
 })();
@@ -658,19 +717,24 @@ skyfield('skycv2',.22);
   const FAST=3.4;           /* fast-forward multiplier */
   function measure(){
     const g=track.querySelector('.pmq-group');
-    groupW=g?g.getBoundingClientRect().width:track.scrollWidth/2;
+    const w=g?g.getBoundingClientRect().width:track.scrollWidth/2;
+    if(w>0)groupW=w;                              /* only accept a real measurement */
+    return groupW>0;
   }
   function frame(ts){
     if(!vis){running=false;return;}
     const dt=Math.min(.05,(ts-last)/1000||.016);last=ts;
+    /* Safari: if width wasn't ready at start, keep trying every frame until it is */
+    if(!groupW){measure();track.style.transform='translateX(0px)';requestAnimationFrame(frame);return;}
     cur+=(target-cur)*Math.min(1,dt*4);        /* ease toward target speed */
     const base=groupW/BASE;                     /* px per second at 1x */
     x+=base*cur*dt;
     if(x>=groupW)x-=groupW;                      /* seamless wrap */
+    if(x<0)x+=groupW;
     track.style.transform='translateX('+(-x).toFixed(2)+'px)';
     requestAnimationFrame(frame);
   }
-  function start(){if(!running){running=true;last=performance.now();requestAnimationFrame(frame);}}
+  function start(){if(!running){running=true;last=performance.now();measure();track.style.transform='translateX(0px)';requestAnimationFrame(frame);}}
   if(fwd){
     const go=()=>{target=FAST;fwd.classList.add('on');};   /* hold to fast-forward */
     const stop=()=>{target=1;fwd.classList.remove('on');};
@@ -698,7 +762,7 @@ skyfield('skycv2',.22);
 
 /* ---------- font fallback (Safari Lockdown Mode etc.) ----------
    Lockdown blocks web fonts AND most named system fonts. Detect whether
-   Anton actually rendered by comparing text width against monospace.
+   Anton actually rendered by comparing text width against monospace —
    if widths match, Anton never applied, so switch headlines to a bold
    system-font style that Lockdown allows. */
 (function(){
