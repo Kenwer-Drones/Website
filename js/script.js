@@ -34,9 +34,103 @@ let _rvPolls=0;const _rvTimer=setInterval(()=>{forceRevealInView();if(++_rvPolls
 })();
 requestAnimationFrame(()=>{document.getElementById('heroH').classList.add('split-in');document.querySelectorAll('.hero .rv').forEach(el=>el.classList.add('in'))});
 
+/* ---------- hero particle field: the image lives as thousands of dots ----------
+   halftone sampling: dot size follows image brightness · idle shimmer ·
+   cursor scatters the dust, springs pull every dot back home                 */
+(function(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const cv=document.getElementById('heroPart'),img=document.getElementById('heroSrc'),hero=document.querySelector('.hero');
+  if(!cv||!img||!hero)return;
+  const ctx=cv.getContext('2d');
+  let W,H,DPR,parts=[],vis=true,running=false,t=0;
+  const mouse={x:-9e3,y:-9e3};
+  const INK='rgba(237,235,228,.85)';
+  function build(){
+    DPR=Math.min(devicePixelRatio||1,1.5);
+    W=cv.clientWidth;H=cv.clientHeight;
+    cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);
+    const iw=img.naturalWidth,ih=img.naturalHeight;if(!iw)return;
+    /* cover mapping, biased to the image's upper-middle like the old object-position */
+    const sc=Math.max(W/iw,H/ih),ox=(W-iw*sc)/2,oy=(H-ih*sc)*.30;
+    /* sample the image once */
+    const oc=document.createElement('canvas');oc.width=iw;oc.height=ih;
+    const octx=oc.getContext('2d');octx.drawImage(img,0,0);
+    const px=octx.getImageData(0,0,iw,ih).data;
+    /* pick a gap that keeps the particle count sane on any screen */
+    let gap=7;const TARGET=innerWidth<820?5200:11500;
+    for(;;){const est=Math.ceil(W/gap)*Math.ceil(H/gap)*.5;if(est<=TARGET||gap>16)break;gap++;}
+    parts=[];
+    for(let y=gap/2;y<H;y+=gap){
+      for(let x=gap/2;x<W;x+=gap){
+        const sx=Math.round((x-ox)/sc),sy=Math.round((y-oy)/sc);
+        if(sx<0||sy<0||sx>=iw||sy>=ih)continue;
+        const i=(sy*iw+sx)*4,b=(px[i]*.3+px[i+1]*.59+px[i+2]*.11);
+        if(b<34)continue;                                  /* skip near-black */
+        parts.push({
+          hx:x,hy:y,x,y,vx:0,vy:0,
+          r:.55+(b/255)*(gap*.30),                         /* halftone: size = brightness */
+          ph:Math.random()*6.283,sp:.4+Math.random()*.8    /* shimmer phase + speed */
+        });
+      }
+    }
+  }
+  function frame(){
+    if(!vis){running=false;return;}
+    t+=.016;
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle=INK;
+    const R=120,R2=R*R;
+    for(let i=0;i<parts.length;i++){
+      const p=parts[i];
+      /* cursor scatter */
+      const dx=p.x-mouse.x,dy=p.y-mouse.y,d2=dx*dx+dy*dy;
+      if(d2<R2){
+        const d=Math.sqrt(d2)||.001,f=(R-d)/R*2.6;
+        p.vx+=dx/d*f;p.vy+=dy/d*f;
+      }
+      /* spring home + damping */
+      p.vx+=(p.hx-p.x)*.02;p.vy+=(p.hy-p.y)*.02;
+      p.vx*=.86;p.vy*=.86;
+      p.x+=p.vx;p.y+=p.vy;
+      /* idle shimmer: the dot breathes in place */
+      const s=p.r*(0.82+.22*Math.sin(t*p.sp*2+p.ph));
+      ctx.fillRect(p.x-s*.5,p.y-s*.5,s,s);
+    }
+    requestAnimationFrame(frame);
+  }
+  function start(){if(!running&&parts.length){running=true;requestAnimationFrame(frame);}}
+  function pointer(e){const r=cv.getBoundingClientRect();mouse.x=e.clientX-r.left;mouse.y=e.clientY-r.top;}
+  hero.addEventListener('pointermove',pointer);
+  hero.addEventListener('pointerleave',()=>{mouse.x=-9e3;mouse.y=-9e3;});
+  let rs;addEventListener('resize',()=>{clearTimeout(rs);rs=setTimeout(()=>{build();},180);});
+  new IntersectionObserver(es=>{vis=es[0].isIntersecting;if(vis)start();}).observe(hero);
+  if(img.complete&&img.naturalWidth){build();start();}
+  else img.addEventListener('load',()=>{build();start();});
+})();
+
 /* ---------- nav bg ---------- */
 const nav=document.getElementById('nav');
 addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>10),{passive:true});
+
+/* ---------- adaptive nav ink: dark lettering over light sections, light over dark ---------- */
+(function(){
+  const nv=document.querySelector('nav');if(!nv)return;
+  const blocks=[...document.querySelectorAll('header.hero,section,footer')];
+  let tick=false;
+  function upd(){
+    tick=false;
+    const y=38;                       /* sample point: mid-height of the nav bar */
+    let light=false;
+    for(const b of blocks){
+      const r=b.getBoundingClientRect();
+      if(r.top<=y&&r.bottom>y){light=b.classList.contains('sec-light');break;}
+    }
+    nv.classList.toggle('ink',light);
+  }
+  addEventListener('scroll',()=>{if(!tick){tick=true;requestAnimationFrame(upd)}},{passive:true});
+  addEventListener('resize',upd);
+  upd();setTimeout(upd,300);addEventListener('load',upd);
+})();
 
 /* ---------- autoplay slider factory (bar fills L→R, then advances) ---------- */
 function autoSlider(cfg){
@@ -170,42 +264,39 @@ addEventListener('scroll',()=>{
   mmRows.forEach((r,i)=>r.classList.toggle('on',i===idx));
 },{passive:true});
 
-/* ---------- minimap: docked right; collapses to a tiny box when text passes under it ---------- */
+/* ---------- minimap: minimized badge → click opens the board → click a row navigates ----------
+   · default: minimized, showing only the section currently on screen
+   · click the box: expands in place (bottom-right) into the full section board
+   · click a section row: smooth-scrolls there and the board re-minimizes
+   · click outside / press Escape / click the box body again: re-minimizes    */
 (function(){
   const mm=document.getElementById('minimap');if(!mm)return;
-  const PAD=14, MARGIN=22, EXP_W=190, CMP_W=118, CMP_H=64;
-  let expH=0, lastFlip=0, tick=false;
-  function layout(){
-    expH=mm.classList.contains('dodge')?expH:mm.offsetHeight||190;
+  const rows=[...mm.querySelectorAll('.rowline')];
+  function setOpen(open){
+    mm.classList.toggle('open',open);
+    mm.setAttribute('aria-expanded',open?'true':'false');
   }
-  function hit(r,zone){
-    return r.left<zone.right+PAD&&r.right>zone.left-PAD&&r.top<zone.bottom+PAD&&r.bottom>zone.top-PAD;
-  }
-  const sel='h1,h2,h3,p,.cv-word,.cv-cue,.svc-item,.dot-label,.ga-l,.ga-n,.faq-q,.btn-big,.btn-box,.hw-tag,.j-title,blockquote';
-  function upd(){
-    tick=false;
-    if(innerWidth<=820)return;
-    const cands=document.querySelectorAll(sel);
-    const zoneExp={left:innerWidth-MARGIN-EXP_W,right:innerWidth-MARGIN,top:innerHeight-MARGIN-expH,bottom:innerHeight-MARGIN};
-    const zoneCmp={left:innerWidth-MARGIN-CMP_W,right:innerWidth-MARGIN,top:innerHeight-MARGIN-CMP_H,bottom:innerHeight-MARGIN};
-    let oE=false,oC=false;
-    for(const el of cands){
-      if(mm.contains(el))continue;
-      const r=el.getBoundingClientRect();
-      if(!r.width||!r.height)continue;
-      if(r.bottom<zoneExp.top-PAD)continue;
-      if(!oE&&hit(r,zoneExp))oE=true;
-      if(!oC&&hit(r,zoneCmp))oC=true;
-      if(oE&&oC)break;
+  mm.addEventListener('click',e=>{
+    const row=e.target.closest('.rowline');
+    if(!mm.classList.contains('open')){
+      setOpen(true);                                   /* minimized → any click opens the board */
+      e.stopPropagation();
+      return;
     }
-    const now=performance.now();
-    const dodged=mm.classList.contains('dodge');
-    if(oE!==dodged&&now-lastFlip>350){mm.classList.toggle('dodge',oE);lastFlip=now}
-    mm.classList.toggle('shy',mm.classList.contains('dodge')&&oC);
-  }
-  addEventListener('scroll',()=>{if(!tick){tick=true;requestAnimationFrame(upd)}},{passive:true});
-  addEventListener('resize',()=>{layout();upd()});
-  layout();upd();
+    if(row){                                           /* open → a row navigates, then minimize */
+      const sec=document.getElementById(row.dataset.sec);
+      if(sec)sec.scrollIntoView({behavior:'smooth',block:'start'});
+      setOpen(false);
+    }else{
+      setOpen(false);                                  /* open → clicking the box body closes it */
+    }
+    e.stopPropagation();
+  });
+  addEventListener('click',e=>{if(mm.classList.contains('open')&&!mm.contains(e.target))setOpen(false)});
+  addEventListener('keydown',e=>{if(e.key==='Escape')setOpen(false)});
+  mm.addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key===' '){e.preventDefault();setOpen(!mm.classList.contains('open'));}
+  });
 })();
 
 /* ---------- flight-path canvases (monochrome, slow) ---------- */
@@ -329,8 +420,6 @@ function skyfield(id,alpha){
   }
   reduce?frame(performance.now()):requestAnimationFrame(frame);
 }
-skyfield('skycv',.3);
-skyfield('skycv2',.22);
 
 /* ---------- gap: word-by-word scroll reveal ---------- */
 (function(){
@@ -707,55 +796,261 @@ skyfield('skycv2',.22);
   addEventListener('keydown',e=>{if(e.key==='Escape')set(false)});
 })();
 
-/* ---------- platform marquee: continuous rAF drift + fast-forward toggle ---------- */
+/* ---------- platform marquee v5 · deep elastic end + 3D lean ----------
+   · idle: drifts 01→06, dwells at the blur edge, carriage-returns to 01
+   · hover/touch: stops; drag, swipe, or horizontal scroll browses the cards
+   · past either boundary: a DEEP rubber-band — you can pull the last card
+     up to ~75% of the viewport into the empty space, with progressive
+     weight (easy at first, heavier the further you stretch) and a subtle
+     3D lean on the cards showing the tension
+   · release mid-air: a damped spring flies the track home to the boundary
+     with a small overshoot wobble — nothing exists past 06, so it returns  */
 (function(){
-  const mq=document.getElementById('pmarquee'),track=document.getElementById('pmqTrack'),fwd=document.getElementById('pmqFwd');
-  if(!mq||!track)return;
+  const mq=document.getElementById('pmarquee'),track=document.getElementById('pmqTrack'),
+        fwd=document.getElementById('pmqFwd'),view=mq?mq.querySelector('.pmq-view'):null;
+  if(!mq||!track||!view)return;
   if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
-  let groupW=0,x=0,cur=0,target=1,vis=false,running=false,last=0;
-  const BASE=42;            /* seconds per loop at 1x */
-  const FAST=3.4;           /* fast-forward multiplier */
+  const canHover=matchMedia('(hover:hover) and (pointer:fine)').matches;
+
+  /* blur cues at both boundaries */
+  const edge=document.createElement('div');edge.className='pmq-edge';view.appendChild(edge);
+  const edgeL=document.createElement('div');edgeL.className='pmq-edge left';view.appendChild(edgeL);
+
+  let maxX=0,x=0,cur=1,target=1,vis=false,running=false,last=0;
+  let dragging=false,maybeDrag=false,pid=null,px=0,py=0,dragVX=0,dragT=0,fling=0;
+  let lastBump=0,rawPull=0,xv=0;        /* rawPull: raw px dragged past a boundary · xv: spring velocity */
+  let DIM=300;                          /* max stretch ≈ 75% of the viewport (set in measure) */
+  const BASE=42;            /* seconds to travel the full set at 1x            */
+  const FAST=3.4;           /* fast-forward button multiplier (touch devices)  */
+  const THRESH=7;           /* px of movement before a press becomes a drag    */
+  const SPR_K=210,SPR_C=21; /* stiff spring: released stretch snaps home in ~0.35s with one tiny wobble */
+
   function measure(){
-    const g=track.querySelector('.pmq-group');
-    const w=g?g.getBoundingClientRect().width:track.scrollWidth/2;
-    if(w>0)groupW=w;                              /* only accept a real measurement */
-    return groupW>0;
+    const w=track.scrollWidth,vw=view.clientWidth;
+    if(w>0&&vw>0){maxX=Math.max(0,w-vw);DIM=Math.min(vw*.16,210);}  /* short leash: stretch can never approach mid-page */
+    return maxX>0;
   }
+  /* iOS-style rubber band: raw pull → displayed stretch, asymptotic to DIM */
+  function rubber(d){ return (1-1/((d*.42)/DIM+1))*DIM; }         /* heavy from the very first pixel of pull */
+  function invRubber(o){ o=Math.min(o,DIM-1); return o*DIM/(.42*Math.max(1,DIM-o)); }
+  function paint(){
+    const oE=x>maxX?x-maxX:0,oS=x<0?-x:0,o=oE||oS;
+    let t='translateX('+(-x).toFixed(2)+'px)';
+    if(o>0){
+      const k=Math.min(1,o/DIM);
+      const squash=1-.03*k;                      /* faint elastic compression   */
+      const tilt=(oE?-1:1)*2.2*k;                /* whisper of a 3D lean, max 2.2° */
+      track.style.transformOrigin=oE?'right center':'left center';
+      t+=' scaleX('+squash.toFixed(4)+') rotateY('+tilt.toFixed(2)+'deg)';
+    }
+    mq.classList.toggle('stretch',o>0);
+    track.style.transform=t;
+  }
+  function bump(which){
+    const now=performance.now();
+    if(now-lastBump<600)return;lastBump=now;
+    const el=which==='L'?edgeL:edge;
+    el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump');
+  }
+  function syncEnd(){
+    edge.classList.toggle('on',x>maxX-24);
+    edgeL.classList.toggle('on',x<-4);
+  }
+
+  /* auto cycle: drift 01→06, dwell at the blur edge, carriage-return to 01 */
+  let phase='drift',dwellAcc=0;
+  const DWELL=1.15;
+  const REWIND=1.35;
+
   function frame(ts){
     if(!vis){running=false;return;}
     const dt=Math.min(.05,(ts-last)/1000||.016);last=ts;
-    /* Safari: if width wasn't ready at start, keep trying every frame until it is */
-    if(!groupW){measure();track.style.transform='translateX(0px)';requestAnimationFrame(frame);return;}
-    cur+=(target-cur)*Math.min(1,dt*4);        /* ease toward target speed */
-    const base=groupW/BASE;                     /* px per second at 1x */
-    x+=base*cur*dt;
-    if(x>=groupW)x-=groupW;                      /* seamless wrap */
-    if(x<0)x+=groupW;
-    track.style.transform='translateX('+(-x).toFixed(2)+'px)';
+    if(!maxX){measure();paint();requestAnimationFrame(frame);return;}
+    if(dragging){requestAnimationFrame(frame);return;}   /* pointer owns position */
+    const out=x>maxX||x<0;
+    if(out){
+      if(wRAF2){/* wheel tension owns the position while it lasts */}
+      else{
+        /* ---- damped spring flight home (with a small overshoot wobble) ---- */
+        const bound=x>maxX?maxX:0;
+        xv+=(-SPR_K*(x-bound)-SPR_C*xv)*dt;
+        x+=xv*dt;
+        if(Math.abs(x-bound)<.6&&Math.abs(xv)<14){x=bound;xv=0;rawPull=0;}
+      }
+      fling=0;
+    }else{
+      xv=0;rawPull=0;
+      /* momentum from a released swipe, decaying */
+      if(Math.abs(fling)>4){
+        x+=fling*dt;
+        fling*=Math.exp(-dt*3.2);
+        if(x>maxX||x<0){xv=fling;fling=0;bump(x<0?'L':'R');}  /* momentum hits the wall → hand it to the spring */
+      }else fling=0;
+      /* eased auto speed: hover → 0, idle → 1x (gates every phase) */
+      cur+=(target-cur)*Math.min(1,dt*(target<cur?7:2.6));
+      if(phase==='drift'){
+        x+=((maxX+view.clientWidth)/BASE)*cur*dt;
+        if(x>=maxX){x=maxX;phase='dwell';dwellAcc=0;bump('R');}
+      }else if(phase==='dwell'){
+        dwellAcc+=dt*cur;
+        if(x<maxX-24)phase='drift';
+        else if(dwellAcc>=DWELL)phase='rewind';
+      }else if(phase==='rewind'){
+        x-=(maxX/REWIND)*cur*dt;
+        if(x<=0){x=0;phase='drift';}
+      }
+    }
+    syncEnd();paint();
     requestAnimationFrame(frame);
   }
-  function start(){if(!running){running=true;last=performance.now();measure();track.style.transform='translateX(0px)';requestAnimationFrame(frame);}}
+  function start(){if(!running){running=true;last=performance.now();measure();paint();requestAnimationFrame(frame);}}
+
+  /* ---- hover: stop / un-hover: resume the ambient cycle ---- */
+  if(canHover){
+    mq.addEventListener('mouseenter',()=>{if(!dragging)target=0;});
+    mq.addEventListener('mouseleave',()=>{target=1;});
+  }
+
+  /* ---- drag / swipe: 1:1 in bounds; deep progressive rubber past them ---- */
+  view.addEventListener('pointerdown',e=>{
+    if(e.button!==undefined&&e.button!==0)return;
+    maybeDrag=true;dragging=false;pid=e.pointerId;px=e.clientX;py=e.clientY;
+    dragVX=0;dragT=performance.now();fling=0;xv=0;phase='drift';wRaw=0;
+    /* if the spring was mid-flight, pick the stretch up exactly where it is */
+    if(x>maxX)rawPull=invRubber(x-maxX);
+    else if(x<0)rawPull=-invRubber(-x);
+    else rawPull=0;
+  });
+  view.addEventListener('pointermove',e=>{
+    if(!maybeDrag||e.pointerId!==pid)return;
+    const dx=e.clientX-px,dy=e.clientY-py;
+    if(!dragging){
+      if(Math.abs(dx)<THRESH)return;
+      if(Math.abs(dy)>Math.abs(dx))return maybeDrag=false;
+      dragging=true;view.classList.add('dragging');
+      try{view.setPointerCapture(pid);}catch(_){}
+    }
+    const now=performance.now(),dt=Math.max(1,now-dragT);
+    const s=-(e.clientX-px);           /* finger left → advance, finger right → go back */
+    /* in-bounds portion moves 1:1; beyond a boundary, raw pull feeds the rubber curve */
+    let inb=x;
+    if(rawPull===0){
+      inb=x+s;
+      if(inb>maxX){rawPull=inb-maxX;inb=maxX;bump('R');}
+      else if(inb<0){rawPull=inb;inb=0;bump('L');}
+      x=inb+ (rawPull>0?rubber(rawPull):rawPull<0?-rubber(-rawPull):0);
+    }else{
+      const prev=rawPull;
+      rawPull+=s;
+      if((prev>0&&rawPull<=0)||(prev<0&&rawPull>=0)){
+        /* pulled back across the boundary: leftover motion applies 1:1 */
+        const leftover=rawPull;rawPull=0;
+        x=Math.min(maxX,Math.max(0,(prev>0?maxX:0)+leftover));
+      }else if(rawPull>0)x=maxX+rubber(rawPull);
+      else x=-rubber(-rawPull);
+    }
+    dragVX=s/(dt/1000);
+    px=e.clientX;py=e.clientY;dragT=now;
+    syncEnd();paint();
+    e.preventDefault();
+  });
+  function endDrag(e){
+    if(e&&pid!==null&&e.pointerId!==pid)return;
+    if(dragging){
+      if(x>maxX||x<0){fling=0;xv=0;}                    /* released in the air → spring takes over */
+      else fling=Math.max(-2600,Math.min(2600,dragVX));
+      cur=0;
+      target=(canHover&&mq.matches(':hover'))?0:1;
+    }
+    dragging=false;maybeDrag=false;pid=null;rawPull=0;
+    view.classList.remove('dragging');
+  }
+  view.addEventListener('pointerup',endDrag);
+  view.addEventListener('pointercancel',endDrag);
+  addEventListener('pointerup',endDrag);
+  view.addEventListener('click',e=>{if(Math.abs(fling)>40){e.stopPropagation();e.preventDefault();}},true);
+
+  /* ---- wheel / trackpad: box-on-a-spring model at the boundaries ----
+     Your scroll input is a FORCE pushing the box against the spring:
+     · pushing hard holds a modest stretch (the spring is always pulling back)
+     · the moment your real force stops, the tension leaks out and the box
+       returns immediately — macOS "momentum" echo events after your fingers
+       lift are detected (fading-delta signature) and ignored, so they can
+       never hold the stretch                                                  */
+  let wheelGlide=0,wheelRAF=false;
+  let wRaw=0,wDir=0,wHist=[],wStreak=0,wTail=false,wLastD=0,wRAF2=false,wLastT=0;
+  function wheelGate(mag){                    /* true = genuine push, false = momentum echo */
+    wHist.push(mag);if(wHist.length>12)wHist.shift();
+    const ref=wHist.length>6?wHist[wHist.length-7]:wHist[0];
+    if(mag>wLastD*1.15&&mag>3){wTail=false;wStreak=0;}   /* a fresh, growing push */
+    else if(mag<ref*.95){if(++wStreak>=3)wTail=true;}    /* steadily fading → echo */
+    else wStreak=0;
+    wLastD=mag;
+    return !wTail;
+  }
+  function stretchStep(ts){
+    if(wRaw<=.5||dragging){wRaw=0;wRAF2=false;return;}   /* drained → spring snaps the last px */
+    const dt=Math.min(.05,(ts-wLastT)/1000||.016);wLastT=ts;
+    wRaw*=Math.exp(-dt*8);                    /* tension constantly leaks — stop pushing, it returns */
+    x=wDir>0?maxX+rubber(wRaw):-rubber(wRaw);
+    syncEnd();paint();
+    requestAnimationFrame(stretchStep);
+  }
+  function enterStretch(dir,initialOver){
+    wDir=dir;wRaw=Math.max(wRaw,invRubber(Math.max(0,initialOver)));
+    wHist.length=0;wStreak=0;wTail=false;wLastD=0;
+    if(!wRAF2){wRAF2=true;wLastT=performance.now();requestAnimationFrame(stretchStep);}
+  }
+  function glideStep(){
+    if(Math.abs(wheelGlide)<.4||wRAF2){wheelGlide=0;wheelRAF=false;return;}
+    const step=wheelGlide*.22;wheelGlide-=step;
+    x+=step;
+    if(x>maxX){enterStretch(1,x-maxX);x=maxX+rubber(wRaw);wheelGlide=0;bump('R');}
+    else if(x<0){enterStretch(-1,-x);x=-rubber(wRaw);wheelGlide=0;bump('L');}
+    syncEnd();paint();
+    if(!wRAF2)requestAnimationFrame(glideStep);else wheelRAF=false;
+  }
+  view.addEventListener('wheel',e=>{
+    if(dragging)return;
+    if(Math.abs(e.deltaX)<=Math.abs(e.deltaY))return;
+    e.preventDefault();
+    fling=0;xv=0;target=0;phase='drift';
+    const d=e.deltaMode===1?e.deltaX*16:e.deltaX;
+    const stretched=wRaw>.5||x>maxX||x<0;
+    if(stretched){
+      const dir=wDir!==0?wDir:(x>maxX?1:-1);
+      if(d*dir>0){                            /* pushing outward: only a real push adds tension */
+        if(wheelGate(Math.abs(d)))wRaw+=Math.abs(d)*2;
+        bump(dir>0?'R':'L');
+      }else{                                  /* pulling back: always releases tension, instantly */
+        wRaw=Math.max(0,wRaw-Math.abs(d)*3);
+      }
+      enterStretch(dir,x>maxX?x-maxX:(x<0?-x:0));
+    }else{
+      if(x>=maxX&&d>0){enterStretch(1,0);if(wheelGate(d))wRaw+=d*2;bump('R');}
+      else if(x<=0&&d<0){enterStretch(-1,0);if(wheelGate(-d))wRaw+=(-d)*2;bump('L');}
+      else{
+        wheelGlide+=d;
+        if(!wheelRAF){wheelRAF=true;requestAnimationFrame(glideStep);}
+      }
+    }
+  },{passive:false});
+
+  /* ---- fast-forward button ---- */
   if(fwd){
-    const go=()=>{target=FAST;fwd.classList.add('on');};   /* hold to fast-forward */
-    const stop=()=>{target=1;fwd.classList.remove('on');};
+    const go=()=>{target=FAST;fwd.classList.add('on');};
+    const stop=()=>{target=(canHover&&mq.matches(':hover'))?0:1;fwd.classList.remove('on');};
     fwd.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();go();});
     fwd.addEventListener('pointerup',stop);
     fwd.addEventListener('pointerleave',stop);
     fwd.addEventListener('pointercancel',stop);
-    /* keyboard: hold Enter/Space */
     fwd.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}});
     fwd.addEventListener('keyup',e=>{if(e.key==='Enter'||e.key===' ')stop();});
     fwd.addEventListener('blur',stop);
   }
-  /* tap-and-hold the card area to pause; release to resume */
-  const boxPause=()=>{target=0;};
-  const boxResume=()=>{target=1;};
-  mq.addEventListener('pointerdown',boxPause);
-  mq.addEventListener('pointerup',boxResume);
-  mq.addEventListener('pointerleave',boxResume);
-  mq.addEventListener('pointercancel',boxResume);
-  measure();addEventListener('resize',()=>{measure();});
-  /* recompute once fonts/images settle */
+
+  measure();
+  addEventListener('resize',()=>{measure();x=Math.min(maxX,Math.max(0,x));xv=0;rawPull=0;paint();syncEnd();});
   setTimeout(measure,400);addEventListener('load',measure);
   new IntersectionObserver(es=>{vis=es[0].isIntersecting;if(vis){measure();start();}},{threshold:.02}).observe(mq);
 })();

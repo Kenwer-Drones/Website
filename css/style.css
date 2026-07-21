@@ -92,11 +92,15 @@ html.fontfallback .disp{font-family:-apple-system,BlinkMacSystemFont,'Helvetica 
 /* ---------- nav ---------- */
 nav{
   position:fixed;inset:0 0 auto 0;z-index:120;mix-blend-mode:normal;
-  transition:background .5s;
+  color:var(--tx-d);                                   /* light lettering over dark sections */
+  transition:background .5s,color .45s var(--ease);
 }
+nav.ink{color:var(--tx-l)}                             /* dark lettering over light sections */
 nav.scrolled{background:var(--hero-vignette);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+nav.ink.scrolled{background:linear-gradient(180deg,rgba(232,231,225,.94),rgba(232,231,225,0))}
+html:has(.menu-ov.open) nav{color:var(--tx-d)}         /* menu overlay is dark → stay light */
 .nav-in{display:flex;align-items:center;justify-content:space-between;height:76px;gap:20px}
-.brand{font-family:'Anton',sans-serif;font-size:20px;letter-spacing:.05em;text-transform:uppercase;
+.brand{font-family:'Anton',sans-serif;font-size:20px;letter-spacing:.05em;text-transform:uppercase;color:currentColor;transition:color .45s var(--ease);
   display:inline-flex;flex-direction:column;line-height:.9}
 .brand>span{display:block}
 .brand .o{display:inline-block}
@@ -106,9 +110,9 @@ nav.scrolled{background:var(--hero-vignette);backdrop-filter:blur(10px);-webkit-
 }
 .nav-mark svg{width:100%;height:100%;display:block}
 .nav-mark path{
-  fill:var(--tx-d);fill-opacity:0;                     /* outline state */
-  stroke:var(--tx-d);stroke-width:7;stroke-opacity:.9;
-  transition:fill-opacity .55s var(--ease),stroke-opacity .55s var(--ease);
+  fill:currentColor;fill-opacity:0;                    /* outline state */
+  stroke:currentColor;stroke-width:7;stroke-opacity:.9;
+  transition:fill-opacity .55s var(--ease),stroke-opacity .55s var(--ease),fill .45s var(--ease),stroke .45s var(--ease);
 }
 .nav-mark.filled path{fill-opacity:1;stroke-opacity:0} /* docked: complete white */
 .nav-mark:hover{opacity:1;transform:translate(-50%,-50%) scale(1.08)}
@@ -119,7 +123,7 @@ nav.scrolled{background:var(--hero-vignette);backdrop-filter:blur(10px);-webkit-
   cursor:pointer;background:none;border:0;padding:10px 2px;
   display:flex;flex-direction:column;gap:6px;align-items:flex-end;
 }
-.menu-btn span{display:block;width:30px;height:2px;background:var(--tx-d);transition:width .35s var(--ease)}
+.menu-btn span{display:block;width:30px;height:2px;background:currentColor;transition:width .35s var(--ease),background-color .45s var(--ease)}
 .menu-btn:hover span:nth-child(2){width:22px}
 .menu-ov{
   position:fixed;inset:0;z-index:200;background:rgba(10,10,9,.96);
@@ -191,7 +195,81 @@ nav.scrolled{background:var(--hero-vignette);backdrop-filter:blur(10px);-webkit-
 
 /* ---------- hero ---------- */
 .hero{position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:center;overflow:hidden;padding-top:96px}
-#skycv{position:absolute;inset:0;width:100%;height:100%;opacity:.8}
+/* ---------- hero background: the image, rebuilt from particles ---------- */
+.hero-bg{position:absolute;inset:0;z-index:0;overflow:hidden}
+.hero-bg canvas{position:absolute;inset:0;width:100%;height:100%}
+.hero-bg img{display:none}                                /* pixel source only */
+.hero-bg::after{content:"";position:absolute;inset:0;z-index:2;background:
+  radial-gradient(ellipse 60% 52% at 50% 55%, rgba(12,12,11,.5), rgba(12,12,11,0) 72%),
+  linear-gradient(180deg, rgba(12,12,11,.94), rgba(12,12,11,.28) 24%, rgba(12,12,11,.28) 72%, rgba(12,12,11,.96))}
+@media(prefers-reduced-motion:reduce){
+  .hero-bg canvas{display:none}
+  .hero-bg img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 30%;opacity:.5}
+}
+/* the image now carries the brain→drone story; the drawn layers stand down (restorable) */
+.hero .hbrain,.hero .hdrone{display:none}
+/* ---------- hero background: giant brain → module install loop ---------- */
+.hbrain{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.hb-g{animation:hbBreath 8s ease-in-out infinite;transform-origin:430px 400px}
+@keyframes hbBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
+.hb-line{stroke:var(--tx-d);stroke-linecap:round;stroke-linejoin:round}
+.hb-line.giant{stroke-width:2.6;opacity:.16}
+.hb-line.giant.dim{stroke-width:1.6;opacity:.1}
+.hb-syn{fill:var(--tx-d);opacity:.12;animation:hbSyn 3s ease-in-out infinite}
+.hb-syn.s2{animation-delay:.6s}.hb-syn.s3{animation-delay:1.2s}
+.hb-syn.s4{animation-delay:1.8s}.hb-syn.s5{animation-delay:2.4s}
+@keyframes hbSyn{0%,100%{opacity:.1}50%{opacity:.55}}
+.hb-label{font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.18em;fill:var(--tx-d);opacity:.5}
+.hb-label.mid{font-size:11px;opacity:.45}
+.hb-socket{stroke:var(--tx-d);stroke-width:1.6;stroke-dasharray:5 6;opacity:.4}
+.hb-uplink{stroke:var(--tx-d);stroke-width:1.2;opacity:.3;stroke-dasharray:2 10;animation:hbMarch 1.5s linear infinite}
+@keyframes hbMarch{to{stroke-dashoffset:-24}}
+.hb-line.mod{stroke-width:2.4;opacity:.85}
+.hb-line.mod.fold{stroke-width:2;opacity:.7}
+.hb-line.mod.pin{stroke-width:2;opacity:.6}
+.hb-mod-inner{animation:hbModSpin 7s ease-in-out infinite}
+@keyframes hbModSpin{0%,20%{transform:rotate(-6deg) scale(.94)}40%{transform:rotate(4deg) scale(1)}60%,100%{transform:rotate(10deg) scale(1)}}
+.hb-ringburst{stroke:var(--tx-d);stroke-width:1.6;fill:none}
+@media(max-width:900px){.hbrain{opacity:.5}}
+@media(prefers-reduced-motion:reduce){
+  .hb-g,.hb-syn,.hb-uplink,.hb-mod-inner{animation:none}
+  .hb-module,.hb-dock{display:none}
+}
+/* ---------- hero drone: blueprint quadcopter ---------- */
+.hdrone{
+  position:absolute;right:clamp(10px,5vw,90px);top:clamp(64px,11vh,130px);
+  width:clamp(260px,30vw,480px);pointer-events:none;z-index:1;
+  opacity:.5;transform:rotate(-8deg);
+}
+.hd-bob{animation:hdBob 6.5s ease-in-out infinite}
+@keyframes hdBob{
+  0%,100%{transform:translateY(0) rotate(0deg)}
+  50%{transform:translateY(-14px) rotate(1.2deg)}
+}
+.hdrone svg{width:100%;height:auto;display:block}
+.hd-line{stroke:var(--tx-d);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.hd-line.disc{stroke-width:1.4;stroke-dasharray:3 9;opacity:.65;animation:hdDisc 5s linear infinite;transform-box:fill-box;transform-origin:center}
+@keyframes hdDisc{to{transform:rotate(360deg)}}
+.hd-fill{fill:var(--tx-d)}
+.rotor .blades{stroke:var(--tx-d);stroke-width:2.4;stroke-linecap:round;opacity:.8;
+  transform-origin:var(--hx) var(--hy);animation:hdSpin .38s linear infinite}
+@keyframes hdSpin{to{transform:rotate(180deg)}}
+.hd-core{fill:var(--tx-d);animation:hdCore 3s var(--ease) infinite}
+@keyframes hdCore{0%,100%{opacity:1}50%{opacity:.55}}
+.hd-rings .ring{stroke:var(--tx-d);fill:none;stroke-width:1.3;opacity:0;
+  transform-box:fill-box;transform-origin:center;animation:hdRing 3s linear infinite}
+.hd-rings .r2{animation-delay:1s}
+.hd-rings .r3{animation-delay:2s}
+@keyframes hdRing{0%{transform:scale(1);opacity:.55}80%{opacity:0}100%{transform:scale(4.4);opacity:0}}
+.hd-callout .co{stroke-width:1.2;opacity:.7}
+.hd-dot{fill:var(--tx-d);animation:hdCore 1.6s var(--ease) infinite}
+.hd-label{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.12em;fill:var(--tx-d)}
+.hd-label.dim{opacity:.55;font-size:10px}
+@media(max-width:900px){.hdrone{right:-6vw;top:70px;width:230px;opacity:.28}}
+@media(prefers-reduced-motion:reduce){
+  .hd-bob,.hd-line.disc,.rotor .blades,.hd-core,.hd-rings .ring,.hd-dot{animation:none}
+  .hd-rings{display:none}
+}
 .hero::after{content:"";position:absolute;inset:0;background:radial-gradient(90% 70% at 50% 40%,transparent 40%,var(--hero-vignette) 100%);pointer-events:none}
 .hero-in{position:relative;z-index:2}
 .hero-h{font-size:clamp(58px,10.5vw,164px);color:var(--tx-d);text-align:left;width:fit-content;margin-inline:auto}
@@ -345,10 +423,44 @@ nav.scrolled{background:var(--hero-vignette);backdrop-filter:blur(10px);-webkit-
 .plat .dot-label{margin-bottom:46px}
 .pmarquee{position:relative;padding:6px 0 10px}
 .pmq-view{
+  position:relative;
   overflow:hidden;
+  perspective:1400px;              /* gives the overstretch lean its 3D depth */
+  touch-action:pan-y;              /* horizontal swipes drag the track, vertical still scrolls page */
+  cursor:grab;
+  -webkit-user-select:none;user-select:none;
   -webkit-mask:linear-gradient(90deg,transparent 0,#000 1.5%,#000 98%,transparent 100%);
           mask:linear-gradient(90deg,transparent 0,#000 1.5%,#000 98%,transparent 100%);
 }
+.pmq-view.dragging{cursor:grabbing}
+.pmq-view.dragging .pcard{transition:none}
+/* while stretched past a boundary, cards stay rigid — no hover-lift jiggle */
+.pmarquee.stretch .pcard{transition:none}
+.pmarquee.stretch .pcard:hover{transform:none;box-shadow:none;border-color:var(--line-l)}
+/* ---- finite carousel: the loop-duplicate group is retired ---- */
+.pmq-group[aria-hidden="true"]{display:none}
+/* ---- silent end spacer: no words, the physics + blur say it ---- */
+.pmq-end{flex:0 0 clamp(34px,4.5vw,72px)}
+/* ---- blur haze at the boundary: fades in as you reach the end ---- */
+.pmq-edge{
+  position:absolute;right:0;top:0;bottom:0;width:clamp(110px,14vw,220px);
+  pointer-events:none;opacity:0;transition:opacity .45s var(--ease);
+  background:linear-gradient(270deg,rgba(0,0,0,.09),transparent 78%);
+  backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);
+  -webkit-mask:linear-gradient(270deg,#000 26%,transparent);
+          mask:linear-gradient(270deg,#000 26%,transparent);
+}
+.pmq-edge.on{opacity:1}
+.pmq-edge.bump{animation:edgeBump .38s cubic-bezier(.22,1,.36,1)}
+@keyframes edgeBump{0%{opacity:.3;transform:scaleX(1)}40%{opacity:1;transform:scaleX(1.35)}100%{opacity:1;transform:scaleX(1)}}
+.pmq-edge{transform-origin:right center}
+.pmq-edge.left{
+  right:auto;left:0;transform-origin:left center;
+  background:linear-gradient(90deg,rgba(0,0,0,.09),transparent 78%);
+  -webkit-mask:linear-gradient(90deg,#000 26%,transparent);
+          mask:linear-gradient(90deg,#000 26%,transparent);
+}
+.pmq-fwd.off{opacity:0;pointer-events:none;transition:opacity .5s var(--ease)}
 .pmq-track{display:flex;width:max-content;will-change:transform}
 .pmq-group{display:flex;gap:26px;padding-right:26px}
 .pmq-fwd{
@@ -379,6 +491,7 @@ nav.scrolled{background:var(--hero-vignette);backdrop-filter:blur(10px);-webkit-
 @media(prefers-reduced-motion:reduce){
   .pmq-track{flex-wrap:wrap;justify-content:center;transform:none!important}
   .pmq-group:nth-child(2){display:none}
+  .pmq-end{display:none}
   .pmq-fwd{display:none}
 }
 .prow-meta{display:flex;align-items:center;gap:0;font-family:'IBM Plex Mono',monospace;font-size:13px;margin-bottom:22px}
@@ -424,7 +537,7 @@ nav.scrolled{background:var(--hero-vignette);backdrop-filter:blur(10px);-webkit-
 
 /* index row */
 .idx{
-  display:grid;grid-template-columns:auto auto 1fr;gap:clamp(28px,4vw,64px);align-items:center;
+  display:grid;grid-template-columns:auto 1fr;gap:clamp(28px,4vw,64px);align-items:center;
   padding:64px 0 72px;
 }
 .idx .go{justify-self:end}
@@ -599,7 +712,6 @@ nav.scrolled{background:var(--hero-vignette);backdrop-filter:blur(10px);-webkit-
 
 /* ---------- final CTA ---------- */
 .final{position:relative;padding:170px 0 150px;overflow:hidden;text-align:center}
-#skycv2{position:absolute;inset:0;width:100%;height:100%;opacity:.55}
 .final::after{content:"";position:absolute;inset:0;background:radial-gradient(80% 70% at 50% 50%,transparent 30%,var(--hero-vignette))}
 .final .wrap{position:relative;z-index:2}
 .final-h{font-size:clamp(54px,9.8vw,156px)}
@@ -643,17 +755,22 @@ footer{padding:110px 0 0;position:relative}
 .halftone .brand{font-size:26px}
 .halftone .tag{font-size:clamp(17px,2vw,24px);font-weight:500}
 
-/* ---------- minimap ---------- */
+/* ---------- minimap: minimized badge → click → full board ---------- */
 .minimap{
-  position:fixed;right:22px;bottom:22px;z-index:150;width:190px;
+  position:fixed;right:22px;bottom:22px;z-index:150;width:132px;
   background:color-mix(in srgb,var(--bg) 80%,var(--on-bg) 10%);border:1px solid var(--line);padding:12px 12px 10px;
   font-family:'IBM Plex Mono',monospace;color:#EDEBE4;
-  transition:width .7s var(--ease),opacity .4s var(--ease);
+  cursor:pointer;
+  transition:width .55s var(--ease),opacity .4s var(--ease),box-shadow .4s var(--ease);
 }
+.minimap:hover{box-shadow:0 18px 44px -20px rgba(0,0,0,.65)}
 .minimap .rowline{max-height:22px;overflow:hidden}
-.minimap.dodge{width:118px}
-.minimap.dodge .rowline:not(.on){max-height:0;opacity:0;padding-top:0;padding-bottom:0}
-.minimap.shy{opacity:.3}
+/* minimized: only the section we're currently at */
+.minimap:not(.open) .rowline:not(.on){max-height:0;opacity:0;padding-top:0;padding-bottom:0}
+/* open: the full board, rows become navigation */
+.minimap.open{width:196px;cursor:default}
+.minimap.open .rowline{cursor:pointer}
+.minimap.open .rowline:hover{opacity:1}
 .minimap .rowline{display:flex;justify-content:space-between;align-items:center;font-size:8.5px;letter-spacing:.1em;padding:3px 0;opacity:.42;transition:opacity .3s,max-height .45s var(--ease),padding .45s var(--ease);text-transform:uppercase}
 .minimap .rowline.on{opacity:1}
 .minimap .vp{height:2px;background:rgba(237,235,228,.25);margin-top:10px;position:relative}
@@ -666,7 +783,7 @@ footer{padding:110px 0 0;position:relative}
   .quote-box,.faq-aside{position:static}
   .pcard{flex-basis:78vw}
   .foot-grid{grid-template-columns:1fr;gap:44px}
-  .idx{grid-template-columns:auto 1fr auto}
+  .idx{grid-template-columns:1fr auto}
 }
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
