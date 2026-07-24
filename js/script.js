@@ -182,7 +182,7 @@ function autoSlider(cfg){
 
 /* ---------- principles slider (deploy) ---------- */
 const quotes=[
- '"Hardware enables flight. Intelligence enables autonomous work. The value of an autonomous system isn\'t the aircraft. It\'s the ability to understand objectives, decide well, and prove the mission was accomplished."',
+ '"A drone that follows a plan is automation. A drone that holds a mission identity, revises its beliefs from evidence, and can explain what changed is a cognitive worker. That layer, not the aircraft, is where the value lives."',
  '"Users should never need to think like pilots or mission planners. Communicate the objective. The platform assumes responsibility for converting it into a safe, executable mission."',
  '"Trust is built through predictable, explainable behavior. Whenever uncertainty exceeds acceptable limits, the system asks for human guidance instead of making unsupported assumptions."'
 ];
@@ -1053,6 +1053,28 @@ function skyfield(id,alpha){
   addEventListener('resize',()=>{measure();x=Math.min(maxX,Math.max(0,x));xv=0;rawPull=0;paint();syncEnd();});
   setTimeout(measure,400);addEventListener('load',measure);
   new IntersectionObserver(es=>{vis=es[0].isIntersecting;if(vis){measure();start();}},{threshold:.02}).observe(mq);
+})();
+
+/* ---------- back to top: scroll without leaving "#top" in the address bar ----------
+   #top is the very start of the page, so parking it in the URL adds nothing and
+   reads like a stray fragment. Handle the scroll ourselves and strip the hash.
+   Other section links (#platform, #faq …) keep their hash on purpose — those are
+   shareable deep links. */
+(function(){
+  function stripHash(){
+    if(!location.hash)return;
+    try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
+  }
+  const smooth=!matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll('a[href="#top"]').forEach(a=>{
+    a.addEventListener('click',e=>{
+      e.preventDefault();
+      window.scrollTo({top:0,behavior:smooth?'smooth':'auto'});
+      stripHash();
+    });
+  });
+  /* arriving with a leftover #top (bookmark, refresh, back button) — clean it too */
+  if(location.hash==='#top')stripHash();
 })();
 
 /* ---------- font fallback (Safari Lockdown Mode etc.) ----------
