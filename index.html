@@ -11,6 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=EB+Garamond:wght@400;500;600&family=Inter:wght@400;450;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
+</head>
 <body>
 
 <div class="grain" aria-hidden="true"></div>
@@ -222,7 +223,9 @@
     <div class="pmq-view">
     <div class="pmq-track" id="pmqTrack">
     <div class="pmq-group">
-      <article class="pcard">
+      <article class="pcard pcard-flip">
+        <div class="flip-in">
+        <div class="flip-front">
         <div class="panel"><div class="inner">
   <div class="p-top"><span>KENWER · MISSION CONSOLE</span><span>01</span></div>
   <div class="p-line"><span class="p">operator ›</span> Inspect this building.</div>
@@ -234,8 +237,125 @@
           <p class="desc">Natural language, voice, maps, or images become a structured mission object: intent, locations, constraints, and success criteria the entire system shares.</p>
           <div class="fact"><span class="n">0</span><div class="l">unsupported assumptions. Ambiguity triggers a question, not a guess</div></div>
         </div>
+        </div>
+        <div class="flip-back" aria-hidden="true">
+          <div class="fb-top"><span>MISSION UNDERSTANDING</span><span>01</span></div>
+          <svg class="fb-svg" viewBox="0 0 400 560" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <filter id="muGlow" x="-60%" y="-60%" width="220%" height="220%">
+                <feGaussianBlur stdDeviation="7" result="b"/>
+                <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+              <radialGradient id="muVig" cx=".5" cy=".42" r=".65">
+                <stop offset="0" stop-color="rgba(140,228,238,.06)"/>
+                <stop offset="1" stop-color="rgba(140,228,238,0)"/>
+              </radialGradient>
+            </defs>
+
+            <ellipse cx="200" cy="250" rx="195" ry="245" fill="url(#muVig)"/>
+            <g fill="rgba(237,235,228,.14)">
+              <circle cx="52" cy="150" r="1.1"/><circle cx="352" cy="120" r="1.1"/>
+              <circle cx="338" cy="452" r="1.1"/><circle cx="46" cy="382" r="1.1"/>
+            </g>
+
+            <!-- ============ INPUT ROW: voice · text · map · image ============ -->
+            <g class="lyr l2-in">
+              <!-- voice tile -->
+              <rect x="34" y="58" width="64" height="52" rx="9" fill="#1B1B19" stroke="rgba(237,235,228,.4)" stroke-width="1.3"/>
+              <path d="M66 108 l-6 10 h14 Z" fill="#1B1B19" stroke="rgba(237,235,228,.4)" stroke-width="1.3"/>
+              <g stroke="rgba(237,235,228,.75)" stroke-width="2.6" stroke-linecap="round">
+                <line x1="48" y1="80" x2="48" y2="88"/><line x1="56" y1="74" x2="56" y2="94"/>
+                <line x1="64" y1="68" x2="64" y2="100"/><line x1="72" y1="76" x2="72" y2="92"/>
+                <line x1="80" y1="82" x2="80" y2="86"/>
+              </g>
+              <!-- text tile -->
+              <rect x="118" y="58" width="64" height="52" rx="6" fill="#1B1B19" stroke="rgba(237,235,228,.4)" stroke-width="1.3"/>
+              <g stroke="rgba(237,235,228,.7)" stroke-width="2.2" stroke-linecap="round">
+                <line x1="128" y1="72" x2="172" y2="72"/><line x1="128" y1="82" x2="164" y2="82"/>
+                <line x1="128" y1="92" x2="170" y2="92"/><line x1="128" y1="100" x2="150" y2="100"/>
+              </g>
+              <!-- map tile -->
+              <rect x="202" y="58" width="64" height="52" rx="6" fill="#1B1B19" stroke="rgba(237,235,228,.4)" stroke-width="1.3"/>
+              <path d="M202 96 l20 -10 22 8 22 -12" fill="none" stroke="rgba(237,235,228,.4)" stroke-width="1.1"/>
+              <path d="M202 78 l20 -8 22 6 22 -10" fill="none" stroke="rgba(237,235,228,.28)" stroke-width="1"/>
+              <path d="M234 66 c-7 0 -11 5 -11 11 c0 8 11 19 11 19 c0 0 11 -11 11 -19 c0 -6 -4 -11 -11 -11 Z"
+                    fill="none" stroke="rgba(237,235,228,.85)" stroke-width="1.8"/>
+              <circle cx="234" cy="77" r="3.4" fill="rgba(237,235,228,.85)"/>
+              <!-- image tile -->
+              <rect x="286" y="58" width="64" height="52" rx="6" fill="#1B1B19" stroke="rgba(237,235,228,.4)" stroke-width="1.3"/>
+              <circle cx="302" cy="72" r="4.5" fill="none" stroke="rgba(237,235,228,.7)" stroke-width="1.6"/>
+              <path d="M290 102 l16 -18 12 12 8 -8 14 14" fill="none" stroke="rgba(237,235,228,.7)" stroke-width="1.8" stroke-linejoin="round"/>
+            </g>
+
+            <!-- ============ CONVERGING STREAMS (marching dashes) ============ -->
+            <g class="lyr l2-st" fill="none" stroke="rgba(237,235,228,.45)" stroke-width="1.4">
+              <path class="flow" d="M66 122 C70 160 140 176 188 206" stroke-dasharray="4 7"/>
+              <path class="flow f2" d="M150 114 C154 148 178 168 196 202" stroke-dasharray="4 7"/>
+              <path class="flow f3" d="M234 114 C230 148 216 168 204 202" stroke-dasharray="4 7"/>
+              <path class="flow f2" d="M318 114 C314 156 254 176 212 206" stroke-dasharray="4 7"/>
+            </g>
+
+            <!-- ============ THE UNDERSTANDING LENS ============ -->
+            <g class="lyr l2-px">
+              <polygon class="mu-halo" points="200,196 258,236 200,276 142,236" fill="rgba(127,223,232,.14)" filter="url(#muGlow)"/>
+              <polygon points="200,202 252,236 200,270 148,236" fill="none" stroke="rgba(150,230,240,.95)" stroke-width="1.7" filter="url(#muGlow)"/>
+              <polygon points="200,212 238,236 200,260 162,236" fill="none" stroke="rgba(150,230,240,.55)" stroke-width="1.1" stroke-dasharray="4 4"/>
+              <circle cx="200" cy="236" r="9" fill="none" stroke="rgba(160,235,245,.9)" stroke-width="1.4"/>
+              <circle cx="200" cy="236" r="3" fill="#FFFFFF" filter="url(#muGlow)"/>
+              <line class="fb-tick" x1="252" y1="236" x2="286" y2="236"/>
+              <text class="fb-lbl fb-side fb-cy" x="290" y="232" text-anchor="start">PARSE +</text>
+              <text class="fb-lbl fb-side fb-cy" x="290" y="246" text-anchor="start">CLARIFY</text>
+            </g>
+
+            <!-- ============ ORDERED CHANNELS OUT ============ -->
+            <g class="lyr l2-ch" fill="none" stroke="rgba(150,230,240,.6)" stroke-width="1.4">
+              <path class="flow" d="M182 268 L152 318" stroke-dasharray="4 6"/>
+              <path class="flow f2" d="M194 272 L184 320" stroke-dasharray="4 6"/>
+              <path class="flow f3" d="M206 272 L216 320" stroke-dasharray="4 6"/>
+              <path class="flow f2" d="M218 268 L248 318" stroke-dasharray="4 6"/>
+              <g stroke="rgba(150,230,240,.85)" stroke-width="1.6">
+                <path d="M148 312 l4 8 l7 -5"/><path d="M181 315 l3 8 l8 -3"/>
+                <path d="M219 323 l8 3 l3 -8"/><path d="M245 315 l7 5 l4 -8"/>
+              </g>
+            </g>
+
+            <!-- ============ THE MISSION OBJECT ============ -->
+            <g class="lyr l2-ob">
+              <polygon points="200,330 342,376 200,422 58,376" fill="#171715" stroke="rgba(237,235,228,.4)" stroke-width="1.6"/>
+              <polygon points="58,376 200,422 200,436 58,390" fill="#101010"/>
+              <polygon points="342,376 200,422 200,436 342,390" fill="#0D0D0C"/>
+              <!-- four structured slots -->
+              <polygon points="152,346 200,362 152,378 104,362" fill="none" stroke="rgba(150,230,240,.7)" stroke-width="1.2"/>
+              <polygon points="248,346 296,362 248,378 200,362" fill="none" stroke="rgba(150,230,240,.7)" stroke-width="1.2"/>
+              <polygon points="152,376 200,392 152,408 104,392" fill="none" stroke="rgba(150,230,240,.7)" stroke-width="1.2"/>
+              <polygon points="248,376 296,392 248,408 200,392" fill="none" stroke="rgba(150,230,240,.7)" stroke-width="1.2"/>
+              <!-- slot glyphs: crosshair · boundary · shield · seal -->
+              <g stroke="rgba(237,235,228,.85)" stroke-width="1.4" fill="none">
+                <circle cx="152" cy="362" r="6.5"/>
+                <line x1="152" y1="352" x2="152" y2="357"/><line x1="152" y1="367" x2="152" y2="372"/>
+                <line x1="142" y1="362" x2="147" y2="362"/><line x1="157" y1="362" x2="162" y2="362"/>
+                <path d="M238 356 l14 -4 8 8 -10 8 -14 -3 Z" stroke-dasharray="3 3"/>
+                <path d="M152 384 c5 2 5 2 0 0 M145 387 c0 8 3 12 7 14 c4 -2 7 -6 7 -14 l-7 -3 Z"/>
+                <circle cx="248" cy="392" r="7"/>
+                <path d="M244.5 392 l2.5 3 l5 -6"/>
+              </g>
+              <line class="fb-tick" x1="342" y1="376" x2="366" y2="380"/>
+              <text class="fb-lbl fb-side" x="390" y="392" text-anchor="end">OBJECT</text>
+              <line class="fb-tick" x1="58" y1="376" x2="34" y2="372"/>
+              <text class="fb-lbl fb-side" x="10" y="368" text-anchor="start">SHARED</text>
+              <text class="fb-lbl fb-side" x="10" y="382" text-anchor="start">STATE</text>
+            </g>
+
+            <!-- spine -->
+            <line class="fb-spine" x1="200" y1="130" x2="200" y2="330" stroke="rgba(237,235,228,.25)" stroke-width="1.1" stroke-dasharray="3 9"/>
+          </svg>
+          <div class="fb-cap">FOUR WAYS IN · ONE MISSION OBJECT OUT</div>
+        </div>
+        </div>
       </article>
-      <article class="pcard">
+      <article class="pcard pcard-flip">
+        <div class="flip-in">
+        <div class="flip-front">
         <div class="panel"><div class="inner dark">
   <div class="p-top"><span>SAFETY &amp; COMPLIANCE GATE</span><span>02</span></div>
   <div class="check-row"><span>Airspace restrictions</span><span class="ok">PASS</span></div>
@@ -250,8 +370,81 @@
           <p class="desc">Every generated mission is validated before execution: airspace, weather, battery, geofencing, aircraft capability, regulatory and organizational policy. Unsafe missions are rejected or modified.</p>
           <div class="fact"><span class="n">100%</span><div class="l">of missions pass the safety gate before anything reaches the aircraft</div></div>
         </div>
+      </div>
+        <div class="flip-back" aria-hidden="true">
+          <div class="fb-top"><span>SAFETY BEFORE AUTONOMY</span><span>02</span></div>
+          <svg class="fb-svg" viewBox="0 0 400 560" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs><filter id="sgG" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur stdDeviation="7" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+            <g fill="rgba(237,235,228,.14)">
+              <circle cx="54" cy="140" r="1.1"/><circle cx="350" cy="112" r="1.1"/>
+              <circle cx="336" cy="470" r="1.1"/><circle cx="48" cy="400" r="1.1"/>
+            </g>
+            <!-- plan chip descending, queue behind it -->
+            <g class="lyr l3-plan">
+              <polygon points="200,26 226,38 200,50 174,38" fill="none" stroke="rgba(237,235,228,.25)" stroke-width="1"/>
+              <polygon points="200,52 232,68 200,84 168,68" fill="#1B1B19" stroke="rgba(237,235,228,.75)" stroke-width="1.5"/>
+              <path d="M184 68 q6 -6 12 0 t12 0" fill="none" stroke="rgba(237,235,228,.7)" stroke-width="1.5"/>
+              <path class="flow" d="M200 88 V142" fill="none" stroke="rgba(237,235,228,.5)" stroke-width="1.5" stroke-dasharray="4 7"/>
+              <line class="fb-tick" x1="168" y1="68" x2="132" y2="60"/>
+              <text class="fb-lbl fb-side" x="128" y="56" text-anchor="end">PLAN</text>
+            </g>
+            <!-- THE GATE: portal + five checks + shield -->
+            <g class="lyr l3-gate">
+              <rect x="118" y="150" width="164" height="24" fill="#171715" stroke="rgba(237,235,228,.45)" stroke-width="1.5"/>
+              <rect x="118" y="174" width="18" height="86" fill="#151513" stroke="rgba(237,235,228,.45)" stroke-width="1.5"/>
+              <rect x="264" y="174" width="18" height="86" fill="#151513" stroke="rgba(237,235,228,.45)" stroke-width="1.5"/>
+              <path d="M112 182 l6 4 M112 196 l6 4 M112 210 l6 4 M288 182 l-6 4 M288 196 l-6 4 M288 210 l-6 4" stroke="rgba(237,235,228,.35)" stroke-width="1.2"/>
+              <circle cx="127" cy="266" r="2.4" fill="none" stroke="rgba(237,235,228,.5)" stroke-width="1"/>
+              <circle cx="273" cy="266" r="2.4" fill="none" stroke="rgba(237,235,228,.5)" stroke-width="1"/>
+              <g fill="#0F0F0E" stroke="rgba(237,235,228,.7)" stroke-width="1.3">
+                <circle cx="140" cy="162" r="8"/><circle cx="170" cy="162" r="8"/>
+                <circle cx="200" cy="162" r="8"/><circle cx="230" cy="162" r="8"/><circle cx="260" cy="162" r="8"/>
+              </g>
+              <g fill="none" stroke="rgba(150,230,240,.9)" stroke-width="1.5">
+                <path d="M136 162 l3 3.5 l5.5 -7"/><path d="M166 162 l3 3.5 l5.5 -7"/>
+                <path d="M196 162 l3 3.5 l5.5 -7"/><path d="M226 162 l3 3.5 l5.5 -7"/><path d="M256 162 l3 3.5 l5.5 -7"/>
+              </g>
+              <path d="M200 190 l16 6 v13 c0 11 -7 18 -16 22 c-9 -4 -16 -11 -16 -22 v-13 Z"
+                    fill="rgba(127,223,232,.10)" stroke="rgba(150,230,240,.95)" stroke-width="1.7" filter="url(#sgG)"/>
+              <path d="M192 210 l6 7 l11 -13" fill="none" stroke="rgba(200,245,250,.95)" stroke-width="1.8"/>
+              <line class="flow" x1="140" y1="246" x2="260" y2="246" stroke="rgba(150,230,240,.5)" stroke-width="1.2" stroke-dasharray="4 6"/>
+              <line class="fb-tick" x1="282" y1="158" x2="316" y2="152"/>
+              <text class="fb-lbl fb-side fb-cy" x="320" y="148" text-anchor="start">5 CHECKS</text>
+              <text class="fb-lbl fb-side fb-cy" x="320" y="162" text-anchor="start">EVERY</text>
+              <text class="fb-lbl fb-side fb-cy" x="320" y="176" text-anchor="start">MISSION</text>
+            </g>
+            <!-- outputs: pass → aircraft, unsafe → rework loop -->
+            <g class="lyr l3-out">
+              <path class="flow f2" d="M200 262 V332" fill="none" stroke="rgba(150,230,240,.6)" stroke-width="1.6" stroke-dasharray="4 6"/>
+              <path d="M194 328 l6 10 l6 -10" fill="none" stroke="rgba(150,230,240,.85)" stroke-width="1.6"/>
+              <path class="flow f3" d="M212 268 C266 280 300 250 302 210 C304 178 272 164 288 163" fill="none" stroke="rgba(237,235,228,.32)" stroke-width="1.3" stroke-dasharray="3 7"/>
+              <path d="M282 158 l8 4 l-6 7" fill="none" stroke="rgba(237,235,228,.5)" stroke-width="1.3"/>
+              <line class="fb-tick" x1="304" y1="236" x2="330" y2="242"/>
+              <text class="fb-lbl fb-side" x="334" y="246" text-anchor="start">REWORK</text>
+              <g stroke="rgba(237,235,228,.8)" fill="rgba(237,235,228,.8)">
+                <rect x="188" y="376" width="24" height="24" fill="none" stroke-width="1.6"/>
+                <line x1="196" y1="384" x2="152" y2="356" stroke-width="1.4"/><line x1="204" y1="384" x2="248" y2="356" stroke-width="1.4"/>
+                <line x1="196" y1="394" x2="152" y2="422" stroke-width="1.4"/><line x1="204" y1="394" x2="248" y2="422" stroke-width="1.4"/>
+                <circle cx="148" cy="352" r="15" fill="none" stroke-width="1.6"/><circle cx="252" cy="352" r="15" fill="none" stroke-width="1.6"/>
+                <circle cx="148" cy="426" r="15" fill="none" stroke-width="1.6"/><circle cx="252" cy="426" r="15" fill="none" stroke-width="1.6"/>
+                <circle cx="148" cy="352" r="2.6"/><circle cx="252" cy="352" r="2.6"/>
+                <circle cx="148" cy="426" r="2.6"/><circle cx="252" cy="426" r="2.6"/>
+                <line x1="137" y1="341" x2="159" y2="363" stroke-width="1.2"/><line x1="263" y1="341" x2="241" y2="363" stroke-width="1.2"/>
+                <line x1="137" y1="437" x2="159" y2="415" stroke-width="1.2"/><line x1="263" y1="437" x2="241" y2="415" stroke-width="1.2"/>
+              </g>
+              <line class="fb-tick" x1="252" y1="446" x2="286" y2="456"/>
+              <text class="fb-lbl fb-side" x="290" y="460" text-anchor="start">AIRCRAFT</text>
+            </g>
+          </svg>
+          <div class="fb-cap">NOTHING FLIES UNTIL THE GATE SAYS SO</div>
+        </div>
+        </div>
       </article>
-      <article class="pcard">
+      <article class="pcard pcard-flip">
+        <div class="flip-in">
+        <div class="flip-front">
         <div class="panel"><div class="inner">
   <div class="p-top"><span>MISSION COMPILER</span><span>03</span></div>
   <div class="big-word">One plan</div>
@@ -264,8 +457,89 @@
           <p class="desc">Drone-specific detail is isolated behind standardized adapters. Organizations keep the fleets they've invested in, switch vendors freely, and the intelligence layer never changes.</p>
           <div class="fact"><span class="n">4+</span><div class="l">drone ecosystems executing the same platform-neutral mission</div></div>
         </div>
+      </div>
+        <div class="flip-back" aria-hidden="true">
+          <div class="fb-top"><span>HARDWARE INDEPENDENCE</span><span>03</span></div>
+          <svg class="fb-svg" viewBox="0 0 400 560" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs><filter id="hwG" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur stdDeviation="7" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+            <g fill="rgba(237,235,228,.14)">
+              <circle cx="56" cy="150" r="1.1"/><circle cx="348" cy="126" r="1.1"/>
+              <circle cx="334" cy="462" r="1.1"/><circle cx="50" cy="396" r="1.1"/>
+            </g>
+            <!-- the single intelligence core -->
+            <g class="lyr l4-core">
+              <rect x="168" y="46" width="64" height="50" rx="9" fill="rgba(127,223,232,.08)" stroke="rgba(150,230,240,.95)" stroke-width="1.7" filter="url(#hwG)"/>
+              <rect x="184" y="60" width="32" height="22" rx="3" fill="none" stroke="rgba(160,235,245,.7)" stroke-width="1.2"/>
+              <circle cx="200" cy="71" r="3" fill="#FFFFFF" filter="url(#hwG)"/>
+              <g stroke="rgba(150,230,240,.7)" stroke-width="1.6">
+                <line x1="180" y1="96" x2="180" y2="104"/><line x1="190" y1="96" x2="190" y2="104"/>
+                <line x1="200" y1="96" x2="200" y2="104"/><line x1="210" y1="96" x2="210" y2="104"/>
+                <line x1="220" y1="96" x2="220" y2="104"/>
+              </g>
+              <path class="flow" d="M200 106 V148" fill="none" stroke="rgba(150,230,240,.6)" stroke-width="1.7" stroke-dasharray="4 6"/>
+              <line class="fb-tick" x1="168" y1="70" x2="132" y2="62"/>
+              <text class="fb-lbl fb-side fb-cy" x="128" y="58" text-anchor="end">ONE</text>
+              <text class="fb-lbl fb-side fb-cy" x="128" y="72" text-anchor="end">PLAN</text>
+            </g>
+            <!-- the adapter wedge -->
+            <g class="lyr l4-ad">
+              <polygon points="140,152 260,152 300,214 100,214" fill="#161614" stroke="rgba(237,235,228,.45)" stroke-width="1.6"/>
+              <path d="M118 206 h16 M266 206 h16 M150 160 h8 M242 160 h8" stroke="rgba(237,235,228,.3)" stroke-width="1.2"/>
+              <g fill="none" stroke="rgba(150,230,240,.55)" stroke-width="1.3">
+                <path class="flow" d="M200 156 C176 176 140 188 124 210" stroke-dasharray="3 6"/>
+                <path class="flow f2" d="M200 156 C192 178 180 192 174 210" stroke-dasharray="3 6"/>
+                <path class="flow f3" d="M200 156 C208 178 220 192 226 210" stroke-dasharray="3 6"/>
+                <path class="flow f2" d="M200 156 C224 176 260 188 276 210" stroke-dasharray="3 6"/>
+              </g>
+              <line class="fb-tick" x1="300" y1="184" x2="332" y2="178"/>
+              <text class="fb-lbl fb-side fb-cy" x="336" y="174" text-anchor="start">ADAPTER</text>
+              <text class="fb-lbl fb-side fb-cy" x="336" y="188" text-anchor="start">FRAME</text>
+            </g>
+            <!-- four different plugs → four different sockets → four different craft -->
+            <g class="lyr l4-fleet" stroke="rgba(237,235,228,.75)" fill="none" stroke-width="1.5">
+              <line x1="124" y1="216" x2="124" y2="238"/><circle cx="124" cy="246" r="8"/>
+              <line x1="174" y1="216" x2="174" y2="238"/><rect x="167" y="240" width="14" height="13"/>
+              <line x1="226" y1="216" x2="226" y2="238"/><polygon points="226,239 234,253 218,253"/>
+              <line x1="276" y1="216" x2="276" y2="236"/><polygon points="276,238 284,242 284,251 276,255 268,251 268,242"/>
+              <path d="M106 276 h12 v-14 M142 276 h-12 v-14"/>
+              <path d="M156 276 h12 v-12 M192 276 h-12 v-12"/>
+              <path d="M208 276 h12 v-11 M244 276 h-12 v-11"/>
+              <path d="M258 276 h12 v-12 M294 276 h-12 v-12"/>
+              <g stroke-width="1.4">
+                <rect x="115" y="322" width="18" height="18"/>
+                <circle cx="106" cy="313" r="9"/><circle cx="142" cy="313" r="9"/>
+                <circle cx="106" cy="349" r="9"/><circle cx="142" cy="349" r="9"/>
+                <line x1="115" y1="322" x2="109" y2="316"/><line x1="133" y1="322" x2="139" y2="316"/>
+                <line x1="115" y1="340" x2="109" y2="346"/><line x1="133" y1="340" x2="139" y2="346"/>
+                <circle cx="174" cy="331" r="10"/>
+                <circle cx="158" cy="315" r="8"/><circle cx="190" cy="315" r="8"/>
+                <circle cx="158" cy="347" r="8"/><circle cx="190" cy="347" r="8"/>
+                <line x1="167" y1="324" x2="161" y2="318"/><line x1="181" y1="324" x2="187" y2="318"/>
+                <line x1="167" y1="338" x2="161" y2="344"/><line x1="181" y1="338" x2="187" y2="344"/>
+                <polygon points="226,321 235,326 235,336 226,341 217,336 217,326"/>
+                <circle cx="210" cy="313" r="8"/><circle cx="242" cy="313" r="8"/>
+                <circle cx="210" cy="349" r="8"/><circle cx="242" cy="349" r="8"/>
+                <line x1="219" y1="324" x2="213" y2="318"/><line x1="233" y1="324" x2="239" y2="318"/>
+                <line x1="219" y1="338" x2="213" y2="344"/><line x1="233" y1="338" x2="239" y2="344"/>
+                <polygon points="276,322 285,340 267,340"/>
+                <circle cx="260" cy="315" r="8"/><circle cx="292" cy="315" r="8"/>
+                <circle cx="260" cy="349" r="8"/><circle cx="292" cy="349" r="8"/>
+                <line x1="270" y1="326" x2="263" y2="319"/><line x1="282" y1="326" x2="289" y2="319"/>
+                <line x1="270" y1="337" x2="263" y2="344"/><line x1="282" y1="337" x2="289" y2="344"/>
+              </g>
+              <line class="fb-tick" x1="142" y1="366" x2="120" y2="386" stroke-width="1"/>
+              <text class="fb-lbl fb-side" x="116" y="398" text-anchor="start" stroke="none" fill="var(--mut-d)">ANY FLEET · SAME MISSION</text>
+            </g>
+          </svg>
+          <div class="fb-cap">SWAP THE AIRCRAFT · KEEP THE INTELLIGENCE</div>
+        </div>
+        </div>
       </article>
-      <article class="pcard">
+      <article class="pcard pcard-flip">
+        <div class="flip-in">
+        <div class="flip-front">
         <div class="panel"><div class="inner dark">
   <div class="p-top"><span>COGNITIVE IDENTITY · LIVE</span><span>04</span></div>
   <div class="bar-row"><span>Mission progress</span><div class="bar"><i style="width:64%"></i></div><span>64%</span></div>
@@ -279,8 +553,172 @@
           <p class="desc">The platform holds a mission identity for the whole flight and beyond it: objective, constraints, assumptions, coverage, and confidence. When evidence contradicts an assumption, the belief is revised, and that change carries into the next mission.</p>
           <div class="fact"><span class="n">1</span><div class="l">continuous mission identity, from objective through belief revision</div></div>
         </div>
+        </div>
+        <div class="flip-back" aria-hidden="true">
+          <div class="fb-top"><span>INSIDE THE BRAIN</span><span>04</span></div>
+          <svg class="fb-svg" viewBox="0 0 400 560" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <filter id="cyGlow" x="-60%" y="-60%" width="220%" height="220%">
+                <feGaussianBlur stdDeviation="7" result="b"/>
+                <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+              <filter id="amGlow" x="-60%" y="-60%" width="220%" height="220%">
+                <feGaussianBlur stdDeviation="6" result="b"/>
+                <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+              <linearGradient id="metal" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#55554F"/><stop offset=".35" stop-color="#C9C9C2"/>
+                <stop offset=".55" stop-color="#8F8F88"/><stop offset="1" stop-color="#3E3E39"/>
+              </linearGradient>
+              <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="rgba(140,228,238,.22)"/>
+                <stop offset=".5" stop-color="rgba(140,228,238,.08)"/>
+                <stop offset="1" stop-color="rgba(140,228,238,.18)"/>
+              </linearGradient>
+              <radialGradient id="vig" cx=".5" cy=".5" r=".65">
+                <stop offset="0" stop-color="rgba(140,228,238,.06)"/>
+                <stop offset="1" stop-color="rgba(140,228,238,0)"/>
+              </radialGradient>
+            </defs>
+
+            <!-- ambient depth -->
+            <ellipse cx="200" cy="300" rx="195" ry="245" fill="url(#vig)"/>
+            <g fill="rgba(237,235,228,.14)">
+              <circle cx="58" cy="160" r="1.1"/><circle cx="348" cy="132" r="1.1"/>
+              <circle cx="330" cy="452" r="1.1"/><circle cx="46" cy="392" r="1.1"/>
+              <circle cx="366" cy="242" r="1.1"/><circle cx="88" cy="510" r="1.1"/>
+            </g>
+
+            <line class="fb-spine" x1="200" y1="150" x2="200" y2="466" stroke="rgba(237,235,228,.3)" stroke-width="1.2" stroke-dasharray="3 9"/>
+
+            <!-- rising data motes (base → brain) -->
+            <g class="fb-motes">
+              <circle class="mote" cx="200" cy="452" r="2" fill="#8FE3EA" filter="url(#cyGlow)"/>
+              <circle class="mote" cx="200" cy="452" r="1.6" fill="#8FE3EA" filter="url(#cyGlow)" style="animation-delay:1.3s"/>
+              <circle class="mote" cx="200" cy="452" r="1.3" fill="#E8C27A" filter="url(#amGlow)" style="animation-delay:2.5s"/>
+            </g>
+
+            <!-- ============ BASE: mechanical core unit ============ -->
+            <g class="lyr lyr-base">
+              <polygon points="200,433 360,472 200,511 40,472" fill="#161614" stroke="rgba(237,235,228,.28)" stroke-width="1.2"/>
+              <polygon points="40,472 200,511 200,527 40,488" fill="#0F0F0E"/>
+              <polygon points="360,472 200,511 200,527 360,488" fill="#0C0C0B"/>
+              <path d="M84 470 l26 6 M96 463 l26 6 M108 456 l26 6" stroke="rgba(237,235,228,.22)" stroke-width="2"/>
+              <path d="M290 456 l-26 6 M302 463 l-26 6" stroke="rgba(237,235,228,.16)" stroke-width="2"/>
+              <polygon points="122,492 146,498 146,505 122,499" fill="#1E1E1C" stroke="rgba(237,235,228,.2)" stroke-width=".8"/>
+              <polygon points="156,500 172,504 172,510 156,506" fill="#1E1E1C" stroke="rgba(237,235,228,.2)" stroke-width=".8"/>
+              <g stroke="rgba(237,235,228,.4)" fill="#0F0F0E">
+                <circle cx="72" cy="472" r="2.6"/><circle cx="328" cy="472" r="2.6"/>
+              </g>
+              <circle cx="268" cy="486" r="2" fill="#E8C27A" filter="url(#amGlow)"/>
+              <circle cx="282" cy="483" r="2" fill="#E8C27A" filter="url(#amGlow)"/>
+              <circle cx="296" cy="480" r="2" fill="#E8C27A" filter="url(#amGlow)"/>
+              <text class="fb-lbl" x="200" y="547" text-anchor="middle">KENWER COGNITIVE CORE UNIT 01</text>
+            </g>
+
+            <!-- ============ AMBER ENERGY LAYER ============ -->
+            <g class="lyr lyr-amber">
+              <polygon points="200,374 330,402 200,430 70,402" fill="rgba(232,194,122,.12)" stroke="rgba(232,194,122,.7)" stroke-width="1.4" filter="url(#amGlow)"/>
+              <polygon points="70,402 200,430 200,440 70,412" fill="rgba(232,194,122,.07)"/>
+              <polygon points="330,402 200,430 200,440 330,412" fill="rgba(232,194,122,.05)"/>
+              <polygon points="200,382 296,402 200,422 104,402" fill="none" stroke="rgba(232,194,122,.4)" stroke-width="1" stroke-dasharray="4 6"/>
+              <path class="fil fa" d="M118 402 q18 -9 36 0 t36 0 t36 0 t36 0" fill="none" stroke="#E8C27A" stroke-width="1.1"/>
+              <path class="fil fa f2" d="M132 394 q16 8 34 1 t38 -2 t34 3" fill="none" stroke="#E8C27A" stroke-width="1"/>
+              <path class="fil fa f3" d="M140 412 q20 -7 40 -1 t42 2" fill="none" stroke="#E8C27A" stroke-width="1"/>
+              <circle cx="152" cy="408" r="1.5" fill="#E8C27A"/>
+              <circle cx="252" cy="396" r="1.5" fill="#E8C27A"/>
+              <line class="fb-tick" x1="330" y1="402" x2="352" y2="404"/>
+              <text class="fb-lbl fb-side" x="390" y="408" text-anchor="end">POWER</text>
+            </g>
+
+            <!-- ============ FRAME PLATE: black gasket + bolts ============ -->
+            <g class="lyr lyr-frame">
+              <polygon points="200,306 350,342 200,378 50,342" fill="#151513" stroke="rgba(237,235,228,.34)" stroke-width="1.6"/>
+              <polygon points="50,342 200,378 200,390 50,354" fill="#0F0F0E"/>
+              <polygon points="350,342 200,378 200,390 350,354" fill="#0C0C0B"/>
+              <polygon points="200,318 300,342 200,366 100,342" fill="rgba(140,228,238,.05)" stroke="rgba(140,228,238,.35)" stroke-width="1" stroke-dasharray="5 5"/>
+              <path d="M116 334 l8 2 M112 340 l8 2 M284 334 l-8 2 M288 340 l-8 2" stroke="rgba(237,235,228,.3)" stroke-width="1"/>
+              <g stroke="rgba(237,235,228,.5)" fill="#0C0C0B">
+                <circle cx="200" cy="313" r="4"/><circle cx="343" cy="342" r="4"/>
+                <circle cx="200" cy="371" r="4"/><circle cx="57" cy="342" r="4"/>
+              </g>
+              <path d="M197 313 h6 M340 342 h6 M197 371 h6 M54 342 h6" stroke="rgba(237,235,228,.55)" stroke-width="1"/>
+              <path d="M200 310 v6 M343 339 v6 M200 368 v6 M57 339 v6" stroke="rgba(237,235,228,.55)" stroke-width="1"/>
+              <line class="fb-tick" x1="350" y1="342" x2="366" y2="346"/>
+              <text class="fb-lbl fb-side" x="390" y="358" text-anchor="end">ARRAY-7</text>
+            </g>
+
+            <!-- ============ CHROME SPINDLE ============ -->
+            <g class="lyr lyr-spindle">
+              <polygon points="192,140 208,140 205,148 195,148" fill="#6E6E68"/>
+              <rect x="193" y="146" width="14" height="82" rx="3" fill="url(#metal)"/>
+              <line x1="196.5" y1="150" x2="196.5" y2="208" stroke="#E4E4DE" stroke-width="1.3" opacity=".55"/>
+              <rect x="189" y="158" width="22" height="3.5" rx="1.5" fill="#7C7C75"/>
+              <rect x="189" y="172" width="22" height="3.5" rx="1.5" fill="#7C7C75"/>
+              <rect x="189" y="186" width="22" height="3.5" rx="1.5" fill="#7C7C75"/>
+              <ellipse cx="200" cy="212" rx="17" ry="6.5" fill="#4A4A44" stroke="#8F8F88" stroke-width="1"/>
+              <ellipse cx="200" cy="212" rx="10" ry="3.6" fill="none" stroke="rgba(143,227,234,.5)" stroke-width="1" filter="url(#cyGlow)"/>
+              <path class="fil fc" d="M200 150 q-26 -12 -44 -30" fill="none" stroke="#8FE3EA" stroke-width="1.1" filter="url(#cyGlow)"/>
+              <path class="fil fc f2" d="M200 150 q24 -14 40 -32" fill="none" stroke="#8FE3EA" stroke-width="1.1" filter="url(#cyGlow)"/>
+              <path class="fil fc f3" d="M200 154 q-14 -22 -8 -40" fill="none" stroke="#8FE3EA" stroke-width="1"/>
+              <path class="fil fc f2" d="M200 154 q16 -20 10 -38" fill="none" stroke="#8FE3EA" stroke-width="1"/>
+            </g>
+
+            <!-- ============ COGNITIVE IDENTITY: translucent chip stack ============ -->
+            <g class="lyr lyr-pcil">
+              <polygon class="pcil-halo" points="200,214 320,252 200,290 80,252" fill="rgba(127,223,232,.16)" filter="url(#cyGlow)"/>
+              <line x1="98" y1="234" x2="98" y2="274" stroke="rgba(150,230,240,.4)" stroke-width="1"/>
+              <line x1="302" y1="234" x2="302" y2="274" stroke="rgba(150,230,240,.4)" stroke-width="1"/>
+              <line x1="200" y1="258" x2="200" y2="298" stroke="rgba(150,230,240,.35)" stroke-width="1"/>
+              <polygon points="200,250 302,274 200,298 98,274" fill="url(#glass)" stroke="rgba(150,230,240,.7)" stroke-width="1.1" filter="url(#cyGlow)"/>
+              <circle cx="170" cy="270" r="1.4" fill="rgba(200,245,250,.9)"/>
+              <circle cx="230" cy="270" r="1.4" fill="rgba(200,245,250,.9)"/>
+              <polygon points="200,230 302,254 200,278 98,254" fill="url(#glass)" stroke="rgba(150,230,240,.85)" stroke-width="1.2" filter="url(#cyGlow)"/>
+              <path d="M140 254 h18 M242 254 h18 M200 242 v-6 M200 266 v6" stroke="rgba(160,235,245,.45)" stroke-width="1"/>
+              <polygon points="200,210 302,234 200,258 98,234" fill="url(#glass)" stroke="rgba(160,235,245,.95)" stroke-width="1.3" filter="url(#cyGlow)"/>
+              <polygon points="200,220 256,234 200,248 144,234" fill="none" stroke="rgba(160,235,245,.8)" stroke-width="1" stroke-dasharray="4 4"/>
+              <polygon points="200,227 228,234 200,241 172,234" fill="rgba(160,235,245,.25)" stroke="rgba(200,245,250,.95)" stroke-width="1"/>
+              <circle cx="200" cy="234" r="3.2" fill="#FFFFFF" filter="url(#cyGlow)"/>
+              <path d="M156 244 h16 M170 226 h14 M232 226 h14 M228 244 h16" stroke="rgba(160,235,245,.5)" stroke-width="1"/>
+              <circle cx="163" cy="238" r="1.2" fill="rgba(200,245,250,.85)"/>
+              <circle cx="237" cy="230" r="1.2" fill="rgba(200,245,250,.85)"/>
+              <polyline class="fb-tick" points="96,236 74,228 64,224" fill="none"/>
+              <text class="fb-lbl fb-side fb-cy" x="14" y="206" text-anchor="start">COGNITIVE</text>
+              <text class="fb-lbl fb-side fb-cy" x="14" y="220" text-anchor="start">IDENTITY</text>
+              <text class="fb-lbl fb-side" x="14" y="234" text-anchor="start">LAYER</text>
+            </g>
+
+            <!-- ============ BRAIN ============ -->
+            <g class="lyr lyr-brL">
+              <path d="M194 140 C142 142 108 122 108 94 C108 68 128 52 152 52 C158 36 180 30 194 40 Z"
+                    fill="#22221F" stroke="rgba(237,235,228,.5)" stroke-width="1.5"/>
+              <path d="M128 66 C120 78 120 92 130 103" fill="none" stroke="rgba(237,235,228,.26)" stroke-width="1.1"/>
+              <path d="M144 56 C134 72 134 92 144 107" fill="none" stroke="rgba(237,235,228,.26)" stroke-width="1.1"/>
+              <path d="M160 50 C152 68 152 94 162 111" fill="none" stroke="rgba(237,235,228,.22)" stroke-width="1.1"/>
+              <path d="M118 116 h20 v-8 h12" fill="none" stroke="rgba(237,235,228,.35)" stroke-width="1.2"/>
+              <circle cx="152" cy="108" r="1.7" fill="rgba(237,235,228,.6)"/>
+              <circle class="syn" cx="136" cy="84" r="1.6" fill="#8FE3EA"/>
+              <circle class="syn s2" cx="170" cy="70" r="1.4" fill="#8FE3EA"/>
+            </g>
+            <g class="lyr lyr-brR">
+              <path d="M206 140 C258 142 292 122 292 94 C292 68 272 52 248 52 C242 36 220 30 206 40 Z"
+                    fill="#22221F" stroke="rgba(237,235,228,.5)" stroke-width="1.5"/>
+              <path d="M272 66 C280 78 280 92 270 103" fill="none" stroke="rgba(237,235,228,.26)" stroke-width="1.1"/>
+              <path d="M256 56 C266 72 266 92 256 107" fill="none" stroke="rgba(237,235,228,.26)" stroke-width="1.1"/>
+              <path d="M240 50 C248 68 248 94 238 111" fill="none" stroke="rgba(237,235,228,.22)" stroke-width="1.1"/>
+              <path d="M282 116 h-20 v-8 h-12" fill="none" stroke="rgba(237,235,228,.35)" stroke-width="1.2"/>
+              <circle cx="248" cy="108" r="1.7" fill="rgba(237,235,228,.6)"/>
+              <circle class="syn s3" cx="264" cy="84" r="1.6" fill="#8FE3EA"/>
+              <circle class="syn s2" cx="230" cy="70" r="1.4" fill="#8FE3EA"/>
+            </g>
+          </svg>
+          <div class="fb-cap">THE LAYER THAT REMEMBERS, REVISES, EXPLAINS</div>
+        </div>
+        </div>
       </article>
-      <article class="pcard">
+      <article class="pcard pcard-flip">
+        <div class="flip-in">
+        <div class="flip-front">
         <div class="panel"><div class="inner">
   <div class="p-top"><span>DECISION LOG</span><span>05</span></div>
   <div class="p-line" style="font-size:.85em;line-height:1.7">
@@ -296,8 +734,84 @@
           <p class="desc">Never a black box. When the platform makes a significant autonomous decision, it can state what was decided, why, what alternatives were considered, and how confident it is.</p>
           <div class="fact"><span class="n">Every</span><div class="l">significant decision is logged and explainable, auditable by design</div></div>
         </div>
+      </div>
+        <div class="flip-back" aria-hidden="true">
+          <div class="fb-top"><span>EXPLAINABLE DECISIONS</span><span>05</span></div>
+          <svg class="fb-svg" viewBox="0 0 400 560" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs><filter id="exG" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur stdDeviation="7" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+            <g fill="rgba(237,235,228,.14)">
+              <circle cx="52" cy="144" r="1.1"/><circle cx="352" cy="120" r="1.1"/>
+              <circle cx="338" cy="470" r="1.1"/><circle cx="46" cy="404" r="1.1"/>
+            </g>
+            <!-- evidence tokens -->
+            <g class="lyr l5-ev">
+              <rect x="70" y="52" width="48" height="40" rx="6" fill="#1B1B19" stroke="rgba(237,235,228,.4)" stroke-width="1.3"/>
+              <circle cx="94" cy="72" r="9" fill="none" stroke="rgba(237,235,228,.75)" stroke-width="1.5"/>
+              <circle cx="94" cy="72" r="3" fill="rgba(237,235,228,.75)"/>
+              <rect x="176" y="52" width="48" height="40" rx="6" fill="#1B1B19" stroke="rgba(237,235,228,.4)" stroke-width="1.3"/>
+              <path d="M184 64 q8 -5 16 0 t16 0 M184 72 q8 -5 16 0 t16 0 M184 80 q8 -5 16 0 t16 0" fill="none" stroke="rgba(237,235,228,.7)" stroke-width="1.4"/>
+              <rect x="282" y="52" width="48" height="40" rx="6" fill="#1B1B19" stroke="rgba(237,235,228,.4)" stroke-width="1.3"/>
+              <rect x="292" y="64" width="24" height="14" rx="2" fill="none" stroke="rgba(237,235,228,.75)" stroke-width="1.4"/>
+              <rect x="316" y="68" width="4" height="6" fill="rgba(237,235,228,.75)"/>
+              <rect x="295" y="67" width="5" height="8" fill="rgba(237,235,228,.7)"/>
+              <rect x="302" y="67" width="5" height="8" fill="rgba(237,235,228,.7)"/>
+              <g fill="none" stroke="rgba(237,235,228,.45)" stroke-width="1.3">
+                <path class="flow" d="M94 96 C100 122 150 132 182 148" stroke-dasharray="4 7"/>
+                <path class="flow f2" d="M200 96 C200 116 200 128 200 146" stroke-dasharray="4 7"/>
+                <path class="flow f3" d="M306 96 C300 122 250 132 218 148" stroke-dasharray="4 7"/>
+              </g>
+              <line class="fb-tick" x1="70" y1="46" x2="70" y2="34"/>
+              <text class="fb-lbl fb-side" x="66" y="30" text-anchor="start">EVIDENCE</text>
+            </g>
+            <!-- the glass decision chamber -->
+            <g class="lyr l5-box">
+              <rect x="104" y="152" width="192" height="150" rx="10" fill="rgba(127,223,232,.04)" stroke="rgba(150,230,240,.9)" stroke-width="1.7" filter="url(#exG)"/>
+              <rect x="112" y="160" width="176" height="134" rx="7" fill="none" stroke="rgba(150,230,240,.3)" stroke-width="1" stroke-dasharray="4 5"/>
+              <path d="M104 168 v-8 a10 10 0 0 1 10 -10 h8 M296 168 v-8 a10 10 0 0 0 -10 -10 h-8 M104 286 v8 a10 10 0 0 0 10 10 h8 M296 286 v8 a10 10 0 0 1 -10 -10 h-8" fill="none" stroke="rgba(150,230,240,.9)" stroke-width="1.7"/>
+              <circle cx="146" cy="222" r="8" fill="none" stroke="rgba(237,235,228,.8)" stroke-width="1.5"/>
+              <circle cx="146" cy="222" r="2.5" fill="rgba(237,235,228,.8)"/>
+              <path d="M154 216 C186 196 216 186 244 184" fill="none" stroke="rgba(237,235,228,.3)" stroke-width="1.2" stroke-dasharray="3 5"/>
+              <path d="M248 180 l-4 -4 m0 8 l8 -8 m-8 0 l8 8" stroke="rgba(237,235,228,.5)" stroke-width="1.3" fill="none"/>
+              <path d="M154 228 C186 248 216 258 244 260" fill="none" stroke="rgba(237,235,228,.3)" stroke-width="1.2" stroke-dasharray="3 5"/>
+              <path d="M248 264 l-4 -4 m0 8 l8 -8 m-8 0 l8 8" stroke="rgba(237,235,228,.5)" stroke-width="1.3" fill="none"/>
+              <path class="flow" d="M154 222 H240" fill="none" stroke="rgba(150,230,240,.9)" stroke-width="1.8" stroke-dasharray="5 5" filter="url(#exG)"/>
+              <circle cx="252" cy="222" r="9" fill="none" stroke="rgba(150,230,240,.95)" stroke-width="1.6" filter="url(#exG)"/>
+              <path d="M247.5 222 l3 3.6 l6 -7.4" fill="none" stroke="rgba(200,245,250,.95)" stroke-width="1.7"/>
+              <path d="M132 282 a18 18 0 0 1 36 0" fill="none" stroke="rgba(237,235,228,.5)" stroke-width="1.5"/>
+              <line x1="150" y1="282" x2="162" y2="270" stroke="rgba(150,230,240,.9)" stroke-width="1.6"/>
+              <path d="M132 282 l0 -4 M141 268 l2 3 M150 264 l0 4 M159 268 l-2 3 M168 282 l0 -4" stroke="rgba(237,235,228,.4)" stroke-width="1.1"/>
+              <circle cx="286" cy="160" r="9" fill="none" stroke="rgba(150,230,240,.85)" stroke-width="1.5"/>
+              <line x1="292" y1="167" x2="300" y2="176" stroke="rgba(150,230,240,.85)" stroke-width="1.7"/>
+              <line class="fb-tick" x1="296" y1="226" x2="330" y2="232"/>
+              <text class="fb-lbl fb-side fb-cy" x="334" y="228" text-anchor="start">SEE THE</text>
+              <text class="fb-lbl fb-side fb-cy" x="334" y="242" text-anchor="start">CHOICE</text>
+            </g>
+            <!-- the receipt: every decision logged -->
+            <g class="lyr l5-out">
+              <path class="flow f2" d="M200 304 V344" fill="none" stroke="rgba(150,230,240,.55)" stroke-width="1.6" stroke-dasharray="4 6"/>
+              <path d="M194 340 l6 10 l6 -10" fill="none" stroke="rgba(150,230,240,.8)" stroke-width="1.5"/>
+              <path d="M166 356 h68 v78 l-8 -6 -9 6 -8 -6 -9 6 -8 -6 -9 6 -9 -6 -8 6 Z"
+                    fill="#171715" stroke="rgba(237,235,228,.6)" stroke-width="1.5"/>
+              <line x1="166" y1="368" x2="234" y2="368" stroke="rgba(237,235,228,.3)" stroke-width="1" stroke-dasharray="3 3"/>
+              <g stroke="rgba(237,235,228,.55)" stroke-width="1.6" stroke-linecap="round">
+                <line x1="176" y1="382" x2="224" y2="382"/><line x1="176" y1="392" x2="214" y2="392"/>
+                <line x1="176" y1="402" x2="220" y2="402"/><line x1="176" y1="412" x2="204" y2="412"/>
+              </g>
+              <circle cx="220" cy="414" r="8" fill="none" stroke="rgba(150,230,240,.9)" stroke-width="1.4"/>
+              <path d="M216 414 l2.6 3 l5.4 -6.4" fill="none" stroke="rgba(150,230,240,.95)" stroke-width="1.5"/>
+              <line class="fb-tick" x1="234" y1="396" x2="268" y2="402"/>
+              <text class="fb-lbl fb-side" x="272" y="406" text-anchor="start">LOGGED</text>
+            </g>
+          </svg>
+          <div class="fb-cap">EVERY DECISION SHOWS ITS WORK</div>
+        </div>
+        </div>
       </article>
-      <article class="pcard">
+      <article class="pcard pcard-flip">
+        <div class="flip-in">
+        <div class="flip-front">
         <div class="panel"><div class="inner dark">
   <div class="p-top"><span>MISSION VERIFICATION</span><span>06</span></div>
   <div class="bar-row"><span>Objective coverage</span><div class="bar"><i style="width:97%"></i></div><span>97%</span></div>
@@ -310,12 +824,89 @@
           <h3>Verified Outcomes</h3>
           <p class="desc">Completion is measured against the original objective, not the flight path. Every mission concludes with evidence: coverage, findings, confidence levels, uncertainties, and next actions.</p>
           <div class="fact"><span class="n">1</span><div class="l">evidence package per mission: flight completion ≠ mission completion</div></div>
+        </div>
+      </div>
+        <div class="flip-back" aria-hidden="true">
+          <div class="fb-top"><span>VERIFIED OUTCOMES</span><span>06</span></div>
+          <svg class="fb-svg" viewBox="0 0 400 560" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs><filter id="voG" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur stdDeviation="7" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+            <g fill="rgba(237,235,228,.14)">
+              <circle cx="54" cy="150" r="1.1"/><circle cx="350" cy="118" r="1.1"/>
+              <circle cx="336" cy="474" r="1.1"/><circle cx="48" cy="402" r="1.1"/>
+            </g>
+            <!-- the original objective -->
+            <g class="lyr l6-obj">
+              <polygon points="200,34 234,54 200,74 166,54" fill="#1B1B19" stroke="rgba(237,235,228,.75)" stroke-width="1.5"/>
+              <circle cx="200" cy="54" r="7.5" fill="none" stroke="rgba(237,235,228,.85)" stroke-width="1.4"/>
+              <line x1="200" y1="42" x2="200" y2="48" stroke="rgba(237,235,228,.85)" stroke-width="1.4"/>
+              <line x1="200" y1="60" x2="200" y2="66" stroke="rgba(237,235,228,.85)" stroke-width="1.4"/>
+              <line x1="188" y1="54" x2="194" y2="54" stroke="rgba(237,235,228,.85)" stroke-width="1.4"/>
+              <line x1="206" y1="54" x2="212" y2="54" stroke="rgba(237,235,228,.85)" stroke-width="1.4"/>
+              <line x1="188" y1="98" x2="212" y2="98" stroke="rgba(150,230,240,.8)" stroke-width="1.6"/>
+              <line x1="188" y1="106" x2="212" y2="106" stroke="rgba(150,230,240,.8)" stroke-width="1.6"/>
+              <path class="flow" d="M200 112 V142" fill="none" stroke="rgba(237,235,228,.45)" stroke-width="1.4" stroke-dasharray="4 7"/>
+              <line class="fb-tick" x1="166" y1="54" x2="132" y2="46"/>
+              <text class="fb-lbl fb-side" x="128" y="42" text-anchor="end">OBJECTIVE</text>
+            </g>
+            <!-- the coverage map -->
+            <g class="lyr l6-map">
+              <polygon points="200,150 322,196 300,300 118,312 84,214" fill="#151513" stroke="rgba(237,235,228,.5)" stroke-width="1.7"/>
+              <g fill="none" stroke="rgba(237,235,228,.45)" stroke-width="1.3">
+                <path d="M110 226 H286"/>
+                <path d="M288 248 H112"/>
+                <path class="flow" d="M116 270 H282" stroke="rgba(150,230,240,.8)" stroke-width="1.6" stroke-dasharray="6 5"/>
+                <path d="M278 292 H124" stroke-dasharray="3 6" stroke="rgba(237,235,228,.3)"/>
+                <path d="M286 226 a11 11 0 0 1 2 22 M112 248 a11 11 0 0 0 4 22 M282 270 a11 11 0 0 1 -4 22"/>
+              </g>
+              <polygon points="268,178 322,196 306,254 258,234" fill="none" stroke="rgba(237,235,228,.55)" stroke-width="1.3" stroke-dasharray="4 4"/>
+              <g stroke="rgba(237,235,228,.4)" stroke-width="1.1">
+                <line x1="272" y1="186" x2="296" y2="238"/><line x1="284" y1="182" x2="306" y2="230"/>
+                <line x1="296" y1="180" x2="312" y2="216"/>
+              </g>
+              <line x1="288" y1="210" x2="288" y2="220" stroke="rgba(237,235,228,.9)" stroke-width="1.8"/>
+              <circle cx="288" cy="226" r="1.4" fill="rgba(237,235,228,.9)"/>
+              <g stroke="rgba(150,230,240,.9)" stroke-width="1.4" fill="rgba(127,223,232,.25)">
+                <line x1="150" y1="238" x2="150" y2="222"/><polygon points="150,222 162,226 150,231"/>
+                <line x1="216" y1="262" x2="216" y2="246"/><polygon points="216,246 228,250 216,255"/>
+                <line x1="176" y1="296" x2="176" y2="280"/><polygon points="176,280 188,284 176,289"/>
+              </g>
+              <line class="fb-tick" x1="322" y1="214" x2="352" y2="208"/>
+              <text class="fb-lbl fb-side" x="392" y="196" text-anchor="end">NOT YET</text>
+              <text class="fb-lbl fb-side" x="392" y="210" text-anchor="end">VERIFIED</text>
+              <line class="fb-tick" x1="84" y1="252" x2="54" y2="258"/>
+              <text class="fb-lbl fb-side fb-cy" x="10" y="254" text-anchor="start">SWEEP</text>
+              <text class="fb-lbl fb-side fb-cy" x="10" y="268" text-anchor="start">COVERAGE</text>
+            </g>
+            <!-- the evidence seal -->
+            <g class="lyr l6-seal">
+              <path class="flow f2" d="M200 314 V368" fill="none" stroke="rgba(150,230,240,.55)" stroke-width="1.6" stroke-dasharray="4 6"/>
+              <path d="M194 364 l6 10 l6 -10" fill="none" stroke="rgba(150,230,240,.8)" stroke-width="1.5"/>
+              <circle cx="200" cy="424" r="34" fill="rgba(127,223,232,.06)" stroke="rgba(150,230,240,.95)" stroke-width="1.8" filter="url(#voG)"/>
+              <circle cx="200" cy="424" r="24" fill="none" stroke="rgba(150,230,240,.55)" stroke-width="1.2" stroke-dasharray="4 4"/>
+              <path d="M188 424 l8 9 l16 -19" fill="none" stroke="rgba(200,245,250,.95)" stroke-width="2.2" filter="url(#voG)"/>
+              <g stroke="rgba(150,230,240,.6)" stroke-width="1.3">
+                <line x1="200" y1="384" x2="200" y2="390"/><line x1="200" y1="458" x2="200" y2="464"/>
+                <line x1="160" y1="424" x2="166" y2="424"/><line x1="234" y1="424" x2="240" y2="424"/>
+                <line x1="172" y1="396" x2="176" y2="400"/><line x1="228" y1="396" x2="224" y2="400"/>
+                <line x1="172" y1="452" x2="176" y2="448"/><line x1="228" y1="452" x2="224" y2="448"/>
+              </g>
+              <line class="fb-tick" x1="234" y1="436" x2="268" y2="444"/>
+              <text class="fb-lbl fb-side fb-cy" x="272" y="440" text-anchor="start">EVIDENCE</text>
+              <text class="fb-lbl fb-side fb-cy" x="272" y="454" text-anchor="start">SEALED</text>
+            </g>
+          </svg>
+          <div class="fb-cap">FLIGHT DONE ≠ MISSION DONE · PROVE IT</div>
+        </div>
         </div>
       </article>
     </div>
     <div class="pmq-end" aria-hidden="true"></div>
     <div class="pmq-group" aria-hidden="true">
-      <article class="pcard">
+      <article class="pcard pcard-flip">
+        <div class="flip-in">
+        <div class="flip-front">
         <div class="panel"><div class="inner">
   <div class="p-top"><span>KENWER · MISSION CONSOLE</span><span>01</span></div>
   <div class="p-line"><span class="p">operator ›</span> Inspect this building.</div>
@@ -327,8 +918,125 @@
           <p class="desc">Natural language, voice, maps, or images become a structured mission object: intent, locations, constraints, and success criteria the entire system shares.</p>
           <div class="fact"><span class="n">0</span><div class="l">unsupported assumptions. Ambiguity triggers a question, not a guess</div></div>
         </div>
+        </div>
+        <div class="flip-back" aria-hidden="true">
+          <div class="fb-top"><span>MISSION UNDERSTANDING</span><span>01</span></div>
+          <svg class="fb-svg" viewBox="0 0 400 560" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <filter id="muGlow" x="-60%" y="-60%" width="220%" height="220%">
+                <feGaussianBlur stdDeviation="7" result="b"/>
+                <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+              <radialGradient id="muVig" cx=".5" cy=".42" r=".65">
+                <stop offset="0" stop-color="rgba(140,228,238,.06)"/>
+                <stop offset="1" stop-color="rgba(140,228,238,0)"/>
+              </radialGradient>
+            </defs>
+
+            <ellipse cx="200" cy="250" rx="195" ry="245" fill="url(#muVig)"/>
+            <g fill="rgba(237,235,228,.14)">
+              <circle cx="52" cy="150" r="1.1"/><circle cx="352" cy="120" r="1.1"/>
+              <circle cx="338" cy="452" r="1.1"/><circle cx="46" cy="382" r="1.1"/>
+            </g>
+
+            <!-- ============ INPUT ROW: voice · text · map · image ============ -->
+            <g class="lyr l2-in">
+              <!-- voice tile -->
+              <rect x="34" y="58" width="64" height="52" rx="9" fill="#1B1B19" stroke="rgba(237,235,228,.4)" stroke-width="1.3"/>
+              <path d="M66 108 l-6 10 h14 Z" fill="#1B1B19" stroke="rgba(237,235,228,.4)" stroke-width="1.3"/>
+              <g stroke="rgba(237,235,228,.75)" stroke-width="2.6" stroke-linecap="round">
+                <line x1="48" y1="80" x2="48" y2="88"/><line x1="56" y1="74" x2="56" y2="94"/>
+                <line x1="64" y1="68" x2="64" y2="100"/><line x1="72" y1="76" x2="72" y2="92"/>
+                <line x1="80" y1="82" x2="80" y2="86"/>
+              </g>
+              <!-- text tile -->
+              <rect x="118" y="58" width="64" height="52" rx="6" fill="#1B1B19" stroke="rgba(237,235,228,.4)" stroke-width="1.3"/>
+              <g stroke="rgba(237,235,228,.7)" stroke-width="2.2" stroke-linecap="round">
+                <line x1="128" y1="72" x2="172" y2="72"/><line x1="128" y1="82" x2="164" y2="82"/>
+                <line x1="128" y1="92" x2="170" y2="92"/><line x1="128" y1="100" x2="150" y2="100"/>
+              </g>
+              <!-- map tile -->
+              <rect x="202" y="58" width="64" height="52" rx="6" fill="#1B1B19" stroke="rgba(237,235,228,.4)" stroke-width="1.3"/>
+              <path d="M202 96 l20 -10 22 8 22 -12" fill="none" stroke="rgba(237,235,228,.4)" stroke-width="1.1"/>
+              <path d="M202 78 l20 -8 22 6 22 -10" fill="none" stroke="rgba(237,235,228,.28)" stroke-width="1"/>
+              <path d="M234 66 c-7 0 -11 5 -11 11 c0 8 11 19 11 19 c0 0 11 -11 11 -19 c0 -6 -4 -11 -11 -11 Z"
+                    fill="none" stroke="rgba(237,235,228,.85)" stroke-width="1.8"/>
+              <circle cx="234" cy="77" r="3.4" fill="rgba(237,235,228,.85)"/>
+              <!-- image tile -->
+              <rect x="286" y="58" width="64" height="52" rx="6" fill="#1B1B19" stroke="rgba(237,235,228,.4)" stroke-width="1.3"/>
+              <circle cx="302" cy="72" r="4.5" fill="none" stroke="rgba(237,235,228,.7)" stroke-width="1.6"/>
+              <path d="M290 102 l16 -18 12 12 8 -8 14 14" fill="none" stroke="rgba(237,235,228,.7)" stroke-width="1.8" stroke-linejoin="round"/>
+            </g>
+
+            <!-- ============ CONVERGING STREAMS (marching dashes) ============ -->
+            <g class="lyr l2-st" fill="none" stroke="rgba(237,235,228,.45)" stroke-width="1.4">
+              <path class="flow" d="M66 122 C70 160 140 176 188 206" stroke-dasharray="4 7"/>
+              <path class="flow f2" d="M150 114 C154 148 178 168 196 202" stroke-dasharray="4 7"/>
+              <path class="flow f3" d="M234 114 C230 148 216 168 204 202" stroke-dasharray="4 7"/>
+              <path class="flow f2" d="M318 114 C314 156 254 176 212 206" stroke-dasharray="4 7"/>
+            </g>
+
+            <!-- ============ THE UNDERSTANDING LENS ============ -->
+            <g class="lyr l2-px">
+              <polygon class="mu-halo" points="200,196 258,236 200,276 142,236" fill="rgba(127,223,232,.14)" filter="url(#muGlow)"/>
+              <polygon points="200,202 252,236 200,270 148,236" fill="none" stroke="rgba(150,230,240,.95)" stroke-width="1.7" filter="url(#muGlow)"/>
+              <polygon points="200,212 238,236 200,260 162,236" fill="none" stroke="rgba(150,230,240,.55)" stroke-width="1.1" stroke-dasharray="4 4"/>
+              <circle cx="200" cy="236" r="9" fill="none" stroke="rgba(160,235,245,.9)" stroke-width="1.4"/>
+              <circle cx="200" cy="236" r="3" fill="#FFFFFF" filter="url(#muGlow)"/>
+              <line class="fb-tick" x1="252" y1="236" x2="286" y2="236"/>
+              <text class="fb-lbl fb-side fb-cy" x="290" y="232" text-anchor="start">PARSE +</text>
+              <text class="fb-lbl fb-side fb-cy" x="290" y="246" text-anchor="start">CLARIFY</text>
+            </g>
+
+            <!-- ============ ORDERED CHANNELS OUT ============ -->
+            <g class="lyr l2-ch" fill="none" stroke="rgba(150,230,240,.6)" stroke-width="1.4">
+              <path class="flow" d="M182 268 L152 318" stroke-dasharray="4 6"/>
+              <path class="flow f2" d="M194 272 L184 320" stroke-dasharray="4 6"/>
+              <path class="flow f3" d="M206 272 L216 320" stroke-dasharray="4 6"/>
+              <path class="flow f2" d="M218 268 L248 318" stroke-dasharray="4 6"/>
+              <g stroke="rgba(150,230,240,.85)" stroke-width="1.6">
+                <path d="M148 312 l4 8 l7 -5"/><path d="M181 315 l3 8 l8 -3"/>
+                <path d="M219 323 l8 3 l3 -8"/><path d="M245 315 l7 5 l4 -8"/>
+              </g>
+            </g>
+
+            <!-- ============ THE MISSION OBJECT ============ -->
+            <g class="lyr l2-ob">
+              <polygon points="200,330 342,376 200,422 58,376" fill="#171715" stroke="rgba(237,235,228,.4)" stroke-width="1.6"/>
+              <polygon points="58,376 200,422 200,436 58,390" fill="#101010"/>
+              <polygon points="342,376 200,422 200,436 342,390" fill="#0D0D0C"/>
+              <!-- four structured slots -->
+              <polygon points="152,346 200,362 152,378 104,362" fill="none" stroke="rgba(150,230,240,.7)" stroke-width="1.2"/>
+              <polygon points="248,346 296,362 248,378 200,362" fill="none" stroke="rgba(150,230,240,.7)" stroke-width="1.2"/>
+              <polygon points="152,376 200,392 152,408 104,392" fill="none" stroke="rgba(150,230,240,.7)" stroke-width="1.2"/>
+              <polygon points="248,376 296,392 248,408 200,392" fill="none" stroke="rgba(150,230,240,.7)" stroke-width="1.2"/>
+              <!-- slot glyphs: crosshair · boundary · shield · seal -->
+              <g stroke="rgba(237,235,228,.85)" stroke-width="1.4" fill="none">
+                <circle cx="152" cy="362" r="6.5"/>
+                <line x1="152" y1="352" x2="152" y2="357"/><line x1="152" y1="367" x2="152" y2="372"/>
+                <line x1="142" y1="362" x2="147" y2="362"/><line x1="157" y1="362" x2="162" y2="362"/>
+                <path d="M238 356 l14 -4 8 8 -10 8 -14 -3 Z" stroke-dasharray="3 3"/>
+                <path d="M152 384 c5 2 5 2 0 0 M145 387 c0 8 3 12 7 14 c4 -2 7 -6 7 -14 l-7 -3 Z"/>
+                <circle cx="248" cy="392" r="7"/>
+                <path d="M244.5 392 l2.5 3 l5 -6"/>
+              </g>
+              <line class="fb-tick" x1="342" y1="376" x2="366" y2="380"/>
+              <text class="fb-lbl fb-side" x="390" y="392" text-anchor="end">OBJECT</text>
+              <line class="fb-tick" x1="58" y1="376" x2="34" y2="372"/>
+              <text class="fb-lbl fb-side" x="10" y="368" text-anchor="start">SHARED</text>
+              <text class="fb-lbl fb-side" x="10" y="382" text-anchor="start">STATE</text>
+            </g>
+
+            <!-- spine -->
+            <line class="fb-spine" x1="200" y1="130" x2="200" y2="330" stroke="rgba(237,235,228,.25)" stroke-width="1.1" stroke-dasharray="3 9"/>
+          </svg>
+          <div class="fb-cap">FOUR WAYS IN · ONE MISSION OBJECT OUT</div>
+        </div>
+        </div>
       </article>
-      <article class="pcard">
+      <article class="pcard pcard-flip">
+        <div class="flip-in">
+        <div class="flip-front">
         <div class="panel"><div class="inner dark">
   <div class="p-top"><span>SAFETY &amp; COMPLIANCE GATE</span><span>02</span></div>
   <div class="check-row"><span>Airspace restrictions</span><span class="ok">PASS</span></div>
@@ -343,8 +1051,81 @@
           <p class="desc">Every generated mission is validated before execution: airspace, weather, battery, geofencing, aircraft capability, regulatory and organizational policy. Unsafe missions are rejected or modified.</p>
           <div class="fact"><span class="n">100%</span><div class="l">of missions pass the safety gate before anything reaches the aircraft</div></div>
         </div>
+      </div>
+        <div class="flip-back" aria-hidden="true">
+          <div class="fb-top"><span>SAFETY BEFORE AUTONOMY</span><span>02</span></div>
+          <svg class="fb-svg" viewBox="0 0 400 560" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs><filter id="sgG" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur stdDeviation="7" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+            <g fill="rgba(237,235,228,.14)">
+              <circle cx="54" cy="140" r="1.1"/><circle cx="350" cy="112" r="1.1"/>
+              <circle cx="336" cy="470" r="1.1"/><circle cx="48" cy="400" r="1.1"/>
+            </g>
+            <!-- plan chip descending, queue behind it -->
+            <g class="lyr l3-plan">
+              <polygon points="200,26 226,38 200,50 174,38" fill="none" stroke="rgba(237,235,228,.25)" stroke-width="1"/>
+              <polygon points="200,52 232,68 200,84 168,68" fill="#1B1B19" stroke="rgba(237,235,228,.75)" stroke-width="1.5"/>
+              <path d="M184 68 q6 -6 12 0 t12 0" fill="none" stroke="rgba(237,235,228,.7)" stroke-width="1.5"/>
+              <path class="flow" d="M200 88 V142" fill="none" stroke="rgba(237,235,228,.5)" stroke-width="1.5" stroke-dasharray="4 7"/>
+              <line class="fb-tick" x1="168" y1="68" x2="132" y2="60"/>
+              <text class="fb-lbl fb-side" x="128" y="56" text-anchor="end">PLAN</text>
+            </g>
+            <!-- THE GATE: portal + five checks + shield -->
+            <g class="lyr l3-gate">
+              <rect x="118" y="150" width="164" height="24" fill="#171715" stroke="rgba(237,235,228,.45)" stroke-width="1.5"/>
+              <rect x="118" y="174" width="18" height="86" fill="#151513" stroke="rgba(237,235,228,.45)" stroke-width="1.5"/>
+              <rect x="264" y="174" width="18" height="86" fill="#151513" stroke="rgba(237,235,228,.45)" stroke-width="1.5"/>
+              <path d="M112 182 l6 4 M112 196 l6 4 M112 210 l6 4 M288 182 l-6 4 M288 196 l-6 4 M288 210 l-6 4" stroke="rgba(237,235,228,.35)" stroke-width="1.2"/>
+              <circle cx="127" cy="266" r="2.4" fill="none" stroke="rgba(237,235,228,.5)" stroke-width="1"/>
+              <circle cx="273" cy="266" r="2.4" fill="none" stroke="rgba(237,235,228,.5)" stroke-width="1"/>
+              <g fill="#0F0F0E" stroke="rgba(237,235,228,.7)" stroke-width="1.3">
+                <circle cx="140" cy="162" r="8"/><circle cx="170" cy="162" r="8"/>
+                <circle cx="200" cy="162" r="8"/><circle cx="230" cy="162" r="8"/><circle cx="260" cy="162" r="8"/>
+              </g>
+              <g fill="none" stroke="rgba(150,230,240,.9)" stroke-width="1.5">
+                <path d="M136 162 l3 3.5 l5.5 -7"/><path d="M166 162 l3 3.5 l5.5 -7"/>
+                <path d="M196 162 l3 3.5 l5.5 -7"/><path d="M226 162 l3 3.5 l5.5 -7"/><path d="M256 162 l3 3.5 l5.5 -7"/>
+              </g>
+              <path d="M200 190 l16 6 v13 c0 11 -7 18 -16 22 c-9 -4 -16 -11 -16 -22 v-13 Z"
+                    fill="rgba(127,223,232,.10)" stroke="rgba(150,230,240,.95)" stroke-width="1.7" filter="url(#sgG)"/>
+              <path d="M192 210 l6 7 l11 -13" fill="none" stroke="rgba(200,245,250,.95)" stroke-width="1.8"/>
+              <line class="flow" x1="140" y1="246" x2="260" y2="246" stroke="rgba(150,230,240,.5)" stroke-width="1.2" stroke-dasharray="4 6"/>
+              <line class="fb-tick" x1="282" y1="158" x2="316" y2="152"/>
+              <text class="fb-lbl fb-side fb-cy" x="320" y="148" text-anchor="start">5 CHECKS</text>
+              <text class="fb-lbl fb-side fb-cy" x="320" y="162" text-anchor="start">EVERY</text>
+              <text class="fb-lbl fb-side fb-cy" x="320" y="176" text-anchor="start">MISSION</text>
+            </g>
+            <!-- outputs: pass → aircraft, unsafe → rework loop -->
+            <g class="lyr l3-out">
+              <path class="flow f2" d="M200 262 V332" fill="none" stroke="rgba(150,230,240,.6)" stroke-width="1.6" stroke-dasharray="4 6"/>
+              <path d="M194 328 l6 10 l6 -10" fill="none" stroke="rgba(150,230,240,.85)" stroke-width="1.6"/>
+              <path class="flow f3" d="M212 268 C266 280 300 250 302 210 C304 178 272 164 288 163" fill="none" stroke="rgba(237,235,228,.32)" stroke-width="1.3" stroke-dasharray="3 7"/>
+              <path d="M282 158 l8 4 l-6 7" fill="none" stroke="rgba(237,235,228,.5)" stroke-width="1.3"/>
+              <line class="fb-tick" x1="304" y1="236" x2="330" y2="242"/>
+              <text class="fb-lbl fb-side" x="334" y="246" text-anchor="start">REWORK</text>
+              <g stroke="rgba(237,235,228,.8)" fill="rgba(237,235,228,.8)">
+                <rect x="188" y="376" width="24" height="24" fill="none" stroke-width="1.6"/>
+                <line x1="196" y1="384" x2="152" y2="356" stroke-width="1.4"/><line x1="204" y1="384" x2="248" y2="356" stroke-width="1.4"/>
+                <line x1="196" y1="394" x2="152" y2="422" stroke-width="1.4"/><line x1="204" y1="394" x2="248" y2="422" stroke-width="1.4"/>
+                <circle cx="148" cy="352" r="15" fill="none" stroke-width="1.6"/><circle cx="252" cy="352" r="15" fill="none" stroke-width="1.6"/>
+                <circle cx="148" cy="426" r="15" fill="none" stroke-width="1.6"/><circle cx="252" cy="426" r="15" fill="none" stroke-width="1.6"/>
+                <circle cx="148" cy="352" r="2.6"/><circle cx="252" cy="352" r="2.6"/>
+                <circle cx="148" cy="426" r="2.6"/><circle cx="252" cy="426" r="2.6"/>
+                <line x1="137" y1="341" x2="159" y2="363" stroke-width="1.2"/><line x1="263" y1="341" x2="241" y2="363" stroke-width="1.2"/>
+                <line x1="137" y1="437" x2="159" y2="415" stroke-width="1.2"/><line x1="263" y1="437" x2="241" y2="415" stroke-width="1.2"/>
+              </g>
+              <line class="fb-tick" x1="252" y1="446" x2="286" y2="456"/>
+              <text class="fb-lbl fb-side" x="290" y="460" text-anchor="start">AIRCRAFT</text>
+            </g>
+          </svg>
+          <div class="fb-cap">NOTHING FLIES UNTIL THE GATE SAYS SO</div>
+        </div>
+        </div>
       </article>
-      <article class="pcard">
+      <article class="pcard pcard-flip">
+        <div class="flip-in">
+        <div class="flip-front">
         <div class="panel"><div class="inner">
   <div class="p-top"><span>MISSION COMPILER</span><span>03</span></div>
   <div class="big-word">One plan</div>
@@ -357,8 +1138,89 @@
           <p class="desc">Drone-specific detail is isolated behind standardized adapters. Organizations keep the fleets they've invested in, switch vendors freely, and the intelligence layer never changes.</p>
           <div class="fact"><span class="n">4+</span><div class="l">drone ecosystems executing the same platform-neutral mission</div></div>
         </div>
+      </div>
+        <div class="flip-back" aria-hidden="true">
+          <div class="fb-top"><span>HARDWARE INDEPENDENCE</span><span>03</span></div>
+          <svg class="fb-svg" viewBox="0 0 400 560" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs><filter id="hwG" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur stdDeviation="7" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+            <g fill="rgba(237,235,228,.14)">
+              <circle cx="56" cy="150" r="1.1"/><circle cx="348" cy="126" r="1.1"/>
+              <circle cx="334" cy="462" r="1.1"/><circle cx="50" cy="396" r="1.1"/>
+            </g>
+            <!-- the single intelligence core -->
+            <g class="lyr l4-core">
+              <rect x="168" y="46" width="64" height="50" rx="9" fill="rgba(127,223,232,.08)" stroke="rgba(150,230,240,.95)" stroke-width="1.7" filter="url(#hwG)"/>
+              <rect x="184" y="60" width="32" height="22" rx="3" fill="none" stroke="rgba(160,235,245,.7)" stroke-width="1.2"/>
+              <circle cx="200" cy="71" r="3" fill="#FFFFFF" filter="url(#hwG)"/>
+              <g stroke="rgba(150,230,240,.7)" stroke-width="1.6">
+                <line x1="180" y1="96" x2="180" y2="104"/><line x1="190" y1="96" x2="190" y2="104"/>
+                <line x1="200" y1="96" x2="200" y2="104"/><line x1="210" y1="96" x2="210" y2="104"/>
+                <line x1="220" y1="96" x2="220" y2="104"/>
+              </g>
+              <path class="flow" d="M200 106 V148" fill="none" stroke="rgba(150,230,240,.6)" stroke-width="1.7" stroke-dasharray="4 6"/>
+              <line class="fb-tick" x1="168" y1="70" x2="132" y2="62"/>
+              <text class="fb-lbl fb-side fb-cy" x="128" y="58" text-anchor="end">ONE</text>
+              <text class="fb-lbl fb-side fb-cy" x="128" y="72" text-anchor="end">PLAN</text>
+            </g>
+            <!-- the adapter wedge -->
+            <g class="lyr l4-ad">
+              <polygon points="140,152 260,152 300,214 100,214" fill="#161614" stroke="rgba(237,235,228,.45)" stroke-width="1.6"/>
+              <path d="M118 206 h16 M266 206 h16 M150 160 h8 M242 160 h8" stroke="rgba(237,235,228,.3)" stroke-width="1.2"/>
+              <g fill="none" stroke="rgba(150,230,240,.55)" stroke-width="1.3">
+                <path class="flow" d="M200 156 C176 176 140 188 124 210" stroke-dasharray="3 6"/>
+                <path class="flow f2" d="M200 156 C192 178 180 192 174 210" stroke-dasharray="3 6"/>
+                <path class="flow f3" d="M200 156 C208 178 220 192 226 210" stroke-dasharray="3 6"/>
+                <path class="flow f2" d="M200 156 C224 176 260 188 276 210" stroke-dasharray="3 6"/>
+              </g>
+              <line class="fb-tick" x1="300" y1="184" x2="332" y2="178"/>
+              <text class="fb-lbl fb-side fb-cy" x="336" y="174" text-anchor="start">ADAPTER</text>
+              <text class="fb-lbl fb-side fb-cy" x="336" y="188" text-anchor="start">FRAME</text>
+            </g>
+            <!-- four different plugs → four different sockets → four different craft -->
+            <g class="lyr l4-fleet" stroke="rgba(237,235,228,.75)" fill="none" stroke-width="1.5">
+              <line x1="124" y1="216" x2="124" y2="238"/><circle cx="124" cy="246" r="8"/>
+              <line x1="174" y1="216" x2="174" y2="238"/><rect x="167" y="240" width="14" height="13"/>
+              <line x1="226" y1="216" x2="226" y2="238"/><polygon points="226,239 234,253 218,253"/>
+              <line x1="276" y1="216" x2="276" y2="236"/><polygon points="276,238 284,242 284,251 276,255 268,251 268,242"/>
+              <path d="M106 276 h12 v-14 M142 276 h-12 v-14"/>
+              <path d="M156 276 h12 v-12 M192 276 h-12 v-12"/>
+              <path d="M208 276 h12 v-11 M244 276 h-12 v-11"/>
+              <path d="M258 276 h12 v-12 M294 276 h-12 v-12"/>
+              <g stroke-width="1.4">
+                <rect x="115" y="322" width="18" height="18"/>
+                <circle cx="106" cy="313" r="9"/><circle cx="142" cy="313" r="9"/>
+                <circle cx="106" cy="349" r="9"/><circle cx="142" cy="349" r="9"/>
+                <line x1="115" y1="322" x2="109" y2="316"/><line x1="133" y1="322" x2="139" y2="316"/>
+                <line x1="115" y1="340" x2="109" y2="346"/><line x1="133" y1="340" x2="139" y2="346"/>
+                <circle cx="174" cy="331" r="10"/>
+                <circle cx="158" cy="315" r="8"/><circle cx="190" cy="315" r="8"/>
+                <circle cx="158" cy="347" r="8"/><circle cx="190" cy="347" r="8"/>
+                <line x1="167" y1="324" x2="161" y2="318"/><line x1="181" y1="324" x2="187" y2="318"/>
+                <line x1="167" y1="338" x2="161" y2="344"/><line x1="181" y1="338" x2="187" y2="344"/>
+                <polygon points="226,321 235,326 235,336 226,341 217,336 217,326"/>
+                <circle cx="210" cy="313" r="8"/><circle cx="242" cy="313" r="8"/>
+                <circle cx="210" cy="349" r="8"/><circle cx="242" cy="349" r="8"/>
+                <line x1="219" y1="324" x2="213" y2="318"/><line x1="233" y1="324" x2="239" y2="318"/>
+                <line x1="219" y1="338" x2="213" y2="344"/><line x1="233" y1="338" x2="239" y2="344"/>
+                <polygon points="276,322 285,340 267,340"/>
+                <circle cx="260" cy="315" r="8"/><circle cx="292" cy="315" r="8"/>
+                <circle cx="260" cy="349" r="8"/><circle cx="292" cy="349" r="8"/>
+                <line x1="270" y1="326" x2="263" y2="319"/><line x1="282" y1="326" x2="289" y2="319"/>
+                <line x1="270" y1="337" x2="263" y2="344"/><line x1="282" y1="337" x2="289" y2="344"/>
+              </g>
+              <line class="fb-tick" x1="142" y1="366" x2="120" y2="386" stroke-width="1"/>
+              <text class="fb-lbl fb-side" x="116" y="398" text-anchor="start" stroke="none" fill="var(--mut-d)">ANY FLEET · SAME MISSION</text>
+            </g>
+          </svg>
+          <div class="fb-cap">SWAP THE AIRCRAFT · KEEP THE INTELLIGENCE</div>
+        </div>
+        </div>
       </article>
-      <article class="pcard">
+      <article class="pcard pcard-flip">
+        <div class="flip-in">
+        <div class="flip-front">
         <div class="panel"><div class="inner dark">
   <div class="p-top"><span>COGNITIVE IDENTITY · LIVE</span><span>04</span></div>
   <div class="bar-row"><span>Mission progress</span><div class="bar"><i style="width:64%"></i></div><span>64%</span></div>
@@ -372,8 +1234,172 @@
           <p class="desc">The platform holds a mission identity for the whole flight and beyond it: objective, constraints, assumptions, coverage, and confidence. When evidence contradicts an assumption, the belief is revised, and that change carries into the next mission.</p>
           <div class="fact"><span class="n">1</span><div class="l">continuous mission identity, from objective through belief revision</div></div>
         </div>
+        </div>
+        <div class="flip-back" aria-hidden="true">
+          <div class="fb-top"><span>INSIDE THE BRAIN</span><span>04</span></div>
+          <svg class="fb-svg" viewBox="0 0 400 560" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <filter id="cyGlow" x="-60%" y="-60%" width="220%" height="220%">
+                <feGaussianBlur stdDeviation="7" result="b"/>
+                <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+              <filter id="amGlow" x="-60%" y="-60%" width="220%" height="220%">
+                <feGaussianBlur stdDeviation="6" result="b"/>
+                <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+              <linearGradient id="metal" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#55554F"/><stop offset=".35" stop-color="#C9C9C2"/>
+                <stop offset=".55" stop-color="#8F8F88"/><stop offset="1" stop-color="#3E3E39"/>
+              </linearGradient>
+              <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="rgba(140,228,238,.22)"/>
+                <stop offset=".5" stop-color="rgba(140,228,238,.08)"/>
+                <stop offset="1" stop-color="rgba(140,228,238,.18)"/>
+              </linearGradient>
+              <radialGradient id="vig" cx=".5" cy=".5" r=".65">
+                <stop offset="0" stop-color="rgba(140,228,238,.06)"/>
+                <stop offset="1" stop-color="rgba(140,228,238,0)"/>
+              </radialGradient>
+            </defs>
+
+            <!-- ambient depth -->
+            <ellipse cx="200" cy="300" rx="195" ry="245" fill="url(#vig)"/>
+            <g fill="rgba(237,235,228,.14)">
+              <circle cx="58" cy="160" r="1.1"/><circle cx="348" cy="132" r="1.1"/>
+              <circle cx="330" cy="452" r="1.1"/><circle cx="46" cy="392" r="1.1"/>
+              <circle cx="366" cy="242" r="1.1"/><circle cx="88" cy="510" r="1.1"/>
+            </g>
+
+            <line class="fb-spine" x1="200" y1="150" x2="200" y2="466" stroke="rgba(237,235,228,.3)" stroke-width="1.2" stroke-dasharray="3 9"/>
+
+            <!-- rising data motes (base → brain) -->
+            <g class="fb-motes">
+              <circle class="mote" cx="200" cy="452" r="2" fill="#8FE3EA" filter="url(#cyGlow)"/>
+              <circle class="mote" cx="200" cy="452" r="1.6" fill="#8FE3EA" filter="url(#cyGlow)" style="animation-delay:1.3s"/>
+              <circle class="mote" cx="200" cy="452" r="1.3" fill="#E8C27A" filter="url(#amGlow)" style="animation-delay:2.5s"/>
+            </g>
+
+            <!-- ============ BASE: mechanical core unit ============ -->
+            <g class="lyr lyr-base">
+              <polygon points="200,433 360,472 200,511 40,472" fill="#161614" stroke="rgba(237,235,228,.28)" stroke-width="1.2"/>
+              <polygon points="40,472 200,511 200,527 40,488" fill="#0F0F0E"/>
+              <polygon points="360,472 200,511 200,527 360,488" fill="#0C0C0B"/>
+              <path d="M84 470 l26 6 M96 463 l26 6 M108 456 l26 6" stroke="rgba(237,235,228,.22)" stroke-width="2"/>
+              <path d="M290 456 l-26 6 M302 463 l-26 6" stroke="rgba(237,235,228,.16)" stroke-width="2"/>
+              <polygon points="122,492 146,498 146,505 122,499" fill="#1E1E1C" stroke="rgba(237,235,228,.2)" stroke-width=".8"/>
+              <polygon points="156,500 172,504 172,510 156,506" fill="#1E1E1C" stroke="rgba(237,235,228,.2)" stroke-width=".8"/>
+              <g stroke="rgba(237,235,228,.4)" fill="#0F0F0E">
+                <circle cx="72" cy="472" r="2.6"/><circle cx="328" cy="472" r="2.6"/>
+              </g>
+              <circle cx="268" cy="486" r="2" fill="#E8C27A" filter="url(#amGlow)"/>
+              <circle cx="282" cy="483" r="2" fill="#E8C27A" filter="url(#amGlow)"/>
+              <circle cx="296" cy="480" r="2" fill="#E8C27A" filter="url(#amGlow)"/>
+              <text class="fb-lbl" x="200" y="547" text-anchor="middle">KENWER COGNITIVE CORE UNIT 01</text>
+            </g>
+
+            <!-- ============ AMBER ENERGY LAYER ============ -->
+            <g class="lyr lyr-amber">
+              <polygon points="200,374 330,402 200,430 70,402" fill="rgba(232,194,122,.12)" stroke="rgba(232,194,122,.7)" stroke-width="1.4" filter="url(#amGlow)"/>
+              <polygon points="70,402 200,430 200,440 70,412" fill="rgba(232,194,122,.07)"/>
+              <polygon points="330,402 200,430 200,440 330,412" fill="rgba(232,194,122,.05)"/>
+              <polygon points="200,382 296,402 200,422 104,402" fill="none" stroke="rgba(232,194,122,.4)" stroke-width="1" stroke-dasharray="4 6"/>
+              <path class="fil fa" d="M118 402 q18 -9 36 0 t36 0 t36 0 t36 0" fill="none" stroke="#E8C27A" stroke-width="1.1"/>
+              <path class="fil fa f2" d="M132 394 q16 8 34 1 t38 -2 t34 3" fill="none" stroke="#E8C27A" stroke-width="1"/>
+              <path class="fil fa f3" d="M140 412 q20 -7 40 -1 t42 2" fill="none" stroke="#E8C27A" stroke-width="1"/>
+              <circle cx="152" cy="408" r="1.5" fill="#E8C27A"/>
+              <circle cx="252" cy="396" r="1.5" fill="#E8C27A"/>
+              <line class="fb-tick" x1="330" y1="402" x2="352" y2="404"/>
+              <text class="fb-lbl fb-side" x="390" y="408" text-anchor="end">POWER</text>
+            </g>
+
+            <!-- ============ FRAME PLATE: black gasket + bolts ============ -->
+            <g class="lyr lyr-frame">
+              <polygon points="200,306 350,342 200,378 50,342" fill="#151513" stroke="rgba(237,235,228,.34)" stroke-width="1.6"/>
+              <polygon points="50,342 200,378 200,390 50,354" fill="#0F0F0E"/>
+              <polygon points="350,342 200,378 200,390 350,354" fill="#0C0C0B"/>
+              <polygon points="200,318 300,342 200,366 100,342" fill="rgba(140,228,238,.05)" stroke="rgba(140,228,238,.35)" stroke-width="1" stroke-dasharray="5 5"/>
+              <path d="M116 334 l8 2 M112 340 l8 2 M284 334 l-8 2 M288 340 l-8 2" stroke="rgba(237,235,228,.3)" stroke-width="1"/>
+              <g stroke="rgba(237,235,228,.5)" fill="#0C0C0B">
+                <circle cx="200" cy="313" r="4"/><circle cx="343" cy="342" r="4"/>
+                <circle cx="200" cy="371" r="4"/><circle cx="57" cy="342" r="4"/>
+              </g>
+              <path d="M197 313 h6 M340 342 h6 M197 371 h6 M54 342 h6" stroke="rgba(237,235,228,.55)" stroke-width="1"/>
+              <path d="M200 310 v6 M343 339 v6 M200 368 v6 M57 339 v6" stroke="rgba(237,235,228,.55)" stroke-width="1"/>
+              <line class="fb-tick" x1="350" y1="342" x2="366" y2="346"/>
+              <text class="fb-lbl fb-side" x="390" y="358" text-anchor="end">ARRAY-7</text>
+            </g>
+
+            <!-- ============ CHROME SPINDLE ============ -->
+            <g class="lyr lyr-spindle">
+              <polygon points="192,140 208,140 205,148 195,148" fill="#6E6E68"/>
+              <rect x="193" y="146" width="14" height="82" rx="3" fill="url(#metal)"/>
+              <line x1="196.5" y1="150" x2="196.5" y2="208" stroke="#E4E4DE" stroke-width="1.3" opacity=".55"/>
+              <rect x="189" y="158" width="22" height="3.5" rx="1.5" fill="#7C7C75"/>
+              <rect x="189" y="172" width="22" height="3.5" rx="1.5" fill="#7C7C75"/>
+              <rect x="189" y="186" width="22" height="3.5" rx="1.5" fill="#7C7C75"/>
+              <ellipse cx="200" cy="212" rx="17" ry="6.5" fill="#4A4A44" stroke="#8F8F88" stroke-width="1"/>
+              <ellipse cx="200" cy="212" rx="10" ry="3.6" fill="none" stroke="rgba(143,227,234,.5)" stroke-width="1" filter="url(#cyGlow)"/>
+              <path class="fil fc" d="M200 150 q-26 -12 -44 -30" fill="none" stroke="#8FE3EA" stroke-width="1.1" filter="url(#cyGlow)"/>
+              <path class="fil fc f2" d="M200 150 q24 -14 40 -32" fill="none" stroke="#8FE3EA" stroke-width="1.1" filter="url(#cyGlow)"/>
+              <path class="fil fc f3" d="M200 154 q-14 -22 -8 -40" fill="none" stroke="#8FE3EA" stroke-width="1"/>
+              <path class="fil fc f2" d="M200 154 q16 -20 10 -38" fill="none" stroke="#8FE3EA" stroke-width="1"/>
+            </g>
+
+            <!-- ============ COGNITIVE IDENTITY: translucent chip stack ============ -->
+            <g class="lyr lyr-pcil">
+              <polygon class="pcil-halo" points="200,214 320,252 200,290 80,252" fill="rgba(127,223,232,.16)" filter="url(#cyGlow)"/>
+              <line x1="98" y1="234" x2="98" y2="274" stroke="rgba(150,230,240,.4)" stroke-width="1"/>
+              <line x1="302" y1="234" x2="302" y2="274" stroke="rgba(150,230,240,.4)" stroke-width="1"/>
+              <line x1="200" y1="258" x2="200" y2="298" stroke="rgba(150,230,240,.35)" stroke-width="1"/>
+              <polygon points="200,250 302,274 200,298 98,274" fill="url(#glass)" stroke="rgba(150,230,240,.7)" stroke-width="1.1" filter="url(#cyGlow)"/>
+              <circle cx="170" cy="270" r="1.4" fill="rgba(200,245,250,.9)"/>
+              <circle cx="230" cy="270" r="1.4" fill="rgba(200,245,250,.9)"/>
+              <polygon points="200,230 302,254 200,278 98,254" fill="url(#glass)" stroke="rgba(150,230,240,.85)" stroke-width="1.2" filter="url(#cyGlow)"/>
+              <path d="M140 254 h18 M242 254 h18 M200 242 v-6 M200 266 v6" stroke="rgba(160,235,245,.45)" stroke-width="1"/>
+              <polygon points="200,210 302,234 200,258 98,234" fill="url(#glass)" stroke="rgba(160,235,245,.95)" stroke-width="1.3" filter="url(#cyGlow)"/>
+              <polygon points="200,220 256,234 200,248 144,234" fill="none" stroke="rgba(160,235,245,.8)" stroke-width="1" stroke-dasharray="4 4"/>
+              <polygon points="200,227 228,234 200,241 172,234" fill="rgba(160,235,245,.25)" stroke="rgba(200,245,250,.95)" stroke-width="1"/>
+              <circle cx="200" cy="234" r="3.2" fill="#FFFFFF" filter="url(#cyGlow)"/>
+              <path d="M156 244 h16 M170 226 h14 M232 226 h14 M228 244 h16" stroke="rgba(160,235,245,.5)" stroke-width="1"/>
+              <circle cx="163" cy="238" r="1.2" fill="rgba(200,245,250,.85)"/>
+              <circle cx="237" cy="230" r="1.2" fill="rgba(200,245,250,.85)"/>
+              <polyline class="fb-tick" points="96,236 74,228 64,224" fill="none"/>
+              <text class="fb-lbl fb-side fb-cy" x="14" y="206" text-anchor="start">COGNITIVE</text>
+              <text class="fb-lbl fb-side fb-cy" x="14" y="220" text-anchor="start">IDENTITY</text>
+              <text class="fb-lbl fb-side" x="14" y="234" text-anchor="start">LAYER</text>
+            </g>
+
+            <!-- ============ BRAIN ============ -->
+            <g class="lyr lyr-brL">
+              <path d="M194 140 C142 142 108 122 108 94 C108 68 128 52 152 52 C158 36 180 30 194 40 Z"
+                    fill="#22221F" stroke="rgba(237,235,228,.5)" stroke-width="1.5"/>
+              <path d="M128 66 C120 78 120 92 130 103" fill="none" stroke="rgba(237,235,228,.26)" stroke-width="1.1"/>
+              <path d="M144 56 C134 72 134 92 144 107" fill="none" stroke="rgba(237,235,228,.26)" stroke-width="1.1"/>
+              <path d="M160 50 C152 68 152 94 162 111" fill="none" stroke="rgba(237,235,228,.22)" stroke-width="1.1"/>
+              <path d="M118 116 h20 v-8 h12" fill="none" stroke="rgba(237,235,228,.35)" stroke-width="1.2"/>
+              <circle cx="152" cy="108" r="1.7" fill="rgba(237,235,228,.6)"/>
+              <circle class="syn" cx="136" cy="84" r="1.6" fill="#8FE3EA"/>
+              <circle class="syn s2" cx="170" cy="70" r="1.4" fill="#8FE3EA"/>
+            </g>
+            <g class="lyr lyr-brR">
+              <path d="M206 140 C258 142 292 122 292 94 C292 68 272 52 248 52 C242 36 220 30 206 40 Z"
+                    fill="#22221F" stroke="rgba(237,235,228,.5)" stroke-width="1.5"/>
+              <path d="M272 66 C280 78 280 92 270 103" fill="none" stroke="rgba(237,235,228,.26)" stroke-width="1.1"/>
+              <path d="M256 56 C266 72 266 92 256 107" fill="none" stroke="rgba(237,235,228,.26)" stroke-width="1.1"/>
+              <path d="M240 50 C248 68 248 94 238 111" fill="none" stroke="rgba(237,235,228,.22)" stroke-width="1.1"/>
+              <path d="M282 116 h-20 v-8 h-12" fill="none" stroke="rgba(237,235,228,.35)" stroke-width="1.2"/>
+              <circle cx="248" cy="108" r="1.7" fill="rgba(237,235,228,.6)"/>
+              <circle class="syn s3" cx="264" cy="84" r="1.6" fill="#8FE3EA"/>
+              <circle class="syn s2" cx="230" cy="70" r="1.4" fill="#8FE3EA"/>
+            </g>
+          </svg>
+          <div class="fb-cap">THE LAYER THAT REMEMBERS, REVISES, EXPLAINS</div>
+        </div>
+        </div>
       </article>
-      <article class="pcard">
+      <article class="pcard pcard-flip">
+        <div class="flip-in">
+        <div class="flip-front">
         <div class="panel"><div class="inner">
   <div class="p-top"><span>DECISION LOG</span><span>05</span></div>
   <div class="p-line" style="font-size:.85em;line-height:1.7">
@@ -389,8 +1415,84 @@
           <p class="desc">Never a black box. When the platform makes a significant autonomous decision, it can state what was decided, why, what alternatives were considered, and how confident it is.</p>
           <div class="fact"><span class="n">Every</span><div class="l">significant decision is logged and explainable, auditable by design</div></div>
         </div>
+      </div>
+        <div class="flip-back" aria-hidden="true">
+          <div class="fb-top"><span>EXPLAINABLE DECISIONS</span><span>05</span></div>
+          <svg class="fb-svg" viewBox="0 0 400 560" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs><filter id="exG" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur stdDeviation="7" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+            <g fill="rgba(237,235,228,.14)">
+              <circle cx="52" cy="144" r="1.1"/><circle cx="352" cy="120" r="1.1"/>
+              <circle cx="338" cy="470" r="1.1"/><circle cx="46" cy="404" r="1.1"/>
+            </g>
+            <!-- evidence tokens -->
+            <g class="lyr l5-ev">
+              <rect x="70" y="52" width="48" height="40" rx="6" fill="#1B1B19" stroke="rgba(237,235,228,.4)" stroke-width="1.3"/>
+              <circle cx="94" cy="72" r="9" fill="none" stroke="rgba(237,235,228,.75)" stroke-width="1.5"/>
+              <circle cx="94" cy="72" r="3" fill="rgba(237,235,228,.75)"/>
+              <rect x="176" y="52" width="48" height="40" rx="6" fill="#1B1B19" stroke="rgba(237,235,228,.4)" stroke-width="1.3"/>
+              <path d="M184 64 q8 -5 16 0 t16 0 M184 72 q8 -5 16 0 t16 0 M184 80 q8 -5 16 0 t16 0" fill="none" stroke="rgba(237,235,228,.7)" stroke-width="1.4"/>
+              <rect x="282" y="52" width="48" height="40" rx="6" fill="#1B1B19" stroke="rgba(237,235,228,.4)" stroke-width="1.3"/>
+              <rect x="292" y="64" width="24" height="14" rx="2" fill="none" stroke="rgba(237,235,228,.75)" stroke-width="1.4"/>
+              <rect x="316" y="68" width="4" height="6" fill="rgba(237,235,228,.75)"/>
+              <rect x="295" y="67" width="5" height="8" fill="rgba(237,235,228,.7)"/>
+              <rect x="302" y="67" width="5" height="8" fill="rgba(237,235,228,.7)"/>
+              <g fill="none" stroke="rgba(237,235,228,.45)" stroke-width="1.3">
+                <path class="flow" d="M94 96 C100 122 150 132 182 148" stroke-dasharray="4 7"/>
+                <path class="flow f2" d="M200 96 C200 116 200 128 200 146" stroke-dasharray="4 7"/>
+                <path class="flow f3" d="M306 96 C300 122 250 132 218 148" stroke-dasharray="4 7"/>
+              </g>
+              <line class="fb-tick" x1="70" y1="46" x2="70" y2="34"/>
+              <text class="fb-lbl fb-side" x="66" y="30" text-anchor="start">EVIDENCE</text>
+            </g>
+            <!-- the glass decision chamber -->
+            <g class="lyr l5-box">
+              <rect x="104" y="152" width="192" height="150" rx="10" fill="rgba(127,223,232,.04)" stroke="rgba(150,230,240,.9)" stroke-width="1.7" filter="url(#exG)"/>
+              <rect x="112" y="160" width="176" height="134" rx="7" fill="none" stroke="rgba(150,230,240,.3)" stroke-width="1" stroke-dasharray="4 5"/>
+              <path d="M104 168 v-8 a10 10 0 0 1 10 -10 h8 M296 168 v-8 a10 10 0 0 0 -10 -10 h-8 M104 286 v8 a10 10 0 0 0 10 10 h8 M296 286 v8 a10 10 0 0 1 -10 -10 h-8" fill="none" stroke="rgba(150,230,240,.9)" stroke-width="1.7"/>
+              <circle cx="146" cy="222" r="8" fill="none" stroke="rgba(237,235,228,.8)" stroke-width="1.5"/>
+              <circle cx="146" cy="222" r="2.5" fill="rgba(237,235,228,.8)"/>
+              <path d="M154 216 C186 196 216 186 244 184" fill="none" stroke="rgba(237,235,228,.3)" stroke-width="1.2" stroke-dasharray="3 5"/>
+              <path d="M248 180 l-4 -4 m0 8 l8 -8 m-8 0 l8 8" stroke="rgba(237,235,228,.5)" stroke-width="1.3" fill="none"/>
+              <path d="M154 228 C186 248 216 258 244 260" fill="none" stroke="rgba(237,235,228,.3)" stroke-width="1.2" stroke-dasharray="3 5"/>
+              <path d="M248 264 l-4 -4 m0 8 l8 -8 m-8 0 l8 8" stroke="rgba(237,235,228,.5)" stroke-width="1.3" fill="none"/>
+              <path class="flow" d="M154 222 H240" fill="none" stroke="rgba(150,230,240,.9)" stroke-width="1.8" stroke-dasharray="5 5" filter="url(#exG)"/>
+              <circle cx="252" cy="222" r="9" fill="none" stroke="rgba(150,230,240,.95)" stroke-width="1.6" filter="url(#exG)"/>
+              <path d="M247.5 222 l3 3.6 l6 -7.4" fill="none" stroke="rgba(200,245,250,.95)" stroke-width="1.7"/>
+              <path d="M132 282 a18 18 0 0 1 36 0" fill="none" stroke="rgba(237,235,228,.5)" stroke-width="1.5"/>
+              <line x1="150" y1="282" x2="162" y2="270" stroke="rgba(150,230,240,.9)" stroke-width="1.6"/>
+              <path d="M132 282 l0 -4 M141 268 l2 3 M150 264 l0 4 M159 268 l-2 3 M168 282 l0 -4" stroke="rgba(237,235,228,.4)" stroke-width="1.1"/>
+              <circle cx="286" cy="160" r="9" fill="none" stroke="rgba(150,230,240,.85)" stroke-width="1.5"/>
+              <line x1="292" y1="167" x2="300" y2="176" stroke="rgba(150,230,240,.85)" stroke-width="1.7"/>
+              <line class="fb-tick" x1="296" y1="226" x2="330" y2="232"/>
+              <text class="fb-lbl fb-side fb-cy" x="334" y="228" text-anchor="start">SEE THE</text>
+              <text class="fb-lbl fb-side fb-cy" x="334" y="242" text-anchor="start">CHOICE</text>
+            </g>
+            <!-- the receipt: every decision logged -->
+            <g class="lyr l5-out">
+              <path class="flow f2" d="M200 304 V344" fill="none" stroke="rgba(150,230,240,.55)" stroke-width="1.6" stroke-dasharray="4 6"/>
+              <path d="M194 340 l6 10 l6 -10" fill="none" stroke="rgba(150,230,240,.8)" stroke-width="1.5"/>
+              <path d="M166 356 h68 v78 l-8 -6 -9 6 -8 -6 -9 6 -8 -6 -9 6 -9 -6 -8 6 Z"
+                    fill="#171715" stroke="rgba(237,235,228,.6)" stroke-width="1.5"/>
+              <line x1="166" y1="368" x2="234" y2="368" stroke="rgba(237,235,228,.3)" stroke-width="1" stroke-dasharray="3 3"/>
+              <g stroke="rgba(237,235,228,.55)" stroke-width="1.6" stroke-linecap="round">
+                <line x1="176" y1="382" x2="224" y2="382"/><line x1="176" y1="392" x2="214" y2="392"/>
+                <line x1="176" y1="402" x2="220" y2="402"/><line x1="176" y1="412" x2="204" y2="412"/>
+              </g>
+              <circle cx="220" cy="414" r="8" fill="none" stroke="rgba(150,230,240,.9)" stroke-width="1.4"/>
+              <path d="M216 414 l2.6 3 l5.4 -6.4" fill="none" stroke="rgba(150,230,240,.95)" stroke-width="1.5"/>
+              <line class="fb-tick" x1="234" y1="396" x2="268" y2="402"/>
+              <text class="fb-lbl fb-side" x="272" y="406" text-anchor="start">LOGGED</text>
+            </g>
+          </svg>
+          <div class="fb-cap">EVERY DECISION SHOWS ITS WORK</div>
+        </div>
+        </div>
       </article>
-      <article class="pcard">
+      <article class="pcard pcard-flip">
+        <div class="flip-in">
+        <div class="flip-front">
         <div class="panel"><div class="inner dark">
   <div class="p-top"><span>MISSION VERIFICATION</span><span>06</span></div>
   <div class="bar-row"><span>Objective coverage</span><div class="bar"><i style="width:97%"></i></div><span>97%</span></div>
@@ -403,6 +1505,81 @@
           <h3>Verified Outcomes</h3>
           <p class="desc">Completion is measured against the original objective, not the flight path. Every mission concludes with evidence: coverage, findings, confidence levels, uncertainties, and next actions.</p>
           <div class="fact"><span class="n">1</span><div class="l">evidence package per mission: flight completion ≠ mission completion</div></div>
+        </div>
+      </div>
+        <div class="flip-back" aria-hidden="true">
+          <div class="fb-top"><span>VERIFIED OUTCOMES</span><span>06</span></div>
+          <svg class="fb-svg" viewBox="0 0 400 560" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs><filter id="voG" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur stdDeviation="7" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+            <g fill="rgba(237,235,228,.14)">
+              <circle cx="54" cy="150" r="1.1"/><circle cx="350" cy="118" r="1.1"/>
+              <circle cx="336" cy="474" r="1.1"/><circle cx="48" cy="402" r="1.1"/>
+            </g>
+            <!-- the original objective -->
+            <g class="lyr l6-obj">
+              <polygon points="200,34 234,54 200,74 166,54" fill="#1B1B19" stroke="rgba(237,235,228,.75)" stroke-width="1.5"/>
+              <circle cx="200" cy="54" r="7.5" fill="none" stroke="rgba(237,235,228,.85)" stroke-width="1.4"/>
+              <line x1="200" y1="42" x2="200" y2="48" stroke="rgba(237,235,228,.85)" stroke-width="1.4"/>
+              <line x1="200" y1="60" x2="200" y2="66" stroke="rgba(237,235,228,.85)" stroke-width="1.4"/>
+              <line x1="188" y1="54" x2="194" y2="54" stroke="rgba(237,235,228,.85)" stroke-width="1.4"/>
+              <line x1="206" y1="54" x2="212" y2="54" stroke="rgba(237,235,228,.85)" stroke-width="1.4"/>
+              <line x1="188" y1="98" x2="212" y2="98" stroke="rgba(150,230,240,.8)" stroke-width="1.6"/>
+              <line x1="188" y1="106" x2="212" y2="106" stroke="rgba(150,230,240,.8)" stroke-width="1.6"/>
+              <path class="flow" d="M200 112 V142" fill="none" stroke="rgba(237,235,228,.45)" stroke-width="1.4" stroke-dasharray="4 7"/>
+              <line class="fb-tick" x1="166" y1="54" x2="132" y2="46"/>
+              <text class="fb-lbl fb-side" x="128" y="42" text-anchor="end">OBJECTIVE</text>
+            </g>
+            <!-- the coverage map -->
+            <g class="lyr l6-map">
+              <polygon points="200,150 322,196 300,300 118,312 84,214" fill="#151513" stroke="rgba(237,235,228,.5)" stroke-width="1.7"/>
+              <g fill="none" stroke="rgba(237,235,228,.45)" stroke-width="1.3">
+                <path d="M110 226 H286"/>
+                <path d="M288 248 H112"/>
+                <path class="flow" d="M116 270 H282" stroke="rgba(150,230,240,.8)" stroke-width="1.6" stroke-dasharray="6 5"/>
+                <path d="M278 292 H124" stroke-dasharray="3 6" stroke="rgba(237,235,228,.3)"/>
+                <path d="M286 226 a11 11 0 0 1 2 22 M112 248 a11 11 0 0 0 4 22 M282 270 a11 11 0 0 1 -4 22"/>
+              </g>
+              <polygon points="268,178 322,196 306,254 258,234" fill="none" stroke="rgba(237,235,228,.55)" stroke-width="1.3" stroke-dasharray="4 4"/>
+              <g stroke="rgba(237,235,228,.4)" stroke-width="1.1">
+                <line x1="272" y1="186" x2="296" y2="238"/><line x1="284" y1="182" x2="306" y2="230"/>
+                <line x1="296" y1="180" x2="312" y2="216"/>
+              </g>
+              <line x1="288" y1="210" x2="288" y2="220" stroke="rgba(237,235,228,.9)" stroke-width="1.8"/>
+              <circle cx="288" cy="226" r="1.4" fill="rgba(237,235,228,.9)"/>
+              <g stroke="rgba(150,230,240,.9)" stroke-width="1.4" fill="rgba(127,223,232,.25)">
+                <line x1="150" y1="238" x2="150" y2="222"/><polygon points="150,222 162,226 150,231"/>
+                <line x1="216" y1="262" x2="216" y2="246"/><polygon points="216,246 228,250 216,255"/>
+                <line x1="176" y1="296" x2="176" y2="280"/><polygon points="176,280 188,284 176,289"/>
+              </g>
+              <line class="fb-tick" x1="322" y1="214" x2="352" y2="208"/>
+              <text class="fb-lbl fb-side" x="392" y="196" text-anchor="end">NOT YET</text>
+              <text class="fb-lbl fb-side" x="392" y="210" text-anchor="end">VERIFIED</text>
+              <line class="fb-tick" x1="84" y1="252" x2="54" y2="258"/>
+              <text class="fb-lbl fb-side fb-cy" x="10" y="254" text-anchor="start">SWEEP</text>
+              <text class="fb-lbl fb-side fb-cy" x="10" y="268" text-anchor="start">COVERAGE</text>
+            </g>
+            <!-- the evidence seal -->
+            <g class="lyr l6-seal">
+              <path class="flow f2" d="M200 314 V368" fill="none" stroke="rgba(150,230,240,.55)" stroke-width="1.6" stroke-dasharray="4 6"/>
+              <path d="M194 364 l6 10 l6 -10" fill="none" stroke="rgba(150,230,240,.8)" stroke-width="1.5"/>
+              <circle cx="200" cy="424" r="34" fill="rgba(127,223,232,.06)" stroke="rgba(150,230,240,.95)" stroke-width="1.8" filter="url(#voG)"/>
+              <circle cx="200" cy="424" r="24" fill="none" stroke="rgba(150,230,240,.55)" stroke-width="1.2" stroke-dasharray="4 4"/>
+              <path d="M188 424 l8 9 l16 -19" fill="none" stroke="rgba(200,245,250,.95)" stroke-width="2.2" filter="url(#voG)"/>
+              <g stroke="rgba(150,230,240,.6)" stroke-width="1.3">
+                <line x1="200" y1="384" x2="200" y2="390"/><line x1="200" y1="458" x2="200" y2="464"/>
+                <line x1="160" y1="424" x2="166" y2="424"/><line x1="234" y1="424" x2="240" y2="424"/>
+                <line x1="172" y1="396" x2="176" y2="400"/><line x1="228" y1="396" x2="224" y2="400"/>
+                <line x1="172" y1="452" x2="176" y2="448"/><line x1="228" y1="452" x2="224" y2="448"/>
+              </g>
+              <line class="fb-tick" x1="234" y1="436" x2="268" y2="444"/>
+              <text class="fb-lbl fb-side fb-cy" x="272" y="440" text-anchor="start">EVIDENCE</text>
+              <text class="fb-lbl fb-side fb-cy" x="272" y="454" text-anchor="start">SEALED</text>
+            </g>
+          </svg>
+          <div class="fb-cap">FLIGHT DONE ≠ MISSION DONE · PROVE IT</div>
+        </div>
         </div>
       </article>
     </div>
@@ -539,7 +1716,7 @@
     </div>
     <div>
       <h2 class="faq-h rv">Here's what you need to know before your first mission.</h2>
-      <div class="faq-item rv"><button class="faq-q" aria-expanded="false">Do we build drones?<span class="dot"></span></button>
+      <div class="faq-item rv"><button class="faq-q" aria-expanded="false">Do you build drones?<span class="dot"></span></button>
         <div class="faq-a"><p>No, deliberately. The industry already ships capable aircraft. What they lack is a mission identity: memory, beliefs, and reasoning that persist. That layer is what we build, and it runs on the fleet you already own.</p></div></div>
       <div class="faq-item rv"><button class="faq-q" aria-expanded="false">Which drone platforms are supported?<span class="dot"></span></button>
         <div class="faq-a"><p>The adapter framework targets DJI, PX4/MAVSDK, ArduPilot/MAVLink, and Auterion, with new ecosystems added without touching the reasoning engine. Missions compile platform-neutral and translate per vendor. That's what prevents lock-in.</p></div></div>
@@ -603,10 +1780,6 @@
 <!-- ================= HALFTONE BAND ================= -->
 <div class="halftone" id="halftone" aria-hidden="true" title="Hold to scatter the swarm">
   <canvas id="droneCv"></canvas>
-  <div class="wrap">
-    <span class="brand"><span>KENW<span class="o">E</span>R</span><span>Drones</span></span>
-    <span class="tag">『 Humans define objectives. 』</span>
-  </div>
 </div>
 
 <!-- ================= MINIMAP ================= -->
@@ -622,5 +1795,4 @@
 </aside>
 
 <script src="js/script.js"></script>
-</body>
-</html>
+</body>>

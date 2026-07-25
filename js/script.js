@@ -431,6 +431,24 @@ function skyfield(id,alpha){
     p.innerHTML=words.map(w=>'<span class="w">'+w+'</span>').join(' ');
   });
   const words=[...box.querySelectorAll('.w')];
+  /* keep the product term "Cognitive Identity" permanently lit, whatever the scroll does */
+  const bare=w=>w.textContent.replace(/[^A-Za-z]/g,'');
+  const pinned=new Set();
+  for(let i=0;i<words.length-1;i++){
+    if(bare(words[i])==='Cognitive'&&bare(words[i+1])==='Identity'){
+      const a=words[i],b=words[i+1],sp=a.nextSibling;
+      a.classList.add('w-pin');b.classList.add('w-pin');
+      a.style.opacity=1;b.style.opacity=1;
+      pinned.add(i);pinned.add(i+1);
+      /* wrap the two words (and their space) so the marker is one clean shape
+         and the term can't break across two lines */
+      const wrap=document.createElement('span');wrap.className='pin-wrap';
+      a.parentNode.insertBefore(wrap,a);
+      wrap.appendChild(a);
+      wrap.appendChild(sp&&sp.nodeType===3?sp:document.createTextNode(' '));
+      wrap.appendChild(b);
+    }
+  }
   if(reduce){words.forEach(w=>w.style.opacity=1);return}
   const DIM=.13, K=2, F=.3; /* K = diagonal slope, F = softness of the fade band */
   let scores=[],lo=0,span=1;
@@ -448,6 +466,7 @@ function skyfield(id,alpha){
     const p=Math.min(1,Math.max(0,(start-r.top)/(r.height+start-end)));
     const pos=p*(1+F); /* overshoot so the last corner reaches full brightness */
     for(let i=0;i<words.length;i++){
+      if(pinned.has(i))continue;
       const s=(scores[i]-lo)/span;
       const t=Math.min(1,Math.max(0,(pos-s)/F));
       words[i].style.opacity=(DIM+t*(1-DIM)).toFixed(3);
@@ -668,115 +687,375 @@ function skyfield(id,alpha){
   }
 })();
 
-/* ---------- footer field: living constellation that locks into an objective, then the mark ---------- */
+/* ---------- footer band: particle film · "The Layer Inside" ----------
+   The website's particle trailer of the Kenwer video storyboard — five acts,
+   continuous, no dead pauses, drawn entirely in particles:
+     act 0  FLEET      five drones; the Kenwer unit (middle) is brighter;
+                       a cyan selection ring pulses on it
+     act 1  DEPART     the other four bank away and fly OUT of frame; their
+                       particles rematerialise into the Kenwer drone, large
+                       and fully detailed
+     act 2  REVEAL     the drone rises; particles stream from its core down
+                       into a brain beneath it, joined by a cyan tether
+     act 3  EXPLODE    the drone dissolves; the brain splits into the full
+                       five-layer stack — hemispheres, memory plate, the
+                       GLOWING CYAN COGNITIVE IDENTITY STACK, bolted frame,
+                       amber power layer — the same anatomy as card 04
+     act 4  RESEAL     the layers glide back into a whole brain with a cyan
+                       core glowing faintly inside … then it disperses back
+                       into the fleet and the film loops
+   Dense sampling + stiff springs keep edges crisp. Cyan marks cognition,
+   amber marks power — same palette as the card-04 scene.
+   Press / hold the band to scatter; release and the film resumes. */
 (function(){
   const band=document.getElementById('halftone'),cv=document.getElementById('droneCv');
-  if(!cv)return;
+  if(!band||!cv)return;
   const ctx=cv.getContext('2d',{alpha:false});
-  const themeBG=()=>{const c=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();return c||'#0C0C0B'};
-  const themeInk=()=>getComputedStyle(document.documentElement).getPropertyValue('--ink-rgb').trim()||'237,235,228';
-  const themeDot=()=>document.documentElement.classList.contains('light')?'#20211E':'#F4F2EC';
-  const hexA=(hex,a)=>{hex=hex.replace('#','');if(hex.length===3)hex=hex.split('').map(c=>c+c).join('');
-    const r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16);
-    return `rgba(${r},${g},${b},${a})`;};
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const LOGO='M 6.4,11.2 C 5.9,11.7 5.9,104.0 6.5,105.2 C 6.7,105.8 6.9,106.5 6.9,106.9 C 6.9,107.8 7.6,109.4 8.5,110.4 C 9.0,110.9 9.3,111.5 9.3,111.6 C 9.3,112.0 14.0,116.7 15.7,117.9 C 16.3,118.4 17.9,119.4 19.1,120.2 C 20.4,121.1 21.8,122.1 22.4,122.6 C 23.3,123.3 23.8,123.7 26.4,125.6 C 26.9,125.9 27.8,126.6 28.5,127.1 C 29.7,128.1 31.4,129.4 32.8,130.4 C 33.3,130.7 34.2,131.4 34.8,131.9 C 37.5,134.0 38.6,134.8 41.0,136.4 C 42.4,137.4 43.8,138.5 44.2,138.9 C 44.5,139.3 45.9,140.3 47.1,141.1 C 48.4,141.9 50.1,143.2 50.9,143.9 C 51.7,144.7 52.8,145.6 53.3,146.0 C 54.3,146.8 54.6,147.3 54.0,147.3 C 53.6,147.3 47.6,144.3 46.7,143.6 C 46.2,143.3 44.1,142.1 41.9,141.0 C 39.8,139.9 37.8,138.8 37.5,138.7 C 37.3,138.4 36.0,137.7 34.7,137.0 C 33.4,136.3 32.2,135.6 31.9,135.4 C 31.7,135.2 29.4,134.0 26.7,132.6 C 24.1,131.3 21.8,130.1 21.6,129.8 C 16.8,125.5 8.6,127.4 6.6,133.3 C 6.0,135.4 5.7,176.9 6.4,177.6 C 6.6,177.8 23.2,177.9 79.0,177.9 C 160.0,177.9 153.4,177.7 154.6,180.1 C 155.7,182.4 162.0,187.5 163.8,187.5 C 164.0,187.5 164.9,187.9 165.8,188.3 C 168.5,189.5 176.2,189.5 178.8,188.3 C 179.8,187.9 180.7,187.5 180.9,187.5 C 181.5,187.5 187.5,183.1 187.5,182.7 C 187.5,182.5 188.0,181.8 188.7,181.1 C 189.4,180.4 189.9,179.7 189.9,179.6 C 189.9,179.4 190.2,178.9 190.5,178.5 C 190.9,178.1 191.8,176.0 192.5,173.7 C 194.6,167.6 194.5,164.2 192.2,159.1 C 191.8,158.3 191.5,157.5 191.5,157.3 C 191.5,157.1 191.2,156.5 190.7,155.9 C 190.3,155.4 189.9,154.8 189.9,154.6 C 189.9,154.4 189.6,154.1 189.3,153.8 C 189.0,153.5 188.6,152.9 188.4,152.4 C 188.2,151.9 187.6,151.2 186.9,150.8 C 186.3,150.4 185.4,149.8 185.0,149.4 C 183.1,147.7 178.6,145.9 175.9,145.9 C 174.1,145.9 173.0,145.6 172.7,144.9 C 172.6,144.7 172.4,119.2 172.3,88.2 C 172.2,42.6 172.1,31.8 171.8,30.8 C 170.7,27.1 170.4,26.1 169.7,24.7 C 169.3,23.9 168.7,22.8 168.3,22.4 C 167.9,21.9 167.5,21.4 167.5,21.2 C 167.5,20.7 163.1,16.3 161.4,15.3 C 159.1,13.7 157.9,13.2 151.5,11.4 C 149.6,10.8 81.7,10.7 80.3,11.3 C 79.8,11.5 78.9,11.7 78.4,11.7 C 76.8,11.7 72.1,13.4 70.3,14.6 C 69.5,15.3 68.2,16.1 67.6,16.6 C 65.8,17.9 64.4,19.2 64.4,19.6 C 64.4,19.8 63.9,20.5 63.3,21.2 C 61.7,22.9 58.8,28.8 58.8,30.3 C 58.8,30.9 58.6,31.8 58.4,32.4 C 57.9,33.7 57.9,40.0 58.4,41.3 C 58.6,41.8 58.8,42.7 58.8,43.4 C 58.8,44.1 59.2,45.2 60.0,46.9 C 60.7,48.3 61.2,49.5 61.2,49.7 C 61.2,49.9 61.6,50.8 62.0,51.7 C 62.5,52.7 62.8,53.6 62.8,53.7 C 62.8,53.9 63.2,54.8 63.6,55.7 C 64.1,56.7 64.4,57.6 64.4,57.7 C 64.4,57.9 65.0,59.1 65.6,60.5 C 66.3,61.9 66.8,63.1 66.8,63.3 C 66.8,63.5 67.4,64.7 68.0,66.1 C 68.7,67.5 69.2,68.7 69.2,68.9 C 69.2,69.0 69.6,69.9 70.0,70.9 C 70.5,71.8 70.8,72.7 70.8,72.9 C 70.8,73.1 71.3,74.3 72.0,75.7 C 72.7,77.1 73.2,78.3 73.2,78.5 C 73.2,78.6 73.6,79.5 74.0,80.5 C 74.5,81.4 74.8,82.3 74.8,82.5 C 74.8,82.6 75.2,83.5 75.6,84.5 C 76.1,85.4 76.4,86.3 76.4,86.5 C 76.4,86.7 76.9,87.9 77.6,89.3 C 78.3,90.6 78.8,91.9 78.8,92.1 C 78.8,92.2 79.3,93.5 80.0,94.9 C 80.7,96.2 81.2,97.5 81.2,97.7 C 81.2,97.8 81.7,99.1 82.4,100.4 C 83.0,101.8 83.7,103.6 84.0,104.5 C 84.3,105.4 85.0,107.2 85.7,108.6 C 86.3,109.9 86.8,111.2 86.8,111.5 C 86.8,111.7 87.1,112.4 87.5,113.2 C 88.2,114.7 88.3,114.8 87.7,114.8 C 87.5,114.8 86.9,113.8 86.2,112.5 C 85.6,111.3 84.9,110.0 84.5,109.6 C 84.2,109.2 83.0,107.2 82.0,105.0 C 80.9,102.9 79.9,101.0 79.7,100.9 C 79.5,100.7 78.8,99.4 78.1,98.1 C 77.4,96.7 76.7,95.4 76.4,95.2 C 76.1,94.9 75.8,94.2 75.6,93.6 C 75.5,93.0 75.2,92.3 74.9,92.1 C 74.7,91.9 74.0,90.6 73.3,89.3 C 72.7,87.9 71.9,86.7 71.7,86.5 C 71.5,86.3 70.4,84.3 69.3,82.1 C 68.2,79.9 67.1,77.9 66.9,77.7 C 66.7,77.5 65.8,75.9 64.9,74.1 C 64.0,72.3 63.1,70.7 62.9,70.5 C 62.7,70.3 61.6,68.3 60.5,66.1 C 59.4,63.9 58.3,61.9 58.1,61.7 C 57.9,61.5 57.2,60.3 56.5,58.9 C 55.9,57.6 55.2,56.3 54.9,56.1 C 54.7,56.0 53.5,53.6 52.1,50.9 C 50.8,48.2 49.5,45.9 49.3,45.7 C 49.1,45.5 48.6,44.6 48.1,43.7 C 47.7,42.8 47.2,41.9 47.0,41.8 C 46.7,41.6 45.5,39.2 44.1,36.5 C 42.8,33.8 41.5,31.5 41.3,31.3 C 41.1,31.1 40.6,30.3 40.2,29.3 C 39.7,28.4 39.2,27.5 39.0,27.3 C 38.7,27.2 38.0,25.9 37.4,24.5 C 36.7,23.2 36.0,21.9 35.8,21.8 C 35.5,21.6 34.8,20.3 34.2,19.0 C 32.3,15.1 29.7,13.0 25.1,11.4 C 23.1,10.7 7.0,10.5 6.4,11.2';
-  let W=0,H=0,dpr=1,parts=[],forms=[],t=0,last=0,running=false,visible=false;
-  const LINK=96;               /* neighbour link radius */
-
-  function reticle(){                              /* objective / targeting reticle points */
-    const pts=[],cx=W/2,cy=H*0.5,R=Math.min(W,H)*0.30;
-    for(const r of [R*0.42,R*0.72,R]){             /* concentric rings */
-      const n=Math.round(r*0.16);
-      for(let i=0;i<n;i++){const a=i/n*Math.PI*2;pts.push([cx+Math.cos(a)*r,cy+Math.sin(a)*r]);}
-    }
-    for(let k=-1;k<=1;k+=2){                        /* crosshair ticks */
-      for(let s=0;s<10;s++){const o=R*0.22+s/10*R*0.5;pts.push([cx+o*k,cy]);pts.push([cx,cy+o*k]);}
-    }
-    pts.push([cx,cy]);
-    return pts;
-  }
-  function markPts(){                               /* Kenwer mark, sampled */
-    const gw=140,gh=140,off=document.createElement('canvas');off.width=gw;off.height=gh;
-    const o=off.getContext('2d');o.fillStyle='#000';o.fillRect(0,0,gw,gh);
-    o.save();const s=gw/200*0.9;o.translate(gw*0.05,gh*0.05);o.scale(s,s);
-    o.fillStyle='#fff';o.fill(new Path2D(LOGO));o.restore();
-    const data=o.getImageData(0,0,gw,gh).data,raw=[];
-    for(let j=0;j<gh;j+=2)for(let i=0;i<gw;i+=2)if(data[(j*gw+i)*4]>110)raw.push([i,j]);
-    const scale=Math.min(W,H)*0.62/gw,ox=W/2-gw*scale/2,oy=H*0.5-gh*scale/2;
-    return raw.map(p=>[ox+p[0]*scale,oy+p[1]*scale]);
-  }
-  function assign(pts){ for(let i=0;i<parts.length;i++)parts[i].tg=pts[i%pts.length]; }
+  const BG='#050505', INK='237,235,228', CY='143,227,234', AM='232,194,122';
+  let W=0,H=0,DPR=1,parts=[],targets=[],running=false,visible=false,last=0;
+  let chosenX=0,chosenY=0;
 
   function size(){
-    const r=band.getBoundingClientRect();dpr=Math.min(2,devicePixelRatio||1);W=r.width;H=r.height;
-    cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
-    const n=Math.min(230,Math.max(90,Math.round(W*H/7200)));
-    parts=[];for(let i=0;i<n;i++)parts.push({x:Math.random()*W,y:Math.random()*H,vx:0,vy:0,tg:[W/2,H/2],sp:.6+Math.random()*.8});
-    forms=[reticle(),markPts()];assign(forms[0]);
-  }
-  function flow(x,y,tt){return (Math.sin(x*0.006+tt*0.6)+Math.cos(y*0.0064-tt*0.45)+Math.sin((x+y)*0.0034+tt*0.3))*1.7;}
-
-  /* formation timeline: long free-flow, brief lock, alternating reticle <-> mark */
-  let formV=0,fi=0,pulseV=0,pulsed=false;
-  function timeline(tt){
-    const p=(tt%17)/17;                    /* 17s cycle */
-    let v=0;
-    if(p>0.5&&p<0.82){const q=(p-0.5)/0.32;v=q<0.5?q*2:1-(q-0.5)*2;v=v*v*(3-2*v);}  /* smooth rise+fall */
-    return v;
+    W=band.clientWidth;H=band.clientHeight;DPR=Math.min(2,devicePixelRatio||1);
+    cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);
+    if(W&&H)seed();
   }
 
-  let px=.5,py=.5,press=0,scatter=0;
-  band.addEventListener('pointerdown',e=>{const r=band.getBoundingClientRect();px=e.clientX-r.left;py=e.clientY-r.top;press=1;scatter=1;});
-  addEventListener('pointerup',()=>press=0);band.addEventListener('pointerleave',()=>press=0);
-
-  function frame(ts){
-    if(!visible){running=false;return;}
-    const dt=Math.min(.05,(ts-last)/1000||.016);last=ts;t+=dt;
-    const rawV=timeline(t);
-    if(rawV>0.02&&formV<=0.02){fi=(fi+1)%forms.length;assign(forms[fi]);pulsed=false;}  /* new lock -> pick form */
-    formV=rawV*(1-scatter);scatter=Math.max(0,scatter-dt*0.8);
-    if(formV>0.9&&!pulsed){pulseV=1;pulsed=true;}
-    ctx.fillStyle=hexA(themeBG(),0.16);ctx.fillRect(0,0,W,H);
-
-    /* integrate */
-    for(const pt of parts){
-      const ang=flow(pt.x,pt.y,t);let fx=Math.cos(ang),fy=Math.sin(ang);
-      if(formV>0.01){const dx=pt.tg[0]-pt.x,dy=pt.tg[1]-pt.y,dl=Math.hypot(dx,dy)||1;fx=fx*(1-formV)+dx/dl*formV*2.6;fy=fy*(1-formV)+dy/dl*formV*2.6;}
-      if(press){const dx=pt.x-px,dy=pt.y-py,d2=dx*dx+dy*dy,R=170;if(d2<R*R){const dd=Math.sqrt(d2)||1,f=(1-dd/R)*7;fx+=dx/dd*f;fy+=dy/dd*f;}}
-      pt.vx=(pt.vx+fx*pt.sp*dt*3)*0.9;pt.vy=(pt.vy+fy*pt.sp*dt*3)*0.9;
-      pt.x+=pt.vx;pt.y+=pt.vy;
-      if(pt.x<-6)pt.x=W+6;else if(pt.x>W+6)pt.x=-6;
-      if(pt.y<-6)pt.y=H+6;else if(pt.y>H+6)pt.y=-6;
+  /* ================= silhouette painters ================= */
+  function drawDrone(o,cx,cy,S,full){
+    const b=S*.13, arm=S*.30, rot=S*.15, lw=Math.max(1.6,S*.014);
+    o.lineWidth=lw;
+    o.strokeRect(cx-b,cy-b,b*2,b*2);
+    if(full){
+      o.strokeRect(cx-b*.55,cy-b*.55,b*1.1,b*1.1);
+      o.beginPath();o.moveTo(cx-b,cy-b);o.lineTo(cx+b,cy+b);
+      o.moveTo(cx+b,cy-b);o.lineTo(cx-b,cy+b);o.stroke();
+      o.beginPath();o.arc(cx,cy-b-S*.085,S*.032,0,7);o.stroke();
+      o.beginPath();o.arc(cx,cy-b-S*.085,S*.013,0,7);o.fill();
     }
-    /* neighbour links via grid */
-    const cs=LINK,cols=Math.ceil(W/cs)+1,grid=new Map();
-    const key=(a,b)=>a+','+b;
-    for(let i=0;i<parts.length;i++){const p=parts[i],gx=p.x/cs|0,gy=p.y/cs|0,k=key(gx,gy);(grid.get(k)||grid.set(k,[]).get(k)).push(i);}
-    ctx.lineWidth=1;
-    const lineA=(0.30+formV*0.16);
-    for(let i=0;i<parts.length;i++){
-      const p=parts[i],gx=p.x/cs|0,gy=p.y/cs|0;
-      for(let ax=-1;ax<=1;ax++)for(let ay=-1;ay<=1;ay++){
-        const arr=grid.get(key(gx+ax,gy+ay));if(!arr)continue;
-        for(const j of arr){if(j<=i)continue;const q=parts[j],dx=p.x-q.x,dy=p.y-q.y,d=Math.hypot(dx,dy);
-          if(d<LINK){ctx.strokeStyle='rgba('+themeInk()+','+(lineA*(1-d/LINK)).toFixed(3)+')';ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();}}
+    o.beginPath();o.moveTo(cx,cy-b);o.lineTo(cx,cy-b-S*.05);o.stroke();
+    let ri=0;
+    for(const[sx,sy]of[[-1,-1],[1,-1],[-1,1],[1,1]]){
+      const ax=cx+sx*arm, ay=cy+sy*arm;
+      if(full){
+        const px=-sy*lw*1.4, py=sx*lw*1.4;
+        o.beginPath();o.moveTo(cx+sx*b*.9+px,cy+sy*b*.9+py);o.lineTo(ax+px*.4,ay+py*.4);o.stroke();
+        o.beginPath();o.moveTo(cx+sx*b*.9-px,cy+sy*b*.9-py);o.lineTo(ax-px*.4,ay-py*.4);o.stroke();
+      }else{
+        o.beginPath();o.moveTo(cx+sx*b*.9,cy+sy*b*.9);o.lineTo(ax,ay);o.stroke();
+      }
+      o.beginPath();o.arc(ax,ay,rot,0,7);o.stroke();
+      if(full){o.beginPath();o.arc(ax,ay,rot*.5,0,7);o.stroke();}
+      o.beginPath();o.arc(ax,ay,rot*(full?.16:.2),0,7);o.fill();
+      const ang=(ri++%2?.55:2.1);
+      o.beginPath();
+      o.moveTo(ax+Math.cos(ang)*rot*.92,ay+Math.sin(ang)*rot*.92);
+      o.lineTo(ax-Math.cos(ang)*rot*.92,ay-Math.sin(ang)*rot*.92);o.stroke();
+      if(full)for(let k=0;k<4;k++){
+        const a2=k*Math.PI/2+.79;
+        o.beginPath();
+        o.moveTo(ax+Math.cos(a2)*rot*.86,ay+Math.sin(a2)*rot*.86);
+        o.lineTo(ax+Math.cos(a2)*rot,ay+Math.sin(a2)*rot);o.stroke();
       }
     }
-    /* nodes */
-    for(const p of parts){const sp=Math.min(1,(Math.abs(p.vx)+Math.abs(p.vy))*0.5);
-      ctx.globalAlpha=0.7+sp*0.3+formV*0.3;ctx.fillStyle=themeDot();
-      const r=1+formV*0.7;ctx.beginPath();ctx.arc(p.x,p.y,r,0,7);ctx.fill();}
-    ctx.globalAlpha=1;
-    /* objective lock pulse */
-    if(pulseV>0){pulseV-=dt*1.1;const cx=W/2,cy=H*0.5,R=Math.min(W,H)*0.30*(1.4-pulseV);
-      ctx.strokeStyle='rgba('+themeInk()+','+(pulseV*0.5).toFixed(3)+')';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.stroke();}
+  }
+  function hemiPath(o,m){
+    o.beginPath();o.moveTo(m*3,74);
+    o.bezierCurveTo(m*54,76,m*90,52,m*90,20);
+    o.bezierCurveTo(m*90,-10,m*70,-30,m*46,-30);
+    o.bezierCurveTo(m*40,-52,m*16,-60,m*3,-46);
+    o.lineTo(m*3,74);o.stroke();
+  }
+  function foldSet(o){
+    function fold(m,pts){
+      o.beginPath();o.moveTo(m*pts[0][0],pts[0][1]);
+      for(let i=1;i<pts.length;i+=3)
+        o.bezierCurveTo(m*pts[i][0],pts[i][1],m*pts[i+1][0],pts[i+1][1],m*pts[i+2][0],pts[i+2][1]);
+      o.stroke();
+    }
+    for(const m of[1,-1]){
+      fold(m,[[14,-38],[34,-46],[52,-34],[56,-16]]);
+      fold(m,[[10,-18],[38,-26],[62,-10],[66,12]]);
+      fold(m,[[12,4],[40,-2],[64,16],[62,38]]);
+      fold(m,[[14,28],[44,22],[60,40],[50,58]]);
+      fold(m,[[12,50],[34,46],[44,58],[36,68]]);
+    }
+  }
+  function drawBrain(o,cx,cy,S){
+    const u=S/200;
+    o.save();o.translate(cx,cy+S*.03);o.scale(u,u);
+    o.lineWidth=Math.max(1.6,S*.016)/u;
+    for(const e of[1,.92]){o.save();o.scale(e,e);hemiPath(o,1);hemiPath(o,-1);o.restore();}
+    foldSet(o);
+    o.beginPath();o.moveTo(-7,74);o.bezierCurveTo(-6,86,-4,92,0,96);
+    o.bezierCurveTo(4,92,6,86,7,74);o.stroke();
+    o.restore();
+  }
+  function iso(o,cx,cy,w,h,fillIt){
+    o.beginPath();
+    o.moveTo(cx,cy-h);o.lineTo(cx+w,cy);o.lineTo(cx,cy+h);o.lineTo(cx-w,cy);
+    o.closePath();
+    fillIt?o.fill():o.stroke();
+  }
+
+  /* ================= keyframe target sets =================
+     point = [x, y, flag, hx, hy]
+       act 0:   flag 1 = Kenwer drone point; hx,hy = that drone's centre
+       acts 2+: flag 0 = warm white, 1 = cyan, 2 = amber                   */
+  function buildTargets(){
+    const off=document.createElement('canvas');off.width=W;off.height=H;
+    const o=off.getContext('2d');o.strokeStyle='#fff';o.fillStyle='#fff';
+    const cx=W/2, cy=H/2, S=Math.min(W*.5,H*.86);
+    const CAP=W<640?3000:6400;
+    const GAP=W<640?3:2;
+
+    function sample(flag,hx,hy){
+      const img=o.getImageData(0,0,W,H).data, pts=[];
+      for(let y=0;y<H;y+=GAP)for(let x=0;x<W;x+=GAP){
+        if(img[(y*W+x)*4+3]>10)
+          pts.push([x+(Math.random()-.5)*.6,y+(Math.random()-.5)*.6,flag,hx||0,hy||0]);
+      }
+      return pts;
+    }
+
+    /* ---- act 0: FLEET ---- */
+    const narrow=W<720;
+    const offs=narrow?[-.30,0,.30]:[-.36,-.18,0,.18,.36];
+    const mid=(offs.length-1)/2;
+    const fleet=[];
+    offs.forEach((ox,i)=>{
+      o.clearRect(0,0,W,H);
+      const dx=cx+ox*W, dy=cy+(i===mid?0:(i%2?-.06:.06)*H);
+      drawDrone(o,dx,dy,S*(i===mid?.5:.4),false);
+      if(i===mid){chosenX=dx;chosenY=dy;}
+      fleet.push(...sample(i===mid?1:0,dx,dy));
+    });
+
+    /* ---- act 1: THE UNIT ---- */
+    o.clearRect(0,0,W,H);
+    drawDrone(o,cx,cy,S,true);
+    const unit=sample(0);
+
+    /* ---- act 2: drone above, brain below, cyan tether ---- */
+    const dS=S*.6, bS=S*.52, topY=H*.28, botY=H*.74;
+    o.clearRect(0,0,W,H);
+    drawDrone(o,cx,topY,dS,true);
+    drawBrain(o,cx,botY,bS);
+    const duo=sample(0);
+    o.clearRect(0,0,W,H);
+    o.lineWidth=2.6;o.setLineDash([5,6]);
+    o.beginPath();o.moveTo(cx,topY+dS*.2);o.lineTo(cx,botY-bS*.36);o.stroke();
+    o.setLineDash([]);
+    o.beginPath();o.arc(cx,botY-bS*.42,5,0,7);o.stroke();
+    duo.push(...sample(1));
+
+    /* ---- act 3: FULL EXPLODED STACK (the card-04 anatomy) ---- */
+    const gapY=H/6, pw=S*.42;
+    const yHemi=gapY*1.05, yMem=gapY*2.35, yCore=gapY*3.3, yFrame=gapY*4.25, yBase=gapY*5.2;
+    const ex=[];
+    /* hemispheres, lifted apart */
+    o.clearRect(0,0,W,H);
+    (function(){
+      const u=(S*.46)/200;
+      o.lineWidth=Math.max(1.6,S*.007)/u;
+      o.save();o.translate(cx-S*.14,yHemi);o.scale(u,u);hemiPath(o,-1);o.restore();
+      o.save();o.translate(cx+S*.14,yHemi);o.scale(u,u);hemiPath(o,1);o.restore();
+    })();
+    /* spindle + memory plate + frame plate (all white) */
+    o.lineWidth=2.2;o.setLineDash([3,7]);
+    o.beginPath();o.moveTo(cx,yHemi+S*.12);o.lineTo(cx,yBase-S*.02);o.stroke();
+    o.setLineDash([]);
+    iso(o,cx,yMem,pw*.8,pw*.24,false);
+    o.beginPath();o.moveTo(cx-pw*.34,yMem);o.lineTo(cx-pw*.12,yMem-pw*.06);o.stroke();
+    o.beginPath();o.moveTo(cx+pw*.34,yMem);o.lineTo(cx+pw*.12,yMem+pw*.06);o.stroke();
+    iso(o,cx,yFrame,pw,pw*.28,false);
+    for(const[bx,by]of[[0,-pw*.24],[pw*.86,0],[0,pw*.24],[-pw*.86,0]]){
+      o.beginPath();o.arc(cx+bx,yFrame+by,4,0,7);o.stroke();
+    }
+    ex.push(...sample(0));
+    /* THE COGNITIVE IDENTITY STACK — cyan */
+    o.clearRect(0,0,W,H);
+    iso(o,cx,yCore-pw*.09,pw*.62,pw*.17,false);
+    iso(o,cx,yCore,pw*.62,pw*.17,false);
+    iso(o,cx,yCore+pw*.09,pw*.62,pw*.17,false);
+    iso(o,cx,yCore,pw*.2,pw*.06,true);
+    o.beginPath();o.moveTo(cx+pw*.66,yCore);o.lineTo(cx+pw*.95,yCore);o.stroke();
+    o.beginPath();o.arc(cx+pw*1.02,yCore,5,0,7);o.stroke();
+    ex.push(...sample(1));
+    /* amber power layer */
+    o.clearRect(0,0,W,H);
+    iso(o,cx,yBase,pw*1.1,pw*.3,false);
+    o.lineWidth=1.8;
+    o.beginPath();o.moveTo(cx-pw*.6,yBase);
+    o.quadraticCurveTo(cx-pw*.25,yBase-pw*.1,cx,yBase);
+    o.quadraticCurveTo(cx+pw*.25,yBase+pw*.1,cx+pw*.6,yBase);o.stroke();
+    ex.push(...sample(2));
+
+    /* ---- act 4: RESEALED brain with a faint cyan core ---- */
+    o.clearRect(0,0,W,H);
+    drawBrain(o,cx,cy,S*.8);
+    const seal=sample(0);
+    o.clearRect(0,0,W,H);
+    (function(){
+      const u=(S*.8)/200;
+      o.save();o.translate(cx,cy+S*.8*.03);o.scale(u,u);
+      o.beginPath();o.moveTo(-26,8);o.quadraticCurveTo(0,-2,26,8);
+      o.quadraticCurveTo(0,16,-26,8);o.fill();
+      o.restore();
+    })();
+    seal.push(...sample(1));
+
+    /* ---- act 5: THE MARK — the Kenwer logo, filled and solid ----
+       The path is read live from the site's own logo SVG (#cvMark), so the
+       particle mark is always identical to the real mark. */
+    o.clearRect(0,0,W,H);
+    const mEl=document.querySelector('#cvMark path');
+    let mark=[];
+    if(mEl){
+      const LS=S*.94, ls=LS/200;
+      o.save();o.translate(cx-LS/2,cy-LS/2);o.scale(ls,ls);
+      o.fill(new Path2D(mEl.getAttribute('d')));
+      o.restore();
+      mark=sample(0);
+    }else{
+      mark=seal.slice();
+    }
+
+    targets=[fleet,unit,duo,ex,seal,mark];
+    /* shuffle every set BEFORE equalising — the filled mark oversamples far
+       past the cap, and truncating an unshuffled row-major list would slice
+       the logo's bottom off instead of thinning it evenly */
+    for(const t of targets)t.sort(()=>Math.random()-.5);
+    const n=Math.min(CAP,Math.max(...targets.map(t=>t.length)));
+    for(const t of targets){while(t.length<n)t.push(t[(Math.random()*t.length)|0]);t.length=n;}
+    return n;
+  }
+
+  function seed(){
+    const n=buildTargets();
+    parts=Array.from({length:n},()=>({
+      x:Math.random()*W,y:Math.random()*H,vx:0,vy:0,
+      ph:Math.random()*7,dl:Math.random(),tp:false,
+      r:1.35+Math.random()*.55, ba:.68+Math.random()*.32
+    }));
+  }
+
+  /* ================= the film ================= */
+  let scene=0,t=0;
+  const HOLD=[2.8,2.3,3.2,4.4,2.6,3.6];
+  let pressed=false,px=0,py=0;
+
+  function frame(ts){
+    if(!visible){running=false;return}
+    const dt=Math.min(.05,(ts-last)/1000||.016);last=ts;t+=dt;
+    if(!pressed&&t>HOLD[scene]){
+      scene=(scene+1)%6;t=0;
+      for(const p of parts)p.tp=false;
+    }
+
+    ctx.fillStyle=BG;ctx.fillRect(0,0,W,H);
+
+    /* cinematic backlight */
+    if(scene>0&&!pressed){
+      const gr=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,Math.min(W,H)*.55);
+      const ga=Math.min(1,t*1.3)*(scene===3?.10:scene===5?.08:.05);
+      gr.addColorStop(0,'rgba('+INK+','+ga+')');gr.addColorStop(1,'rgba('+INK+',0)');
+      ctx.fillStyle=gr;ctx.fillRect(0,0,W,H);
+    }
+    /* cyan selection ring, late in the fleet act */
+    if(scene===0&&!pressed&&t>HOLD[0]-1.2){
+      const k=(t-(HOLD[0]-1.2))/1.2;
+      for(const q of[0,.45]){
+        const kk=(k+q)%1;
+        ctx.strokeStyle='rgba('+CY+','+(0.6*(1-kk))+')';
+        ctx.lineWidth=1.6;
+        ctx.beginPath();ctx.arc(chosenX,chosenY,28+kk*74,0,7);ctx.stroke();
+      }
+    }
+
+    const tg=targets[scene], t0=targets[0];
+    for(let i=0;i<parts.length;i++){
+      const p=parts[i], T=tg[i];
+      let alpha=1, tint=0;
+
+      if(pressed){
+        const dx=p.x-px,dy=p.y-py,d=Math.hypot(dx,dy)||1;
+        const f=Math.max(0,1-d/(W*.45))*420*dt;
+        p.vx+=dx/d*f+(Math.random()-.5)*70*dt;
+        p.vy+=dy/d*f+(Math.random()-.5)*70*dt;
+        alpha=.6;
+      }else if(scene===1&&t0[i][2]===0&&!p.tp){
+        /* a partner-drone particle: bank away and exit the frame like the
+           video's act 2, fade in flight, then rematerialise on the unit */
+        if(t<.95){
+          const exitX=t0[i][3]<W/2? -W*.12 : W*1.12;
+          const exitY=t0[i][4]+(t0[i][3]<W/2?-1:1)*H*.10;
+          p.vx+=(exitX-p.x)*6.5*dt;
+          p.vy+=(exitY-p.y)*6.5*dt;
+          alpha=Math.max(0,1-Math.max(0,t-.3)/.55);
+        }else{
+          p.tp=true;
+          p.x=T[0]+(Math.random()-.5)*60;
+          p.y=T[1]+(Math.random()-.5)*60;
+          p.vx=p.vy=0;
+        }
+      }else{
+        const born=scene===1&&t0[i][2]===0;
+        const gate=Math.min(1,Math.max(.15,(born?(t-.95)*2.4:t*2.3)-p.dl*.5));
+        p.vx+=(T[0]-p.x)*14*gate*dt;
+        p.vy+=(T[1]-p.y)*14*gate*dt;
+        if(born)alpha=Math.min(1,(t-.95)/.6);
+      }
+
+      p.vx*=Math.exp(-4.5*dt);p.vy*=Math.exp(-4.5*dt);
+      p.x+=p.vx*dt;p.y+=p.vy*dt;
+
+      let ox=0,oy=0;
+      if(!pressed&&t>1.6){p.ph+=dt*1.4;ox=Math.sin(p.ph)*.4;oy=Math.cos(p.ph*.9)*.4}
+
+      if(scene===0&&T[2]===1)alpha*=1.3;
+      if(scene===5)alpha*=Math.min(1.2,1+t*.08);   /* the mark warms as it settles */
+      if(scene>=2&&scene<5)tint=T[2];
+
+      const a=Math.min(1,alpha*p.ba);
+      if(tint===1){
+        ctx.fillStyle='rgba('+CY+','+(a*.28)+')';
+        ctx.fillRect(p.x+ox-p.r*1.6,p.y+oy-p.r*1.6,p.r*3.2,p.r*3.2);
+        ctx.fillStyle='rgba('+CY+','+a+')';
+      }else if(tint===2){
+        ctx.fillStyle='rgba('+AM+','+(a*.25)+')';
+        ctx.fillRect(p.x+ox-p.r*1.6,p.y+oy-p.r*1.6,p.r*3.2,p.r*3.2);
+        ctx.fillStyle='rgba('+AM+','+a+')';
+      }else{
+        ctx.fillStyle='rgba('+INK+','+a+')';
+      }
+      ctx.fillRect(p.x+ox-p.r*.5,p.y+oy-p.r*.5,p.r,p.r);
+    }
     requestAnimationFrame(frame);
   }
-  function start(){if(!running){running=true;last=performance.now();ctx.fillStyle=themeBG();ctx.fillRect(0,0,W,H);requestAnimationFrame(frame);}}
+  function start(){if(!running){running=true;last=performance.now();requestAnimationFrame(frame)}}
 
-  if(reduce){size();ctx.fillStyle=themeBG();ctx.fillRect(0,0,W,H);ctx.fillStyle=themeDot();forms[0].forEach(p=>{ctx.beginPath();ctx.arc(p[0],p[1],1.3,0,7);ctx.fill();});return;}
-  new IntersectionObserver(es=>{visible=es[0].isIntersecting;if(visible){size();start();}},{threshold:.04}).observe(band);
+  band.addEventListener('pointerdown',e=>{
+    const r=band.getBoundingClientRect();
+    pressed=true;px=e.clientX-r.left;py=e.clientY-r.top;
+  });
+  band.addEventListener('pointermove',e=>{
+    if(!pressed)return;
+    const r=band.getBoundingClientRect();px=e.clientX-r.left;py=e.clientY-r.top;
+  });
+  ['pointerup','pointercancel','pointerleave'].forEach(ev=>
+    band.addEventListener(ev,()=>{pressed=false}));
+
+  if(reduce){
+    size();ctx.fillStyle=BG;ctx.fillRect(0,0,W,H);
+    targets[5].forEach(pt=>{
+      ctx.fillStyle='rgba('+INK+',.88)';
+      ctx.fillRect(pt[0]-1,pt[1]-1,2,2);
+    });
+    return;
+  }
+  new IntersectionObserver(es=>{visible=es[0].isIntersecting;if(visible){start()}},{threshold:.04}).observe(band);
   addEventListener('resize',size);size();
 })();
 
@@ -825,9 +1104,23 @@ function skyfield(id,alpha){
   const THRESH=7;           /* px of movement before a press becomes a drag    */
   const SPR_K=210,SPR_C=21; /* stiff spring: released stretch snaps home in ~0.35s with one tiny wobble */
 
+  let seeded=false;
   function measure(){
     const w=track.scrollWidth,vw=view.clientWidth;
-    if(w>0&&vw>0){maxX=Math.max(0,w-vw);DIM=Math.min(vw*.16,210);}  /* short leash: stretch can never approach mid-page */
+    if(w>0&&vw>0){
+      maxX=Math.max(0,w-vw);DIM=Math.min(vw*.16,210);  /* short leash: stretch can never approach mid-page */
+      /* first successful measure: park the track so card 2 is the leftmost
+         visible card. That way card 4 (Persistent Cognitive Identity) enters
+         cleanly from the right edge as the drift progresses, instead of
+         starting mid-screen. From here, ambient drift continues toward 06,
+         dwells, and rewinds all the way to 01, so cycles after this behave
+         normally. */
+      if(!seeded){
+        seeded=true;
+        const cards=track.querySelectorAll('.pmq-group:not([aria-hidden="true"]) .pcard');
+        if(cards.length>=2&&maxX>0){x=Math.min(maxX,cards[1].offsetLeft);}
+      }
+    }
     return maxX>0;
   }
   /* iOS-style rubber band: raw pull → displayed stretch, asymptotic to DIM */
@@ -1053,6 +1346,39 @@ function skyfield(id,alpha){
   addEventListener('resize',()=>{measure();x=Math.min(maxX,Math.max(0,x));xv=0;rawPull=0;paint();syncEnd();});
   setTimeout(measure,400);addEventListener('load',measure);
   new IntersectionObserver(es=>{vis=es[0].isIntersecting;if(vis){measure();start();}},{threshold:.02}).observe(mq);
+})();
+
+/* ---------- card 04 flip: tap toggles on touch / no-hover devices ----------
+   A tap on the card flips it; a swipe that ended on the card must NOT flip it.
+   We can't rely on the marquee's .dragging class — pointerup removes it before
+   the click event fires. Instead we track pointer movement per-card and treat
+   anything past a small threshold as a drag, not a tap. */
+(function(){
+  if(matchMedia('(hover: hover)').matches)return;   /* mouse users flip via hover */
+  document.querySelectorAll('.pcard-flip').forEach(c=>{
+    let sx=0,sy=0,moved=false,down=false;
+    c.addEventListener('pointerdown',e=>{
+      down=true;moved=false;sx=e.clientX;sy=e.clientY;
+    },{passive:true});
+    c.addEventListener('pointermove',e=>{
+      if(!down)return;
+      if(Math.abs(e.clientX-sx)>8||Math.abs(e.clientY-sy)>8)moved=true;
+    },{passive:true});
+    c.addEventListener('pointercancel',()=>{down=false;moved=true;},{passive:true});
+    c.addEventListener('click',e=>{
+      const wasDrag=moved;down=false;moved=false;
+      if(wasDrag)return;
+      c.classList.toggle('flipped');
+    });
+  });
+  /* tap anywhere outside a flipped card returns it to the front.
+     Runs after the card's own click handler (bubble order), so a tap on the
+     card that just added .flipped is inside the card and correctly ignored. */
+  document.addEventListener('click',e=>{
+    document.querySelectorAll('.pcard-flip.flipped').forEach(c=>{
+      if(!c.contains(e.target))c.classList.remove('flipped');
+    });
+  });
 })();
 
 /* ---------- back to top: scroll without leaving "#top" in the address bar ----------
