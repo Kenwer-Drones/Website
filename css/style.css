@@ -613,12 +613,16 @@ html:has(.menu-ov.open) nav{color:var(--tx-d)}         /* menu overlay is dark â
     box-shadow:0 0 0 1.5px rgba(150,230,240,.55),
                0 12px 40px rgba(150,230,240,.18)
   }
-  .pcard-flip:hover .flip-in{transform:rotateY(180deg)}
-  .pcard-flip:hover .fb-side,
-  .pcard-flip:hover .fb-tick,
-  .pcard-flip:hover .fb-spine{opacity:1}
-  .pcard-flip:hover .lyr{transform:none}
-  .pcard-flip:hover .fb-motes{opacity:1}
+  /* the flip effects are additionally gated by :not(.locked-front) â€” a click
+     on a card adds that class to lock it to the front so the person can read
+     the description. The halo above still fires on hover so pointing at a
+     locked card still shows feedback; only the flip itself is suppressed. */
+  .pcard-flip:hover:not(.locked-front) .flip-in{transform:rotateY(180deg)}
+  .pcard-flip:hover:not(.locked-front) .fb-side,
+  .pcard-flip:hover:not(.locked-front) .fb-tick,
+  .pcard-flip:hover:not(.locked-front) .fb-spine{opacity:1}
+  .pcard-flip:hover:not(.locked-front) .lyr{transform:none}
+  .pcard-flip:hover:not(.locked-front) .fb-motes{opacity:1}
 }
 .mote{animation:moteRise 3.8s linear infinite}
 @keyframes moteRise{
@@ -688,15 +692,16 @@ html:has(.menu-ov.open) nav{color:var(--tx-d)}         /* menu overlay is dark â
 }
 .fact .l{margin-top:12px;font-size:17px;font-weight:500;line-height:1.4;max-width:24ch}
 
-/* mock media panel */
+/* mock media panel â€” inner console fills the entire panel now so the dark
+   bezel bands don't show inside the card. The inner is absolutely positioned
+   to lock to the panel's full size regardless of parent centering. */
 .panel{
-  background:#101010;outline:1px solid rgba(17,19,16,.2);
+  background:transparent;outline:1px solid rgba(17,19,16,.2);
   aspect-ratio:16/10.6;position:relative;overflow:hidden;
-  display:flex;align-items:center;justify-content:center;
 }
 .panel .inner{
-  width:78%;background:#F1EFE8;color:#141412;padding:26px 28px;
-  box-shadow:0 30px 60px rgba(0,0,0,.5);
+  position:absolute;inset:0;box-sizing:border-box;
+  background:#F1EFE8;color:#141412;padding:26px 28px;
   font-size:clamp(10px,1.05vw,14px);
 }
 .panel .inner.dark{background:#161614;color:#EDEBE4}

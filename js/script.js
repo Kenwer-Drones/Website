@@ -1348,13 +1348,16 @@ function skyfield(id,alpha){
   new IntersectionObserver(es=>{vis=es[0].isIntersecting;if(vis){measure();start();}},{threshold:.02}).observe(mq);
 })();
 
-/* ---------- card 04 flip: tap toggles on touch / no-hover devices ----------
-   A tap on the card flips it; a swipe that ended on the card must NOT flip it.
-   We can't rely on the marquee's .dragging class — pointerup removes it before
-   the click event fires. Instead we track pointer movement per-card and treat
-   anything past a small threshold as a drag, not a tap. */
+/* ---------- card flip: touch = tap to flip, desktop = click to lock front ----------
+   On touch/no-hover devices the tap toggles .flipped (existing behaviour: the
+   flip is fully controlled by that class). On desktop the flip happens on
+   hover via CSS; a click toggles .locked-front, which the CSS rules honour by
+   suppressing the hover flip. Result: hover to peek, click to hold the front
+   still while reading, click again to release. Same movement-based drag guard
+   in both cases so a marquee swipe never registers as a click. */
 (function(){
-  if(matchMedia('(hover: hover)').matches)return;   /* mouse users flip via hover */
+  const canHover=matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const stateClass=canHover?'locked-front':'flipped';
   document.querySelectorAll('.pcard-flip').forEach(c=>{
     let sx=0,sy=0,moved=false,down=false;
     c.addEventListener('pointerdown',e=>{
@@ -1368,15 +1371,14 @@ function skyfield(id,alpha){
     c.addEventListener('click',e=>{
       const wasDrag=moved;down=false;moved=false;
       if(wasDrag)return;
-      c.classList.toggle('flipped');
+      c.classList.toggle(stateClass);
     });
   });
-  /* tap anywhere outside a flipped card returns it to the front.
-     Runs after the card's own click handler (bubble order), so a tap on the
-     card that just added .flipped is inside the card and correctly ignored. */
+  /* on touch: tapping outside a flipped card returns it to the front.
+     on desktop: clicking outside releases the front-lock so hover works again. */
   document.addEventListener('click',e=>{
-    document.querySelectorAll('.pcard-flip.flipped').forEach(c=>{
-      if(!c.contains(e.target))c.classList.remove('flipped');
+    document.querySelectorAll('.pcard-flip.'+stateClass).forEach(c=>{
+      if(!c.contains(e.target))c.classList.remove(stateClass);
     });
   });
 })();
