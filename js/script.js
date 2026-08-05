@@ -687,34 +687,56 @@ function skyfield(id,alpha){
   }
 })();
 
-/* ---------- footer band: particle film · "The Layer Inside" ----------
-   The website's particle trailer of the Kenwer video storyboard — five acts,
-   continuous, no dead pauses, drawn entirely in particles:
-     act 0  FLEET      five drones; the Kenwer unit (middle) is brighter;
-                       a cyan selection ring pulses on it
-     act 1  DEPART     the other four bank away and fly OUT of frame; their
-                       particles rematerialise into the Kenwer drone, large
-                       and fully detailed
-     act 2  REVEAL     the drone rises; particles stream from its core down
-                       into a brain beneath it, joined by a cyan tether
-     act 3  EXPLODE    the drone dissolves; the brain splits into the full
-                       five-layer stack — hemispheres, memory plate, the
-                       GLOWING CYAN COGNITIVE IDENTITY STACK, bolted frame,
-                       amber power layer — the same anatomy as card 04
-     act 4  RESEAL     the layers glide back into a whole brain with a cyan
-                       core glowing faintly inside … then it disperses back
-                       into the fleet and the film loops
-   Dense sampling + stiff springs keep edges crisp. Cyan marks cognition,
-   amber marks power — same palette as the card-04 scene.
-   Press / hold the band to scatter; release and the film resumes. */
+/* ---------- logo particle band ---------- */
 (function(){
-  const band=document.getElementById('halftone'),cv=document.getElementById('droneCv');
+  var band=document.getElementById('halftone'),cv=document.getElementById('droneCv');
   if(!band||!cv)return;
-  const ctx=cv.getContext('2d',{alpha:false});
-  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const BG='#050505', INK='237,235,228', CY='143,227,234', AM='232,194,122';
-  let W=0,H=0,DPR=1,parts=[],targets=[],running=false,visible=false,last=0;
-  let chosenX=0,chosenY=0;
+  var ctx=cv.getContext('2d',{alpha:false});
+  var W=0,H=0,DPR=1,parts=[],visible=false,raf=0;
+  var mx=-9999,my=-9999,pressing=false;
+  var BG='#050505';
+  var LOGO_PATH=new Path2D("M 6.4,11.2 C 5.9,11.7 5.9,104.0 6.5,105.2 C 6.7,105.8 6.9,106.5 6.9,106.9 C 6.9,107.8 7.6,109.4 8.5,110.4 C 9.0,110.9 9.3,111.5 9.3,111.6 C 9.3,112.0 14.0,116.7 15.7,117.9 C 16.3,118.4 17.9,119.4 19.1,120.2 C 20.4,121.1 21.8,122.1 22.4,122.6 C 23.3,123.3 23.8,123.7 26.4,125.6 C 26.9,125.9 27.8,126.6 28.5,127.1 C 29.7,128.1 31.4,129.4 32.8,130.4 C 33.3,130.7 34.2,131.4 34.8,131.9 C 37.5,134.0 38.6,134.8 41.0,136.4 C 42.4,137.4 43.8,138.5 44.2,138.9 C 44.5,139.3 45.9,140.3 47.1,141.1 C 48.4,141.9 50.1,143.2 50.9,143.9 C 51.7,144.7 52.8,145.6 53.3,146.0 C 54.3,146.8 54.6,147.3 54.0,147.3 C 53.6,147.3 47.6,144.3 46.7,143.6 C 46.2,143.3 44.1,142.1 41.9,141.0 C 39.8,139.9 37.8,138.8 37.5,138.7 C 37.3,138.4 36.0,137.7 34.7,137.0 C 33.4,136.3 32.2,135.6 31.9,135.4 C 31.7,135.2 29.4,134.0 26.7,132.6 C 24.1,131.3 21.8,130.1 21.6,129.8 C 16.8,125.5 8.6,127.4 6.6,133.3 C 6.0,135.4 5.7,176.9 6.4,177.6 C 6.6,177.8 23.2,177.9 79.0,177.9 C 160.0,177.9 153.4,177.7 154.6,180.1 C 155.7,182.4 162.0,187.5 163.8,187.5 C 164.0,187.5 164.9,187.9 165.8,188.3 C 168.5,189.5 176.2,189.5 178.8,188.3 C 179.8,187.9 180.7,187.5 180.9,187.5 C 181.5,187.5 187.5,183.1 187.5,182.7 C 187.5,182.5 188.0,181.8 188.7,181.1 C 189.4,180.4 189.9,179.7 189.9,179.6 C 189.9,179.4 190.2,178.9 190.5,178.5 C 190.9,178.1 191.8,176.0 192.5,173.7 C 194.6,167.6 194.5,164.2 192.2,159.1 C 191.8,158.3 191.5,157.5 191.5,157.3 C 191.5,157.1 191.2,156.5 190.7,155.9 C 190.3,155.4 189.9,154.8 189.9,154.6 C 189.9,154.4 189.6,154.1 189.3,153.8 C 189.0,153.5 188.6,152.9 188.4,152.4 C 188.2,151.9 187.6,151.2 186.9,150.8 C 186.3,150.4 185.4,149.8 185.0,149.4 C 183.1,147.7 178.6,145.9 175.9,145.9 C 174.1,145.9 173.0,145.6 172.7,144.9 C 172.6,144.7 172.4,119.2 172.3,88.2 C 172.2,42.6 172.1,31.8 171.8,30.8 C 170.7,27.1 170.4,26.1 169.7,24.7 C 169.3,23.9 168.7,22.8 168.3,22.4 C 167.9,21.9 167.5,21.4 167.5,21.2 C 167.5,20.7 163.1,16.3 161.4,15.3 C 159.1,13.7 157.9,13.2 151.5,11.4 C 149.6,10.8 81.7,10.7 80.3,11.3 C 79.8,11.5 78.9,11.7 78.4,11.7 C 76.8,11.7 72.1,13.4 70.3,14.6 C 69.5,15.3 68.2,16.1 67.6,16.6 C 65.8,17.9 64.4,19.2 64.4,19.6 C 64.4,19.8 63.9,20.5 63.3,21.2 C 61.7,22.9 58.8,28.8 58.8,30.3 C 58.8,30.9 58.6,31.8 58.4,32.4 C 57.9,33.7 57.9,40.0 58.4,41.3 C 58.6,41.8 58.8,42.7 58.8,43.4 C 58.8,44.1 59.2,45.2 60.0,46.9 C 60.7,48.3 61.2,49.5 61.2,49.7 C 61.2,49.9 61.6,50.8 62.0,51.7 C 62.5,52.7 62.8,53.6 62.8,53.7 C 62.8,53.9 63.2,54.8 63.6,55.7 C 64.1,56.7 64.4,57.6 64.4,57.7 C 64.4,57.9 65.0,59.1 65.6,60.5 C 66.3,61.9 66.8,63.1 66.8,63.3 C 66.8,63.5 67.4,64.7 68.0,66.1 C 68.7,67.5 69.2,68.7 69.2,68.9 C 69.2,69.0 69.6,69.9 70.0,70.9 C 70.5,71.8 70.8,72.7 70.8,72.9 C 70.8,73.1 71.3,74.3 72.0,75.7 C 72.7,77.1 73.2,78.3 73.2,78.5 C 73.2,78.6 73.6,79.5 74.0,80.5 C 74.5,81.4 74.8,82.3 74.8,82.5 C 74.8,82.6 75.2,83.5 75.6,84.5 C 76.1,85.4 76.4,86.3 76.4,86.5 C 76.4,86.7 76.9,87.9 77.6,89.3 C 78.3,90.6 78.8,91.9 78.8,92.1 C 78.8,92.2 79.3,93.5 80.0,94.9 C 80.7,96.2 81.2,97.5 81.2,97.7 C 81.2,97.8 81.7,99.1 82.4,100.4 C 83.0,101.8 83.7,103.6 84.0,104.5 C 84.3,105.4 85.0,107.2 85.7,108.6 C 86.3,109.9 86.8,111.2 86.8,111.5 C 86.8,111.7 87.1,112.4 87.5,113.2 C 88.2,114.7 88.3,114.8 87.7,114.8 C 87.5,114.8 86.9,113.8 86.2,112.5 C 85.6,111.3 84.9,110.0 84.5,109.6 C 84.2,109.2 83.0,107.2 82.0,105.0 C 80.9,102.9 79.9,101.0 79.7,100.9 C 79.5,100.7 78.8,99.4 78.1,98.1 C 77.4,96.7 76.7,95.4 76.4,95.2 C 76.1,94.9 75.8,94.2 75.6,93.6 C 75.5,93.0 75.2,92.3 74.9,92.1 C 74.7,91.9 74.0,90.6 73.3,89.3 C 72.7,87.9 71.9,86.7 71.7,86.5 C 71.5,86.3 70.4,84.3 69.3,82.1 C 68.2,79.9 67.1,77.9 66.9,77.7 C 66.7,77.5 65.8,75.9 64.9,74.1 C 64.0,72.3 63.1,70.7 62.9,70.5 C 62.7,70.3 61.6,68.3 60.5,66.1 C 59.4,63.9 58.3,61.9 58.1,61.7 C 57.9,61.5 57.2,60.3 56.5,58.9 C 55.9,57.6 55.2,56.3 54.9,56.1 C 54.7,56.0 53.5,53.6 52.1,50.9 C 50.8,48.2 49.5,45.9 49.3,45.7 C 49.1,45.5 48.6,44.6 48.1,43.7 C 47.7,42.8 47.2,41.9 47.0,41.8 C 46.7,41.6 45.5,39.2 44.1,36.5 C 42.8,33.8 41.5,31.5 41.3,31.3 C 41.1,31.1 40.6,30.3 40.2,29.3 C 39.7,28.4 39.2,27.5 39.0,27.3 C 38.7,27.2 38.0,25.9 37.4,24.5 C 36.7,23.2 36.0,21.9 35.8,21.8 C 35.5,21.6 34.8,20.3 34.2,19.0 C 32.3,15.1 29.7,13.0 25.1,11.4 C 23.1,10.7 7.0,10.5 6.4,11.2");
+
+  function sampleLogo(cb){
+    var tmp=document.createElement('canvas');
+    var tc=tmp.getContext('2d');
+    var s=Math.min(W*.45,H*.75);
+    tmp.width=Math.ceil(s);tmp.height=Math.ceil(s);
+    tc.scale(s/200,s/200);
+    tc.fillStyle='#fff';
+    tc.fill(LOGO_PATH);
+    var id=tc.getImageData(0,0,tmp.width,tmp.height).data;
+    var pts=[];
+    var gap=Math.max(3,Math.round(s/100));
+    for(var y=0;y<tmp.height;y+=gap){
+      for(var x=0;x<tmp.width;x+=gap){
+        var a=id[(y*tmp.width+x)*4+3];
+        if(a>80) pts.push({x:x-tmp.width/2,y:y-tmp.height/2,b:a/255});
+      }
+    }
+    cb(pts);
+  }
+
+  function seed(){
+    sampleLogo(function(pts){
+      var ox=W/2,oy=H/2;
+      parts=[];
+      for(var i=0;i<pts.length;i++){
+        var p=pts[i];
+        var angle=Math.random()*Math.PI*2;
+        var dist=Math.random()*Math.max(W,H)*.7;
+        parts.push({
+          x:ox+Math.cos(angle)*dist,
+          y:oy+Math.sin(angle)*dist,
+          tx:ox+p.x,ty:oy+p.y,
+          vx:0,vy:0,
+          r:1.0+p.b*1.6,
+          b:p.b,
+          phase:Math.random()*Math.PI*2
+        });
+      }
+    });
+  }
 
   function size(){
     W=band.clientWidth;H=band.clientHeight;DPR=Math.min(2,devicePixelRatio||1);
@@ -722,340 +744,60 @@ function skyfield(id,alpha){
     if(W&&H)seed();
   }
 
-  /* ================= silhouette painters ================= */
-  function drawDrone(o,cx,cy,S,full){
-    const b=S*.13, arm=S*.30, rot=S*.15, lw=Math.max(1.6,S*.014);
-    o.lineWidth=lw;
-    o.strokeRect(cx-b,cy-b,b*2,b*2);
-    if(full){
-      o.strokeRect(cx-b*.55,cy-b*.55,b*1.1,b*1.1);
-      o.beginPath();o.moveTo(cx-b,cy-b);o.lineTo(cx+b,cy+b);
-      o.moveTo(cx+b,cy-b);o.lineTo(cx-b,cy+b);o.stroke();
-      o.beginPath();o.arc(cx,cy-b-S*.085,S*.032,0,7);o.stroke();
-      o.beginPath();o.arc(cx,cy-b-S*.085,S*.013,0,7);o.fill();
-    }
-    o.beginPath();o.moveTo(cx,cy-b);o.lineTo(cx,cy-b-S*.05);o.stroke();
-    let ri=0;
-    for(const[sx,sy]of[[-1,-1],[1,-1],[-1,1],[1,1]]){
-      const ax=cx+sx*arm, ay=cy+sy*arm;
-      if(full){
-        const px=-sy*lw*1.4, py=sx*lw*1.4;
-        o.beginPath();o.moveTo(cx+sx*b*.9+px,cy+sy*b*.9+py);o.lineTo(ax+px*.4,ay+py*.4);o.stroke();
-        o.beginPath();o.moveTo(cx+sx*b*.9-px,cy+sy*b*.9-py);o.lineTo(ax-px*.4,ay-py*.4);o.stroke();
-      }else{
-        o.beginPath();o.moveTo(cx+sx*b*.9,cy+sy*b*.9);o.lineTo(ax,ay);o.stroke();
-      }
-      o.beginPath();o.arc(ax,ay,rot,0,7);o.stroke();
-      if(full){o.beginPath();o.arc(ax,ay,rot*.5,0,7);o.stroke();}
-      o.beginPath();o.arc(ax,ay,rot*(full?.16:.2),0,7);o.fill();
-      const ang=(ri++%2?.55:2.1);
-      o.beginPath();
-      o.moveTo(ax+Math.cos(ang)*rot*.92,ay+Math.sin(ang)*rot*.92);
-      o.lineTo(ax-Math.cos(ang)*rot*.92,ay-Math.sin(ang)*rot*.92);o.stroke();
-      if(full)for(let k=0;k<4;k++){
-        const a2=k*Math.PI/2+.79;
-        o.beginPath();
-        o.moveTo(ax+Math.cos(a2)*rot*.86,ay+Math.sin(a2)*rot*.86);
-        o.lineTo(ax+Math.cos(a2)*rot,ay+Math.sin(a2)*rot);o.stroke();
-      }
-    }
-  }
-  function hemiPath(o,m){
-    o.beginPath();o.moveTo(m*3,74);
-    o.bezierCurveTo(m*54,76,m*90,52,m*90,20);
-    o.bezierCurveTo(m*90,-10,m*70,-30,m*46,-30);
-    o.bezierCurveTo(m*40,-52,m*16,-60,m*3,-46);
-    o.lineTo(m*3,74);o.stroke();
-  }
-  function foldSet(o){
-    function fold(m,pts){
-      o.beginPath();o.moveTo(m*pts[0][0],pts[0][1]);
-      for(let i=1;i<pts.length;i+=3)
-        o.bezierCurveTo(m*pts[i][0],pts[i][1],m*pts[i+1][0],pts[i+1][1],m*pts[i+2][0],pts[i+2][1]);
-      o.stroke();
-    }
-    for(const m of[1,-1]){
-      fold(m,[[14,-38],[34,-46],[52,-34],[56,-16]]);
-      fold(m,[[10,-18],[38,-26],[62,-10],[66,12]]);
-      fold(m,[[12,4],[40,-2],[64,16],[62,38]]);
-      fold(m,[[14,28],[44,22],[60,40],[50,58]]);
-      fold(m,[[12,50],[34,46],[44,58],[36,68]]);
-    }
-  }
-  function drawBrain(o,cx,cy,S){
-    const u=S/200;
-    o.save();o.translate(cx,cy+S*.03);o.scale(u,u);
-    o.lineWidth=Math.max(1.6,S*.016)/u;
-    for(const e of[1,.92]){o.save();o.scale(e,e);hemiPath(o,1);hemiPath(o,-1);o.restore();}
-    foldSet(o);
-    o.beginPath();o.moveTo(-7,74);o.bezierCurveTo(-6,86,-4,92,0,96);
-    o.bezierCurveTo(4,92,6,86,7,74);o.stroke();
-    o.restore();
-  }
-  function iso(o,cx,cy,w,h,fillIt){
-    o.beginPath();
-    o.moveTo(cx,cy-h);o.lineTo(cx+w,cy);o.lineTo(cx,cy+h);o.lineTo(cx-w,cy);
-    o.closePath();
-    fillIt?o.fill():o.stroke();
-  }
-
-  /* ================= keyframe target sets =================
-     point = [x, y, flag, hx, hy]
-       act 0:   flag 1 = Kenwer drone point; hx,hy = that drone's centre
-       acts 2+: flag 0 = warm white, 1 = cyan, 2 = amber                   */
-  function buildTargets(){
-    const off=document.createElement('canvas');off.width=W;off.height=H;
-    const o=off.getContext('2d');o.strokeStyle='#fff';o.fillStyle='#fff';
-    const cx=W/2, cy=H/2, S=Math.min(W*.5,H*.86);
-    const CAP=W<640?3000:6400;
-    const GAP=W<640?3:2;
-
-    function sample(flag,hx,hy){
-      const img=o.getImageData(0,0,W,H).data, pts=[];
-      for(let y=0;y<H;y+=GAP)for(let x=0;x<W;x+=GAP){
-        if(img[(y*W+x)*4+3]>10)
-          pts.push([x+(Math.random()-.5)*.6,y+(Math.random()-.5)*.6,flag,hx||0,hy||0]);
-      }
-      return pts;
-    }
-
-    /* ---- act 0: FLEET ---- */
-    const narrow=W<720;
-    const offs=narrow?[-.30,0,.30]:[-.36,-.18,0,.18,.36];
-    const mid=(offs.length-1)/2;
-    const fleet=[];
-    offs.forEach((ox,i)=>{
-      o.clearRect(0,0,W,H);
-      const dx=cx+ox*W, dy=cy+(i===mid?0:(i%2?-.06:.06)*H);
-      drawDrone(o,dx,dy,S*(i===mid?.5:.4),false);
-      if(i===mid){chosenX=dx;chosenY=dy;}
-      fleet.push(...sample(i===mid?1:0,dx,dy));
-    });
-
-    /* ---- act 1: THE UNIT ---- */
-    o.clearRect(0,0,W,H);
-    drawDrone(o,cx,cy,S,true);
-    const unit=sample(0);
-
-    /* ---- act 2: drone above, brain below, cyan tether ---- */
-    const dS=S*.6, bS=S*.52, topY=H*.28, botY=H*.74;
-    o.clearRect(0,0,W,H);
-    drawDrone(o,cx,topY,dS,true);
-    drawBrain(o,cx,botY,bS);
-    const duo=sample(0);
-    o.clearRect(0,0,W,H);
-    o.lineWidth=2.6;o.setLineDash([5,6]);
-    o.beginPath();o.moveTo(cx,topY+dS*.2);o.lineTo(cx,botY-bS*.36);o.stroke();
-    o.setLineDash([]);
-    o.beginPath();o.arc(cx,botY-bS*.42,5,0,7);o.stroke();
-    duo.push(...sample(1));
-
-    /* ---- act 3: FULL EXPLODED STACK (the card-04 anatomy) ---- */
-    const gapY=H/6, pw=S*.42;
-    const yHemi=gapY*1.05, yMem=gapY*2.35, yCore=gapY*3.3, yFrame=gapY*4.25, yBase=gapY*5.2;
-    const ex=[];
-    /* hemispheres, lifted apart */
-    o.clearRect(0,0,W,H);
-    (function(){
-      const u=(S*.46)/200;
-      o.lineWidth=Math.max(1.6,S*.007)/u;
-      o.save();o.translate(cx-S*.14,yHemi);o.scale(u,u);hemiPath(o,-1);o.restore();
-      o.save();o.translate(cx+S*.14,yHemi);o.scale(u,u);hemiPath(o,1);o.restore();
-    })();
-    /* spindle + memory plate + frame plate (all white) */
-    o.lineWidth=2.2;o.setLineDash([3,7]);
-    o.beginPath();o.moveTo(cx,yHemi+S*.12);o.lineTo(cx,yBase-S*.02);o.stroke();
-    o.setLineDash([]);
-    iso(o,cx,yMem,pw*.8,pw*.24,false);
-    o.beginPath();o.moveTo(cx-pw*.34,yMem);o.lineTo(cx-pw*.12,yMem-pw*.06);o.stroke();
-    o.beginPath();o.moveTo(cx+pw*.34,yMem);o.lineTo(cx+pw*.12,yMem+pw*.06);o.stroke();
-    iso(o,cx,yFrame,pw,pw*.28,false);
-    for(const[bx,by]of[[0,-pw*.24],[pw*.86,0],[0,pw*.24],[-pw*.86,0]]){
-      o.beginPath();o.arc(cx+bx,yFrame+by,4,0,7);o.stroke();
-    }
-    ex.push(...sample(0));
-    /* THE COGNITIVE IDENTITY STACK — cyan */
-    o.clearRect(0,0,W,H);
-    iso(o,cx,yCore-pw*.09,pw*.62,pw*.17,false);
-    iso(o,cx,yCore,pw*.62,pw*.17,false);
-    iso(o,cx,yCore+pw*.09,pw*.62,pw*.17,false);
-    iso(o,cx,yCore,pw*.2,pw*.06,true);
-    o.beginPath();o.moveTo(cx+pw*.66,yCore);o.lineTo(cx+pw*.95,yCore);o.stroke();
-    o.beginPath();o.arc(cx+pw*1.02,yCore,5,0,7);o.stroke();
-    ex.push(...sample(1));
-    /* amber power layer */
-    o.clearRect(0,0,W,H);
-    iso(o,cx,yBase,pw*1.1,pw*.3,false);
-    o.lineWidth=1.8;
-    o.beginPath();o.moveTo(cx-pw*.6,yBase);
-    o.quadraticCurveTo(cx-pw*.25,yBase-pw*.1,cx,yBase);
-    o.quadraticCurveTo(cx+pw*.25,yBase+pw*.1,cx+pw*.6,yBase);o.stroke();
-    ex.push(...sample(2));
-
-    /* ---- act 4: RESEALED brain with a faint cyan core ---- */
-    o.clearRect(0,0,W,H);
-    drawBrain(o,cx,cy,S*.8);
-    const seal=sample(0);
-    o.clearRect(0,0,W,H);
-    (function(){
-      const u=(S*.8)/200;
-      o.save();o.translate(cx,cy+S*.8*.03);o.scale(u,u);
-      o.beginPath();o.moveTo(-26,8);o.quadraticCurveTo(0,-2,26,8);
-      o.quadraticCurveTo(0,16,-26,8);o.fill();
-      o.restore();
-    })();
-    seal.push(...sample(1));
-
-    /* ---- act 5: THE MARK — the Kenwer logo, filled and solid ----
-       The path is read live from the site's own logo SVG (#cvMark), so the
-       particle mark is always identical to the real mark. */
-    o.clearRect(0,0,W,H);
-    const mEl=document.querySelector('#cvMark path');
-    let mark=[];
-    if(mEl){
-      const LS=S*.94, ls=LS/200;
-      o.save();o.translate(cx-LS/2,cy-LS/2);o.scale(ls,ls);
-      o.fill(new Path2D(mEl.getAttribute('d')));
-      o.restore();
-      mark=sample(0);
-    }else{
-      mark=seal.slice();
-    }
-
-    targets=[fleet,unit,duo,ex,seal,mark];
-    /* shuffle every set BEFORE equalising — the filled mark oversamples far
-       past the cap, and truncating an unshuffled row-major list would slice
-       the logo's bottom off instead of thinning it evenly */
-    for(const t of targets)t.sort(()=>Math.random()-.5);
-    const n=Math.min(CAP,Math.max(...targets.map(t=>t.length)));
-    for(const t of targets){while(t.length<n)t.push(t[(Math.random()*t.length)|0]);t.length=n;}
-    return n;
-  }
-
-  function seed(){
-    const n=buildTargets();
-    parts=Array.from({length:n},()=>({
-      x:Math.random()*W,y:Math.random()*H,vx:0,vy:0,
-      ph:Math.random()*7,dl:Math.random(),tp:false,
-      r:1.35+Math.random()*.55, ba:.68+Math.random()*.32
-    }));
-  }
-
-  /* ================= the film ================= */
-  let scene=0,t=0;
-  const HOLD=[2.8,2.3,3.2,4.4,2.6,3.6];
-  let pressed=false,px=0,py=0;
-
-  function frame(ts){
-    if(!visible){running=false;return}
-    const dt=Math.min(.05,(ts-last)/1000||.016);last=ts;t+=dt;
-    if(!pressed&&t>HOLD[scene]){
-      scene=(scene+1)%6;t=0;
-      for(const p of parts)p.tp=false;
-    }
-
+  function draw(t){
+    raf=requestAnimationFrame(draw);
+    if(!visible)return;
     ctx.fillStyle=BG;ctx.fillRect(0,0,W,H);
-
-    /* cinematic backlight */
-    if(scene>0&&!pressed){
-      const gr=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,Math.min(W,H)*.55);
-      const ga=Math.min(1,t*1.3)*(scene===3?.10:scene===5?.08:.05);
-      gr.addColorStop(0,'rgba('+INK+','+ga+')');gr.addColorStop(1,'rgba('+INK+',0)');
-      ctx.fillStyle=gr;ctx.fillRect(0,0,W,H);
-    }
-    /* cyan selection ring, late in the fleet act */
-    if(scene===0&&!pressed&&t>HOLD[0]-1.2){
-      const k=(t-(HOLD[0]-1.2))/1.2;
-      for(const q of[0,.45]){
-        const kk=(k+q)%1;
-        ctx.strokeStyle='rgba('+CY+','+(0.6*(1-kk))+')';
-        ctx.lineWidth=1.6;
-        ctx.beginPath();ctx.arc(chosenX,chosenY,28+kk*74,0,7);ctx.stroke();
+    var ts=t*.001;
+    for(var i=0;i<parts.length;i++){
+      var p=parts[i];
+      var dx=p.x-mx,dy=p.y-my;
+      var d2=dx*dx+dy*dy;
+      var radius=pressing?16000:9000;
+      var force=pressing?2.5:1.4;
+      if(d2<radius&&d2>0){
+        var d=Math.sqrt(d2);
+        var f=force*(1-d/Math.sqrt(radius));
+        p.vx+=dx/d*f;
+        p.vy+=dy/d*f;
       }
+      var sx=p.tx-p.x, sy=p.ty-p.y;
+      p.vx+=sx*0.04;
+      p.vy+=sy*0.04;
+      p.vx*=0.87;
+      p.vy*=0.87;
+      p.x+=p.vx;
+      p.y+=p.vy;
+      var shimmer=0.5+0.5*Math.sin(ts*1.5+p.phase);
+      var alpha=0.3+p.b*0.6+shimmer*0.1;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,6.283);
+      ctx.fillStyle='rgba(237,235,228,'+alpha+')';
+      ctx.fill();
     }
-
-    const tg=targets[scene], t0=targets[0];
-    for(let i=0;i<parts.length;i++){
-      const p=parts[i], T=tg[i];
-      let alpha=1, tint=0;
-
-      if(pressed){
-        const dx=p.x-px,dy=p.y-py,d=Math.hypot(dx,dy)||1;
-        const f=Math.max(0,1-d/(W*.45))*420*dt;
-        p.vx+=dx/d*f+(Math.random()-.5)*70*dt;
-        p.vy+=dy/d*f+(Math.random()-.5)*70*dt;
-        alpha=.6;
-      }else if(scene===1&&t0[i][2]===0&&!p.tp){
-        /* a partner-drone particle: bank away and exit the frame like the
-           video's act 2, fade in flight, then rematerialise on the unit */
-        if(t<.95){
-          const exitX=t0[i][3]<W/2? -W*.12 : W*1.12;
-          const exitY=t0[i][4]+(t0[i][3]<W/2?-1:1)*H*.10;
-          p.vx+=(exitX-p.x)*6.5*dt;
-          p.vy+=(exitY-p.y)*6.5*dt;
-          alpha=Math.max(0,1-Math.max(0,t-.3)/.55);
-        }else{
-          p.tp=true;
-          p.x=T[0]+(Math.random()-.5)*60;
-          p.y=T[1]+(Math.random()-.5)*60;
-          p.vx=p.vy=0;
-        }
-      }else{
-        const born=scene===1&&t0[i][2]===0;
-        const gate=Math.min(1,Math.max(.15,(born?(t-.95)*2.4:t*2.3)-p.dl*.5));
-        p.vx+=(T[0]-p.x)*14*gate*dt;
-        p.vy+=(T[1]-p.y)*14*gate*dt;
-        if(born)alpha=Math.min(1,(t-.95)/.6);
-      }
-
-      p.vx*=Math.exp(-4.5*dt);p.vy*=Math.exp(-4.5*dt);
-      p.x+=p.vx*dt;p.y+=p.vy*dt;
-
-      let ox=0,oy=0;
-      if(!pressed&&t>1.6){p.ph+=dt*1.4;ox=Math.sin(p.ph)*.4;oy=Math.cos(p.ph*.9)*.4}
-
-      if(scene===0&&T[2]===1)alpha*=1.3;
-      if(scene===5)alpha*=Math.min(1.2,1+t*.08);   /* the mark warms as it settles */
-      if(scene>=2&&scene<5)tint=T[2];
-
-      const a=Math.min(1,alpha*p.ba);
-      if(tint===1){
-        ctx.fillStyle='rgba('+CY+','+(a*.28)+')';
-        ctx.fillRect(p.x+ox-p.r*1.6,p.y+oy-p.r*1.6,p.r*3.2,p.r*3.2);
-        ctx.fillStyle='rgba('+CY+','+a+')';
-      }else if(tint===2){
-        ctx.fillStyle='rgba('+AM+','+(a*.25)+')';
-        ctx.fillRect(p.x+ox-p.r*1.6,p.y+oy-p.r*1.6,p.r*3.2,p.r*3.2);
-        ctx.fillStyle='rgba('+AM+','+a+')';
-      }else{
-        ctx.fillStyle='rgba('+INK+','+a+')';
-      }
-      ctx.fillRect(p.x+ox-p.r*.5,p.y+oy-p.r*.5,p.r,p.r);
-    }
-    requestAnimationFrame(frame);
   }
-  function start(){if(!running){running=true;last=performance.now();requestAnimationFrame(frame)}}
 
-  band.addEventListener('pointerdown',e=>{
-    const r=band.getBoundingClientRect();
-    pressed=true;px=e.clientX-r.left;py=e.clientY-r.top;
-  });
-  band.addEventListener('pointermove',e=>{
-    if(!pressed)return;
-    const r=band.getBoundingClientRect();px=e.clientX-r.left;py=e.clientY-r.top;
-  });
-  ['pointerup','pointercancel','pointerleave'].forEach(ev=>
-    band.addEventListener(ev,()=>{pressed=false}));
+  function start(){if(!raf)raf=requestAnimationFrame(draw);}
 
-  if(reduce){
-    size();ctx.fillStyle=BG;ctx.fillRect(0,0,W,H);
-    targets[5].forEach(pt=>{
-      ctx.fillStyle='rgba('+INK+',.88)';
-      ctx.fillRect(pt[0]-1,pt[1]-1,2,2);
-    });
-    return;
-  }
-  new IntersectionObserver(es=>{visible=es[0].isIntersecting;if(visible){start()}},{threshold:.04}).observe(band);
+  band.addEventListener('mousemove',function(e){
+    var r=band.getBoundingClientRect();
+    mx=e.clientX-r.left;my=e.clientY-r.top;
+  });
+  band.addEventListener('mouseleave',function(){mx=-9999;my=-9999;pressing=false;});
+  band.addEventListener('mousedown',function(){pressing=true;});
+  band.addEventListener('mouseup',function(){pressing=false;});
+  band.addEventListener('touchstart',function(e){
+    pressing=true;
+    var r=band.getBoundingClientRect();
+    mx=e.touches[0].clientX-r.left;my=e.touches[0].clientY-r.top;
+  },{passive:true});
+  band.addEventListener('touchmove',function(e){
+    var r=band.getBoundingClientRect();
+    mx=e.touches[0].clientX-r.left;my=e.touches[0].clientY-r.top;
+  },{passive:true});
+  band.addEventListener('touchend',function(){pressing=false;mx=-9999;my=-9999;});
+
+  new IntersectionObserver(function(es){visible=es[0].isIntersecting;if(visible)start();},{threshold:.04}).observe(band);
   addEventListener('resize',size);size();
 })();
 
@@ -1073,6 +815,19 @@ function skyfield(id,alpha){
   cls.addEventListener('click',()=>set(false));
   ov.querySelectorAll('.menu-links a').forEach(a=>a.addEventListener('click',()=>set(false)));
   addEventListener('keydown',e=>{if(e.key==='Escape')set(false)});
+})();
+
+/* ---------- contact dropdown (touch fallback) ---------- */
+(function(){
+  var wrap=document.getElementById('contactDrop');
+  var btn=document.getElementById('contactToggle');
+  if(!wrap||!btn)return;
+  /* on touch devices, toggle on tap since hover doesn't exist */
+  btn.addEventListener('click',function(e){
+    e.preventDefault();
+    if('ontouchstart' in window){wrap.classList.toggle('open');}
+  });
+  document.addEventListener('click',function(e){if(!wrap.contains(e.target))wrap.classList.remove('open');});
 })();
 
 /* ---------- platform marquee v5 · deep elastic end + 3D lean ----------
@@ -1425,4 +1180,109 @@ function skyfield(id,alpha){
   function apply(){if(antonMissing())document.documentElement.classList.add('fontfallback')}
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(apply).catch(apply);
   setTimeout(apply,2000); /* safety net if fonts.ready never settles */
+})();
+
+/* ---------- careers modal ---------- */
+(function(){
+  /* ---- build the overlay ---- */
+  const ov=document.createElement('div');
+  ov.className='careers-ov';
+  ov.id='careersOv';
+  ov.setAttribute('aria-hidden','true');
+  ov.innerHTML=`
+  <button class="btn-box careers-close" id="careersClose" aria-label="Close careers">Close <span class="sq">✕</span></button>
+  <div class="careers-inner">
+    <div class="careers-head">
+      <h2>Join Kenwer</h2>
+      <p>We're building the intelligence layer for autonomous drones. If you're excited about shaping the future of mission autonomy, we'd love to hear from you.</p>
+    </div>
+    <form class="careers-form" id="careersForm" novalidate>
+      <div class="cf-group">
+        <label>Full Name <span class="req">*</span></label>
+        <input type="text" name="fullName" placeholder="Your full name" required>
+      </div>
+      <div class="cf-row">
+        <div class="cf-group">
+          <label>Email <span class="req">*</span></label>
+          <input type="email" name="email" placeholder="you@example.com" required>
+        </div>
+        <div class="cf-group">
+          <label>Phone <span class="req">*</span></label>
+          <input type="tel" name="phone" placeholder="+1 (555) 000-0000" required>
+        </div>
+      </div>
+      <div class="cf-row">
+        <div class="cf-group">
+          <label>College / University <span class="req">*</span></label>
+          <input type="text" name="college" placeholder="Your college or university" required>
+        </div>
+        <div class="cf-group">
+          <label>Graduation Date <span class="req">*</span></label>
+          <input type="month" name="gradDate" required>
+        </div>
+      </div>
+      <div class="cf-group">
+        <label>Position of Interest</label>
+        <select name="position">
+          <option value="">— Select a role —</option>
+          <option value="Software Engineer">Software Engineer</option>
+          <option value="AI/ML Engineer">AI / ML Engineer</option>
+          <option value="Robotics Engineer">Robotics Engineer</option>
+          <option value="Hardware Engineer">Hardware Engineer</option>
+          <option value="Business / Operations">Business / Operations</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="cf-group">
+        <label>LinkedIn Profile</label>
+        <input type="url" name="linkedin" placeholder="https://linkedin.com/in/yourprofile">
+      </div>
+      <div class="cf-group">
+        <label>Previous Experience</label>
+        <textarea name="experience" placeholder="Briefly describe your relevant experience, projects, or interests"></textarea>
+      </div>
+      <div class="cf-row">
+        <div class="cf-group">
+          <label>Resume <span class="req">*</span></label>
+          <input type="file" name="resume" accept=".pdf,.doc,.docx" required>
+          <span class="cf-hint">PDF or Word · Max 5 MB</span>
+        </div>
+        <div class="cf-group">
+          <label>Cover Letter <span class="req">*</span></label>
+          <input type="file" name="coverLetter" accept=".pdf,.doc,.docx" required>
+          <span class="cf-hint">PDF or Word · Max 5 MB</span>
+        </div>
+      </div>
+      <button type="submit" class="cf-submit">Submit Application <span class="sq">→</span></button>
+    </form>
+    <div class="cf-success" id="cfSuccess">
+      <h3>Application Received</h3>
+      <p>Thank you for your interest in Kenwer. We'll review your application and get back to you soon.</p>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+
+  /* ---- open / close ---- */
+  function openCareers(){ov.classList.add('open');ov.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';}
+  function closeCareers(){ov.classList.remove('open');ov.setAttribute('aria-hidden','true');document.body.style.overflow='';}
+
+  document.getElementById('careersClose').addEventListener('click',closeCareers);
+  /* final CTA "View open roles" button */
+  var finalBtn=document.getElementById('finalCareersBtn');
+  if(finalBtn)finalBtn.addEventListener('click',function(e){e.preventDefault();openCareers();});
+  /* footer careers link */
+  var footLink=document.getElementById('footCareersLink');
+  if(footLink)footLink.addEventListener('click',function(e){e.preventDefault();openCareers();});
+  ov.addEventListener('click',function(e){if(e.target===ov)closeCareers();});
+
+  /* ---- form "submit" (UI only, no backend) ---- */
+  document.getElementById('careersForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    /* basic required-field check */
+    var valid=true;
+    this.querySelectorAll('[required]').forEach(function(el){if(!el.value.trim())valid=false;});
+    if(!valid){alert('Please fill in all required fields and attach your resume and cover letter.');return;}
+    this.style.display='none';
+    document.getElementById('cfSuccess').style.display='block';
+  });
 })();
