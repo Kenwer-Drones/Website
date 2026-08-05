@@ -1275,14 +1275,70 @@ function skyfield(id,alpha){
   if(footLink)footLink.addEventListener('click',function(e){e.preventDefault();openCareers();});
   ov.addEventListener('click',function(e){if(e.target===ov)closeCareers();});
 
-  /* ---- form "submit" (UI only, no backend) ---- */
+  /* ---- Supabase: stores the application row + uploads the two files ---- */
+  var SUPABASE_URL='https://rgevwosnbeglfsagfqpk.supabase.co';
+  var SUPABASE_KEY='sb_publishable_npilwVrdEihiu09ks9a0qQ_XomiqUFr';
+  var sb=(window.supabase&&window.supabase.createClient)
+    ?window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY)
+    :null;
+
+  var MAX_FILE_BYTES=5*1024*1024;
+
+  function randomStamp(){
+    return Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8);
+  }
+
   document.getElementById('careersForm').addEventListener('submit',function(e){
     e.preventDefault();
-    /* basic required-field check */
+    var form=this;
+
     var valid=true;
-    this.querySelectorAll('[required]').forEach(function(el){if(!el.value.trim())valid=false;});
-    if(!valid){alert('Please fill in all required fields and attach your resume and cover letter.');return;}
-    this.style.display='none';
-    document.getElementById('cfSuccess').style.display='block';
+    form.querySelectorAll('[required]').forEach(function(el){if(!el.value.trim())valid=false;});
+    var resumeFile=form.resume.files[0],coverFile=form.coverLetter.files[0];
+    if(!valid||!resumeFile||!coverFile){alert('Please fill in all required fields and attach your resume and cover letter.');return;}
+    if(resumeFile.size>MAX_FILE_BYTES||coverFile.size>MAX_FILE_BYTES){alert('Resume and cover letter must each be under 5 MB.');return;}
+    if(!sb){alert('Application system is temporarily unavailable. Please email us directly instead.');return;}
+
+    var submitBtn=form.querySelector('.cf-submit');
+    var originalHTML=submitBtn.innerHTML;
+    submitBtn.disabled=true;
+    submitBtn.innerHTML='Submitting…';
+
+    var stamp=randomStamp();
+    var resumePath=stamp+'/resume-'+resumeFile.name;
+    var coverPath=stamp+'/cover-letter-'+coverFile.name;
+    var gradDateVal=form.gradDate.value?form.gradDate.value+'-01':null;
+
+    sb.storage.from('resumes').upload(resumePath,resumeFile)
+      .then(function(res){
+        if(res.error)throw res.error;
+        return sb.storage.from('resumes').upload(coverPath,coverFile);
+      })
+      .then(function(res){
+        if(res.error)throw res.error;
+        return sb.from('applicants').insert({
+          full_name:form.fullName.value.trim(),
+          email:form.email.value.trim(),
+          phone:form.phone.value.trim(),
+          college:form.college.value.trim(),
+          grad_date:gradDateVal,
+          position:form.position.value||null,
+          linkedin:form.linkedin.value.trim()||null,
+          experience:form.experience.value.trim()||null,
+          resume_path:resumePath,
+          cover_letter_path:coverPath
+        });
+      })
+      .then(function(res){
+        if(res.error)throw res.error;
+        form.style.display='none';
+        document.getElementById('cfSuccess').style.display='block';
+      })
+      .catch(function(err){
+        console.error('Careers form submission failed:',err);
+        alert('Something went wrong submitting your application. Please try again or email us directly.');
+        submitBtn.disabled=false;
+        submitBtn.innerHTML=originalHTML;
+      });
   });
 })();
