@@ -1273,7 +1273,7 @@ function skyfield(id,alpha){
   /* footer careers link */
   var footLink=document.getElementById('footCareersLink');
   if(footLink)footLink.addEventListener('click',function(e){e.preventDefault();openCareers();});
-  ov.addEventListener('click',function(e){if(e.target===ov)closeCareers();});
+  /* removed: click-outside-to-close — only the X button closes the careers modal */
 
   /* ---- Supabase: stores the application row + uploads the two files ---- */
   var SUPABASE_URL='https://rgevwosnbeglfsagfqpk.supabase.co';
