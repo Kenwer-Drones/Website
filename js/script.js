@@ -1342,3 +1342,20 @@ function skyfield(id,alpha){
       });
   });
 })();
+
+/* ---------- "Book a call": always the Cal.com popup, never a new tab ---------- */
+(function(){
+  var btn=document.getElementById('bookCallBtn');
+  if(!btn)return;
+  btn.addEventListener('click',function(e){
+    e.preventDefault();
+    if(window.Cal&&Cal.ns&&Cal.ns['kenwer-intro-call']){
+      Cal.ns['kenwer-intro-call']('modal',{
+        calLink:'vamsi-krishna-boddapalli-hhjia7/kenwer-intro-call',
+        config:{layout:'month_view'}
+      });
+    }else{
+      window.open(btn.href,'_blank','noopener');
+    }
+  });
+})();
