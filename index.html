@@ -14,6 +14,7 @@
   (function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if(typeof namespace === "string"){cal.ns[namespace] = cal.ns[namespace] || api;p(cal.ns[namespace], ar);p(cal, ["initNamespace", namespace]);} else p(cal, ar); return;} p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
   Cal("init", "kenwer-intro-call", {origin:"https://cal.com"});
   Cal.ns["kenwer-intro-call"]("ui", {"styles":{"branding":{"brandColor":"#111310"}},"hideEventTypeDetails":false,"layout":"month_view"});
+  Cal.ns["kenwer-intro-call"]("preload", {calLink:"vamsi-krishna-boddapalli-hhjia7/kenwer-intro-call"});
 </script>
 </head>
 <body>
@@ -1836,7 +1837,7 @@
     <h2 class="disp final-h rv">
       <span class="split-line"><span>Come build with us.</span></span>
     </h2>
-    <p class="final-sub rv rv-d1" style="font-size:clamp(15px,1.6vw,20px);color:var(--mut-d);max-width:38ch;margin:0 auto 44px;line-height:1.6;text-align:center;">We're a small team solving hard problems in autonomous flight. If that excites you, we'd love to hear from you.</p>
+    <p class="final-sub rv rv-d1" style="font-family:'EB Garamond',serif;font-style:italic;font-weight:400;font-size:clamp(15px,1.6vw,20px);color:var(--mut-d);max-width:38ch;margin:0 auto 44px;line-height:1.6;text-align:center;">We're a small team solving hard problems in autonomous flight. If that excites you, we'd love to hear from you.</p>
     <a class="btn-big rv rv-d2" href="#" id="finalCareersBtn"><span class="p">(</span>View open roles<span class="p">)</span></a>
   </div>
 </section>
