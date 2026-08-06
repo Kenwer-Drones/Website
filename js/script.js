@@ -1248,9 +1248,9 @@ function skyfield(id,alpha){
           <span class="cf-hint">PDF or Word · Max 5 MB</span>
         </div>
         <div class="cf-group">
-          <label>Cover Letter <span class="req">*</span></label>
-          <input type="file" name="coverLetter" accept=".pdf,.doc,.docx" required>
-          <span class="cf-hint">PDF or Word · Max 5 MB</span>
+          <label>Cover Letter</label>
+          <input type="file" name="coverLetter" accept=".pdf,.doc,.docx">
+          <span class="cf-hint">PDF or Word · Max 5 MB · Optional</span>
         </div>
       </div>
       <button type="submit" class="cf-submit">Submit Application <span class="sq">→</span></button>
@@ -1294,9 +1294,9 @@ function skyfield(id,alpha){
 
     var valid=true;
     form.querySelectorAll('[required]').forEach(function(el){if(!el.value.trim())valid=false;});
-    var resumeFile=form.resume.files[0],coverFile=form.coverLetter.files[0];
-    if(!valid||!resumeFile||!coverFile){alert('Please fill in all required fields and attach your resume and cover letter.');return;}
-    if(resumeFile.size>MAX_FILE_BYTES||coverFile.size>MAX_FILE_BYTES){alert('Resume and cover letter must each be under 5 MB.');return;}
+    var resumeFile=form.resume.files[0],coverFile=form.coverLetter.files[0]||null;
+    if(!valid||!resumeFile){alert('Please fill in all required fields and attach your resume.');return;}
+    if(resumeFile.size>MAX_FILE_BYTES||(coverFile&&coverFile.size>MAX_FILE_BYTES)){alert('Resume and cover letter must each be under 5 MB.');return;}
     if(!sb){alert('Application system is temporarily unavailable. Please email us directly instead.');return;}
 
     var submitBtn=form.querySelector('.cf-submit');
@@ -1306,13 +1306,13 @@ function skyfield(id,alpha){
 
     var stamp=randomStamp();
     var resumePath=stamp+'/resume-'+resumeFile.name;
-    var coverPath=stamp+'/cover-letter-'+coverFile.name;
+    var coverPath=coverFile?stamp+'/cover-letter-'+coverFile.name:null;
     var gradDateVal=form.gradDate.value?form.gradDate.value+'-01':null;
 
     sb.storage.from('resumes').upload(resumePath,resumeFile)
       .then(function(res){
         if(res.error)throw res.error;
-        return sb.storage.from('resumes').upload(coverPath,coverFile);
+        return coverFile?sb.storage.from('resumes').upload(coverPath,coverFile):Promise.resolve({error:null});
       })
       .then(function(res){
         if(res.error)throw res.error;
