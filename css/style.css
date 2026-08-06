@@ -484,6 +484,14 @@ html:has(.menu-ov.open) nav{color:var(--tx-d)}         /* menu overlay is dark â
   -webkit-mask:linear-gradient(270deg,#000 26%,transparent);
           mask:linear-gradient(270deg,#000 26%,transparent);
 }
+.pmq-edge-left{
+  position:absolute;left:0;top:0;bottom:0;width:clamp(110px,14vw,220px);
+  pointer-events:none;opacity:0;transition:opacity .45s var(--ease);
+  background:linear-gradient(90deg,rgba(0,0,0,.09),transparent 78%);
+  backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);
+  -webkit-mask:linear-gradient(90deg,#000 26%,transparent);
+          mask:linear-gradient(90deg,#000 26%,transparent);
+}
 .pmq-edge.on{opacity:1}
 .pmq-edge.bump{animation:edgeBump .38s cubic-bezier(.22,1,.36,1)}
 @keyframes edgeBump{0%{opacity:.3;transform:scaleX(1)}40%{opacity:1;transform:scaleX(1.35)}100%{opacity:1;transform:scaleX(1)}}
