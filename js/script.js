@@ -1351,7 +1351,7 @@ function skyfield(id,alpha){
     e.preventDefault();
     if(window.Cal&&Cal.ns&&Cal.ns['kenwer-intro-call']){
       Cal.ns['kenwer-intro-call']('modal',{
-        calLink:'vamsi-krishna-boddapalli-hhjia7/kenwer-intro-call',
+        calLink:'kenwer-drones-hhjia7/kenwer-intro-call',
         config:{layout:'month_view'}
       });
     }else{
