@@ -1344,6 +1344,7 @@ function skyfield(id,alpha){
 })();
 
 /* ---------- "Book a call": always the Cal.com popup, never a new tab ---------- */
+/* redeploy trigger */
 (function(){
   var btn=document.getElementById('bookCallBtn');
   if(!btn)return;
