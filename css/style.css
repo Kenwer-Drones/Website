@@ -937,7 +937,7 @@ footer{padding:80px 0 0;position:relative}
 }
 .fb-social a:hover{color:var(--tx-d);transform:translateY(-1px)}
 .fb-social svg{display:block}
-.fb-email{margin-top:6px;font-size:15px;color:var(--mut-d);transition:color .3s var(--ease)}
+.fb-email{margin-top:0;font-size:15px;color:var(--mut-d);transition:color .3s var(--ease)}
 .fb-email:hover{color:var(--tx-d)}
 .foot-links{display:flex;gap:clamp(28px,4vw,56px);flex-wrap:wrap}
 .foot-links-col{display:flex;flex-direction:column;gap:10px}
