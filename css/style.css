@@ -930,17 +930,15 @@ footer{padding:80px 0 0;position:relative}
 .foot-brand .fb-head .fb-logo{height:.85em!important;width:.85em!important;flex:0 0 auto;display:block}
 .foot-brand .fb-head .fb-logo path{fill:var(--on-bg)!important;stroke:none!important}
 .foot-brand .fb-tagline{font-size:13px;color:var(--mut-d);line-height:1.5}
-.fb-social{display:flex;gap:26px;margin-top:8px}
+.fb-social{display:flex;gap:20px;margin-top:10px}
 .fb-social a{
-  width:36px;height:36px;flex:0 0 auto;display:grid;place-items:center;
-  border:1px solid var(--line-d);color:var(--mut-d);
-  transition:color .3s var(--ease),border-color .3s var(--ease),transform .35s var(--ease);
+  flex:0 0 auto;display:inline-flex;align-items:center;color:var(--mut-d);
+  transition:color .3s var(--ease),transform .35s var(--ease);
 }
-.fb-social a:hover{color:var(--tx-d);border-color:var(--mut-d);transform:translateY(-1px)}
+.fb-social a:hover{color:var(--tx-d);transform:translateY(-1px)}
 .fb-social svg{display:block}
-.fb-email{margin-top:14px;font-size:13px;color:var(--mut-d);transition:color .3s var(--ease)}
+.fb-email{margin-top:6px;font-size:15px;color:var(--mut-d);transition:color .3s var(--ease)}
 .fb-email:hover{color:var(--tx-d)}
-.fb-social+.fb-email,.fb-email+.fb-social{margin-top:8px}
 .foot-links{display:flex;gap:clamp(28px,4vw,56px);flex-wrap:wrap}
 .foot-links-col{display:flex;flex-direction:column;gap:10px}
 .foot-links-col .fl-head{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut-d);margin-bottom:4px}
