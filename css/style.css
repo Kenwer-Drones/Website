@@ -925,9 +925,9 @@ footer{padding:80px 0 0;position:relative}
   border-bottom:1px solid var(--line-d);
 }
 .foot-brand{display:flex;flex-direction:column;gap:8px;max-width:260px}
-.foot-brand .fb-head{display:flex;align-items:center;gap:12px}
-.foot-brand .fb-logo{width:40px;height:40px;object-fit:contain;display:block;flex:0 0 auto}
-.foot-brand .fb-name{font-family:'Anton',sans-serif;font-size:22px;text-transform:uppercase;letter-spacing:.04em;color:var(--on-bg)}
+.foot-brand .fb-head{display:flex;align-items:center;gap:10px;font-size:22px;line-height:1}
+.foot-brand .fb-logo{height:1em;width:auto;object-fit:contain;display:block;flex:0 0 auto}
+.foot-brand .fb-name{font-family:'Anton',sans-serif;font-size:1em;text-transform:uppercase;letter-spacing:.04em;color:var(--on-bg);line-height:1}
 .foot-brand .fb-tagline{font-size:13px;color:var(--mut-d);line-height:1.5}
 .fb-social{display:flex;gap:12px;margin-top:14px}
 .fb-social a{
