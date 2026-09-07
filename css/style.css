@@ -927,8 +927,8 @@ footer{padding:80px 0 0;position:relative}
 .foot-brand{display:flex;flex-direction:column;gap:8px;max-width:260px}
 .foot-brand .fb-head{display:flex;align-items:center;gap:10px;font-size:22px;line-height:1}
 .foot-brand .fb-name{font-family:'Anton',sans-serif;font-size:1em;text-transform:uppercase;letter-spacing:.04em;color:var(--on-bg);line-height:1}
-.foot-brand .fb-logo{height:.82em;width:auto;flex:0 0 auto;display:block}
-.foot-brand .fb-logo path{fill:var(--on-bg)}
+.foot-brand .fb-head .fb-logo{height:.85em!important;width:.85em!important;flex:0 0 auto;display:block}
+.foot-brand .fb-head .fb-logo path{fill:var(--on-bg)!important;stroke:none!important}
 .foot-brand .fb-tagline{font-size:13px;color:var(--mut-d);line-height:1.5}
 .fb-social{display:flex;gap:26px;margin-top:8px}
 .fb-social a{
