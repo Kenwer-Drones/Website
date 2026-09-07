@@ -1346,17 +1346,19 @@ function skyfield(id,alpha){
 /* ---------- "Book a call": always the Cal.com popup, never a new tab ---------- */
 /* redeploy trigger */
 (function(){
-  var btn=document.getElementById('bookCallBtn');
-  if(!btn)return;
-  btn.addEventListener('click',function(e){
-    e.preventDefault();
-    if(window.Cal&&Cal.ns&&Cal.ns['kenwer-intro-call']){
-      Cal.ns['kenwer-intro-call']('modal',{
-        calLink:'kenwer-drones-hhjia7/kenwer-intro-call',
-        config:{layout:'month_view'}
-      });
-    }else{
-      window.open(btn.href,'_blank','noopener');
-    }
+  ['bookCallBtn','contactCallBtn','footCallBtn'].forEach(function(id){
+    var btn=document.getElementById(id);
+    if(!btn)return;
+    btn.addEventListener('click',function(e){
+      e.preventDefault();
+      if(window.Cal&&Cal.ns&&Cal.ns['kenwer-intro-call']){
+        Cal.ns['kenwer-intro-call']('modal',{
+          calLink:'kenwer-drones-hhjia7/kenwer-intro-call',
+          config:{layout:'month_view'}
+        });
+      }else{
+        window.open(btn.href,'_blank','noopener');
+      }
+    });
   });
 })();
