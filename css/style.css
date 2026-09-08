@@ -897,7 +897,7 @@ html:has(.menu-ov.open) nav{color:var(--tx-d)}         /* menu overlay is dark â
 .faq-a p{padding:24px 6px 34px;color:var(--mut-d);font-size:16.5px;max-width:62ch;line-height:1.7}
 
 /* ---------- final CTA ---------- */
-.final{position:relative;padding:170px 0 150px;overflow:hidden;text-align:center}
+.final{position:relative;padding:170px 0 90px;overflow:hidden;text-align:center}
 .final::after{content:"";position:absolute;inset:0;background:radial-gradient(80% 70% at 50% 50%,transparent 30%,var(--hero-vignette))}
 .final .wrap{position:relative;z-index:2}
 .final-h{font-size:clamp(54px,9.8vw,156px)}
@@ -957,22 +957,25 @@ html:has(.menu-ov.open) nav{color:var(--tx-d)}         /* menu overlay is dark â
 /* ---- centered brand block ---- */
 .footer-center{grid-column:2;grid-row:1;display:flex;flex-direction:column;align-items:center;text-align:center}
 .footer-emblem{
-  width:clamp(104px,11vw,144px);aspect-ratio:204/236;
+  width:clamp(120px,12vw,160px);aspect-ratio:491/581;
   margin-top:calc(-1 * clamp(82px,8vw,108px) - 66px);
   margin-bottom:14px;
   position:relative;
+  cursor:grab;touch-action:pan-y;user-select:none;perspective:700px;
   filter:drop-shadow(8px 12px 8px rgba(0,0,0,.18));
 }
+.footer-emblem:active{cursor:grabbing}
 .footer-mark{
   position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:contain;
-  clip-path:polygon(1% 5%,16% 0,25% 3%,30% 13%,43% 7%,77% 10%,89% 16%,93% 24%,93% 82%,98% 86%,100% 93%,96% 99%,87% 100%,79% 96%,1% 85%,1% 75%,12% 72%,1% 62%);
+  clip-path:polygon(1% 5%,13% 1%,21% 3%,25% 13%,40% 7%,73% 10%,87% 17%,91% 26%,91% 82%,98% 85%,100% 91%,97% 95%,87% 100%,76% 98%,69% 93%,1% 82%,1% 65%,5% 60%,16% 65%,1% 54%);
+  filter:invert(1) grayscale(1) contrast(1.15);
   mix-blend-mode:screen;
 }
 .footer-mark-face{
-  animation:footerMarkFloat 5.5s var(--ease) infinite;
-  transform-origin:50% 70%;
+  transform:rotateX(var(--logo-x,0deg)) rotateY(var(--logo-y,0deg));
+  transition:transform .35s var(--ease);transform-origin:center;
 }
-@keyframes footerMarkFloat{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-7px) rotate(1deg)}}
+.footer-emblem.is-dragging .footer-mark-face{transition:none}
 .footer-word{
   font-family:'Inter',-apple-system,sans-serif;font-weight:700;
   letter-spacing:-.055em;line-height:1.02;color:var(--on-bg);
@@ -1078,7 +1081,7 @@ html:has(.menu-ov.open) nav{color:var(--tx-d)}         /* menu overlay is dark â
   .footer-nav{grid-column:1;grid-row:3;justify-content:flex-start;gap:48px}
 }
 
-@media(prefers-reduced-motion:reduce){.footer-mark-face{animation:none}}
+@media(prefers-reduced-motion:reduce){.footer-mark-face{transition:none}}
 
 /* ---------- logo particle band ---------- */
 .halftone{
@@ -1237,4 +1240,3 @@ nav.ink .contact-menu a:hover{background:rgba(17,19,16,.06)}
 .cf-success{display:none;text-align:center;padding:60px 20px}
 .cf-success h3{font-family:'Anton',sans-serif;font-size:32px;text-transform:uppercase;color:var(--tx-d);margin-bottom:12px}
 .cf-success p{color:var(--mut-d);font-size:15px;line-height:1.6}
-
