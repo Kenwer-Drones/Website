@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://app.cal.com">
 <link rel="preconnect" href="https://cal.com">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=EB+Garamond:wght@400;500;600&family=Inter:wght@400;450;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=flight-paths-simple-1">
-<link rel="stylesheet" href="css/footer-v1.css?v=flight-paths-simple-1">
+<link rel="stylesheet" href="css/style.css?v=flight-paths-gap-1">
+<link rel="stylesheet" href="css/footer-v1.css?v=flight-paths-gap-1">
 <script type="text/javascript">
   (function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if(typeof namespace === "string"){cal.ns[namespace] = cal.ns[namespace] || api;p(cal.ns[namespace], ar);p(cal, ["initNamespace", namespace]);} else p(cal, ar); return;} p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
   Cal("init", "kenwer-intro-call", {origin:"https://cal.com"});
@@ -1735,15 +1735,16 @@
 <footer class="sec-dark footer">
   <div class="footer-panel">
     <div class="footer-flow" id="footerFlow" aria-label="Decorative animated flight path. Click and drag the line to reshape it.">
-      <svg viewBox="0 0 1400 480" preserveAspectRatio="none" id="flowSvg">
+      <svg viewBox="0 0 1400 110" preserveAspectRatio="none" id="flowSvg">
         <!-- one clean dotted wave, animated to flow, with an invisible
              generously-wide "hit" twin so the whole line is the drag
              target — grab and drag anywhere along it to reshape. -->
         <path class="flow-hit" id="fp1-hit" data-path="fp1" tabindex="0" role="slider" aria-label="Drag flight path"></path>
         <path class="flow-path" id="fp1"></path>
 
-        <!-- a single faded drone riding the path -->
+        <!-- a single drone riding the path: small glow + bright core -->
         <g class="flow-drone" id="fd1" aria-hidden="true">
+          <circle class="fd-glow" r="9"/>
           <circle r="3"/>
         </g>
       </svg>
@@ -1816,7 +1817,7 @@
 </aside>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="js/script.js?v=flight-paths-simple-1"></script>
+<script src="js/script.js?v=flight-paths-gap-1"></script>
 <script src="js/footer-model-v3.js?v=slow-revolution-1"></script>
 </body>
 </html>

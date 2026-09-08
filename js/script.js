@@ -262,7 +262,7 @@ tick();setInterval(tick,1000);
   const svg=document.getElementById('flowSvg');if(!svg)return;
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const VB_W=1400;
-  const baseY=240,amp=34; /* one full up-down-up cycle across the width */
+  const baseY=55,amp=22; /* centered in the short band between the logo and heading */
   let lift=0;
 
   const el=document.getElementById('fp1'),hit=document.getElementById('fp1-hit');
@@ -295,25 +295,25 @@ tick();setInterval(tick,1000);
     hit.addEventListener('pointermove',e=>{
       if(!dragging)return;
       const p=svgPoint(e.clientX,e.clientY);
-      lift=Math.max(-140,Math.min(140,dragStartLift+(p.y-dragStartY)));
+      lift=Math.max(-30,Math.min(30,dragStartLift+(p.y-dragStartY)));
       draw();
     });
     const release=()=>{dragging=false;hit.classList.remove('dragging')};
     hit.addEventListener('pointerup',release);
     hit.addEventListener('pointercancel',release);
     hit.addEventListener('keydown',e=>{
-      let step=16,changed=true;
+      let step=6,changed=true;
       if(e.key==='ArrowUp')lift-=step;
       else if(e.key==='ArrowDown')lift+=step;
       else changed=false;
-      if(changed){lift=Math.max(-140,Math.min(140,lift));e.preventDefault();draw()}
+      if(changed){lift=Math.max(-30,Math.min(30,lift));e.preventDefault();draw()}
     });
   }
 
   /* the drone rides whatever shape the path currently has */
   const drone=document.getElementById('fd1');
   if(!drone||!el)return;
-  const dur=13000;
+  const dur=9000;
 
   if(reduce){
     const len=el.getTotalLength(),p=el.getPointAtLength(len*.5);
