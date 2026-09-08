@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://app.cal.com">
 <link rel="preconnect" href="https://cal.com">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=EB+Garamond:wght@400;500;600&family=Inter:wght@400;450;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=flight-paths-quad-1">
-<link rel="stylesheet" href="css/footer-v1.css?v=flight-paths-quad-1">
+<link rel="stylesheet" href="css/style.css?v=flight-paths-quad-2">
+<link rel="stylesheet" href="css/footer-v1.css?v=flight-paths-quad-2">
 <script type="text/javascript">
   (function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if(typeof namespace === "string"){cal.ns[namespace] = cal.ns[namespace] || api;p(cal.ns[namespace], ar);p(cal, ["initNamespace", namespace]);} else p(cal, ar); return;} p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
   Cal("init", "kenwer-intro-call", {origin:"https://cal.com"});
@@ -1742,15 +1742,9 @@
         <path class="flow-hit" id="fp1-hit" data-path="fp1" tabindex="0" role="slider" aria-label="Drag flight path"></path>
         <path class="flow-path" id="fp1"></path>
 
-        <!-- drone 1: small glow + bright core, riding the path -->
-        <g class="flow-drone" id="fd1" aria-hidden="true">
-          <circle class="fd-glow" r="9"/>
-          <circle r="3"/>
-        </g>
-
-        <!-- drone 2: minimal top-down quadcopter silhouette, riding the
-             same path a little behind — crossed arms, four small rotor
-             discs, a hub. Rotates to face its direction of travel. -->
+        <!-- drone: minimal top-down quadcopter silhouette riding the
+             path — crossed arms, four small rotor discs, a hub. Rotates
+             to face its direction of travel. -->
         <g class="flow-drone flow-quad" id="fd2" aria-hidden="true">
           <line class="fq-arm" x1="-8" y1="-8" x2="8" y2="8"/>
           <line class="fq-arm" x1="8" y1="-8" x2="-8" y2="8"/>
@@ -1830,7 +1824,7 @@
 </aside>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="js/script.js?v=flight-paths-quad-1"></script>
+<script src="js/script.js?v=flight-paths-quad-2"></script>
 <script src="js/footer-model-v3.js?v=slow-revolution-1"></script>
 </body>
 </html>

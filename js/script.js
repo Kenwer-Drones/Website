@@ -407,10 +407,9 @@ tick();setInterval(tick,1000);
     }
   });
 
-  /* ---- the drones: ride the live, ever-changing curve ---- */
+  /* ---- the drone: rides the live, ever-changing curve ---- */
   const drones=[
-    {el:document.getElementById('fd1'),dur:9000,delay:0,quad:false},
-    {el:document.getElementById('fd2'),dur:11000,delay:3500,quad:true},
+    {el:document.getElementById('fd2'),dur:11000,delay:0,quad:true},
   ].filter(d=>d.el);
   const t0=performance.now();
 

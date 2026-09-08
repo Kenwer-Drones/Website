@@ -59,14 +59,10 @@
 .flow-hit.dragging+.flow-path{stroke:rgba(237,235,228,.8)}
 @keyframes flowMarch{to{stroke-dashoffset:-110}}
 
-/* drone 1: a small glowing dot that visibly travels along the path */
+/* the drone: minimal top-down quadcopter silhouette */
 .flow-drone{
   opacity:0;pointer-events:none;
 }
-.flow-drone circle{fill:rgba(237,235,228,.85);stroke:none}
-.flow-drone .fd-glow{fill:rgba(237,235,228,.28)}
-
-/* drone 2: minimal top-down quadcopter silhouette */
 .flow-quad .fq-arm{stroke:rgba(237,235,228,.6);stroke-width:1.3;stroke-linecap:round}
 .flow-quad .fq-rotor{fill:none;stroke:rgba(237,235,228,.45);stroke-width:1}
 .flow-quad .fq-hub{fill:rgba(237,235,228,.8);stroke:none}
