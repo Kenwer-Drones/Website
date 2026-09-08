@@ -933,10 +933,12 @@ html:has(.menu-ov.open) nav{color:var(--tx-d)}         /* menu overlay is dark â
   padding:clamp(52px,7vw,104px) clamp(28px,5vw,88px) clamp(30px,3.4vw,48px);
 }
 
-/* flowing background lines, drawn subtle like the reference terrain */
+/* flowing background lines: topographic contour pattern spanning the
+   full panel height, echoing the reference layout */
 .footer-flow{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.5}
 .footer-flow svg{width:100%;height:100%;display:block}
-.footer-flow path{fill:none;stroke:var(--line-dot);stroke-width:1.4}
+.footer-flow path,
+.footer-flow ellipse{fill:none;stroke:var(--line-dot);stroke-width:1.4}
 
 .footer-panel>*{position:relative;z-index:1}
 
@@ -944,8 +946,8 @@ html:has(.menu-ov.open) nav{color:var(--tx-d)}         /* menu overlay is dark â
 .footer-center{display:flex;flex-direction:column;align-items:center;text-align:center}
 .footer-mark{
   width:clamp(64px,8vw,110px);height:auto;display:block;margin-bottom:clamp(14px,1.6vw,22px);
+  object-fit:contain;
 }
-.footer-mark path{fill:var(--on-bg)}
 .footer-word{
   font-family:'Anton','Arial Narrow',sans-serif;font-weight:400;text-transform:uppercase;
   letter-spacing:.01em;line-height:.9;color:var(--on-bg);
