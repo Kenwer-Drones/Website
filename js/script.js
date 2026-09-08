@@ -257,13 +257,31 @@ tick();setInterval(tick,1000);
    flow. Dragging directly on the line (or its wide invisible hit twin)
    lifts/lowers the whole wave — no separate handle dot. A single faded
    dot rides the path every frame via getPointAtLength, so it always
-   tracks whatever shape the visitor has bent the path into. */
+   tracks whatever shape the visitor has bent the path into.
+
+   Persistence model:
+   · Whoever drags the line FIRST, ever, across all visitors, permanently
+     sets the shared default for everyone. This is enforced at the
+     database level (a single row, insert-once — Postgres rejects any
+     insert after the first one, and no update/delete policy exists, so
+     it can never be changed again by anyone, including future drags).
+   · Every visitor's own drags are also saved to their own browser
+     (localStorage) and always take priority over the shared default in
+     that browser, forever, regardless of what happens to the shared
+     default. Dragging again just updates that visitor's local view. */
 (function(){
   const svg=document.getElementById('flowSvg');if(!svg)return;
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const VB_W=1400;
   const baseY=55,amp=22; /* centered in the short band between the logo and heading */
+  const LS_KEY='kenwerFooterFlowLift';
   let lift=0;
+
+  const FLOW_SUPABASE_URL='https://rgevwosnbeglfsagfqpk.supabase.co';
+  const FLOW_SUPABASE_KEY='sb_publishable_npilwVrdEihiu09ks9a0qQ_XomiqUFr';
+  const flowDb=(window.supabase&&window.supabase.createClient)
+    ?window.supabase.createClient(FLOW_SUPABASE_URL,FLOW_SUPABASE_KEY)
+    :null;
 
   const el=document.getElementById('fp1'),hit=document.getElementById('fp1-hit');
 
@@ -275,12 +293,48 @@ tick();setInterval(tick,1000);
     if(el)el.setAttribute('d',d);
     if(hit)hit.setAttribute('d',d);
   }
-  draw();
+
+  /* load order: this browser's own saved position wins if it exists;
+     otherwise use the shared default from the database (once fetched);
+     otherwise the hardcoded starting shape. */
+  function readLocalLift(){
+    try{const v=localStorage.getItem(LS_KEY);return v===null?null:parseFloat(v)}catch(e){return null}
+  }
+  function saveLocalLift(v){
+    try{localStorage.setItem(LS_KEY,String(v))}catch(e){}
+  }
+
+  const localLift=readLocalLift();
+  if(localLift!==null&&!isNaN(localLift)){
+    lift=Math.max(-30,Math.min(30,localLift));
+    draw();
+  }else{
+    draw(); /* draw the default immediately, then refine once the DB answers */
+    if(flowDb){
+      flowDb.from('footer_flow_settings').select('lift').eq('id',1).maybeSingle()
+        .then(({data})=>{
+          if(readLocalLift()!==null)return; /* visitor dragged while this was in flight */
+          if(data&&typeof data.lift==='number'){
+            lift=Math.max(-30,Math.min(30,data.lift));
+            draw();
+          }
+        })
+        .catch(()=>{});
+    }
+  }
 
   function svgPoint(clientX,clientY){
     const pt=svg.createSVGPoint();pt.x=clientX;pt.y=clientY;
     const ctm=svg.getScreenCTM();if(!ctm)return{x:0,y:0};
     return pt.matrixTransform(ctm.inverse());
+  }
+
+  /* tries to become the permanent global default. Succeeds only if no
+     one has ever done this before (id=1 is a primary key, so the first
+     insert wins and every later attempt fails harmlessly). */
+  function tryClaimGlobalDefault(v){
+    if(!flowDb)return;
+    flowDb.from('footer_flow_settings').insert({id:1,lift:v}).then(()=>{}).catch(()=>{});
   }
 
   let dragging=false,dragStartY=0,dragStartLift=0;
@@ -298,7 +352,12 @@ tick();setInterval(tick,1000);
       lift=Math.max(-30,Math.min(30,dragStartLift+(p.y-dragStartY)));
       draw();
     });
-    const release=()=>{dragging=false;hit.classList.remove('dragging')};
+    const release=()=>{
+      if(!dragging)return;
+      dragging=false;hit.classList.remove('dragging');
+      saveLocalLift(lift);      /* always remembered in this browser, forever */
+      tryClaimGlobalDefault(lift); /* only ever takes effect for the very first visitor to do this */
+    };
     hit.addEventListener('pointerup',release);
     hit.addEventListener('pointercancel',release);
     hit.addEventListener('keydown',e=>{
@@ -306,7 +365,12 @@ tick();setInterval(tick,1000);
       if(e.key==='ArrowUp')lift-=step;
       else if(e.key==='ArrowDown')lift+=step;
       else changed=false;
-      if(changed){lift=Math.max(-30,Math.min(30,lift));e.preventDefault();draw()}
+      if(changed){
+        lift=Math.max(-30,Math.min(30,lift));
+        e.preventDefault();draw();
+        saveLocalLift(lift);
+        tryClaimGlobalDefault(lift);
+      }
     });
   }
 
