@@ -916,45 +916,63 @@ html:has(.menu-ov.open) nav{color:var(--tx-d)}         /* menu overlay is dark â
   .final .btn-big{margin-top:48px}
 }
 
-/* ---------- footer (floating rounded panel) ---------- */
-/* The section sits on the beige panel surface; a large rounded dark panel
-   floats on top of it â€” echoing the reference layout while staying on
-   Kenwer's black / beige / ink palette. */
+/* ---------- footer (raised brand monument) ---------- */
 .footer{
-  background:var(--panel);
-  padding:0 clamp(14px,2.4vw,40px) clamp(14px,2.4vw,40px);
-  overflow:hidden;
+  position:relative;
+  background:var(--bg);
+  padding:0 clamp(8px,1.2vw,18px) clamp(8px,1.2vw,18px);
+  overflow:visible;
 }
 .footer-panel{
-  position:relative;overflow:hidden;
-  max-width:1420px;margin:0 auto;
-  background:var(--bg-raise);color:var(--on-bg);
-  border-radius:clamp(28px,4vw,54px);
-  padding:clamp(52px,7vw,104px) clamp(28px,5vw,88px) clamp(30px,3.4vw,48px);
+  position:relative;overflow:visible;
+  max-width:1600px;margin:0 auto;
+  background:#222220;color:var(--on-bg);
+  border-radius:clamp(18px,2vw,30px) clamp(18px,2vw,30px) 0 0;
+  padding:clamp(104px,12vw,172px) clamp(28px,5vw,88px) clamp(30px,3.4vw,48px);
+  isolation:isolate;
+}
+.footer-panel::after{
+  content:"";position:absolute;inset:0;z-index:0;overflow:hidden;
+  border-radius:inherit;pointer-events:none;
+  background:radial-gradient(circle at 50% -8%,rgba(255,255,255,.08),transparent 29%);
 }
 
 /* flowing background lines: topographic contour pattern spanning the
    full panel height, echoing the reference layout */
-.footer-flow{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.5}
+.footer-flow{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.42;overflow:hidden;border-radius:inherit}
 .footer-flow svg{width:100%;height:100%;display:block}
 .footer-flow path,
-.footer-flow ellipse{fill:none;stroke:var(--line-dot);stroke-width:1.4}
+.footer-flow ellipse{fill:none;stroke:rgba(237,235,228,.13);stroke-width:1.4}
 
 .footer-panel>*{position:relative;z-index:1}
+.footer-panel>.footer-flow{position:absolute;z-index:0}
 
 /* ---- centered brand block ---- */
 .footer-center{display:flex;flex-direction:column;align-items:center;text-align:center}
-.footer-mark{
-  width:clamp(84px,9vw,140px);height:auto;display:block;margin-bottom:clamp(14px,1.6vw,22px);
-  object-fit:contain;
-  /* source art is a black halftone dot pattern on a white card; invert +
-     screen-blend so it reads as light dots directly on the dark panel */
-  filter:invert(1);mix-blend-mode:screen;
+.footer-emblem{
+  position:absolute;left:50%;top:0;
+  width:clamp(112px,12vw,176px);aspect-ratio:1/1;
+  transform:translate(-50%,-47%);
+  filter:drop-shadow(0 25px 20px rgba(0,0,0,.38));
 }
+.footer-mark{
+  position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:contain;
+  filter:invert(1) grayscale(1) brightness(2.4) contrast(1.18);
+  mix-blend-mode:screen;
+}
+.footer-mark-depth{opacity:.42}
+.footer-mark-depth-1{transform:translate(4px,5px);filter:invert(1) grayscale(1) brightness(1.1) contrast(1.5)}
+.footer-mark-depth-2{transform:translate(8px,10px);opacity:.28;filter:invert(1) grayscale(1) brightness(.8) contrast(1.7)}
+.footer-mark-depth-3{transform:translate(12px,15px);opacity:.16;filter:invert(1) grayscale(1) brightness(.55) contrast(1.8)}
+.footer-mark-face{
+  animation:footerMarkFloat 5.5s var(--ease) infinite;
+  transform-origin:50% 70%;
+}
+@keyframes footerMarkFloat{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-7px) rotate(1deg)}}
 .footer-word{
   font-family:'Inter',-apple-system,sans-serif;font-weight:700;
   letter-spacing:-.01em;line-height:1.05;color:var(--on-bg);
-  font-size:clamp(28px,3.4vw,40px);
+  font-size:clamp(32px,3.8vw,48px);
 }
 .footer-tag{
   font-family:'EB Garamond',Georgia,serif;font-style:italic;font-weight:500;
@@ -1037,9 +1055,13 @@ html:has(.menu-ov.open) nav{color:var(--tx-d)}         /* menu overlay is dark â
 .footer-base .muted{color:var(--on-bg-mut)}
 
 @media(max-width:760px){
+  .footer-panel{padding-top:96px}
+  .footer-emblem{width:112px}
   .footer-grid{flex-direction:column;gap:34px}
   .footer-base{justify-content:center;text-align:center}
 }
+
+@media(prefers-reduced-motion:reduce){.footer-mark-face{animation:none}}
 
 /* ---------- logo particle band ---------- */
 .halftone{
