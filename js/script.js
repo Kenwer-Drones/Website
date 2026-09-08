@@ -253,41 +253,63 @@ function tick(){
 tick();setInterval(tick,1000);
 
 /* ---------- footer: interactive dotted flight paths + faded drones ----------
-   Each path is a gentle horizontal wave (M start, then a series of quadratic
-   segments) running left to right through the panel. There's no separate
-   handle dot — dragging directly on the line (or its wide invisible hit
-   twin) lifts/lowers the whole wave, which feels more natural and is much
-   easier to grab than a tiny circle. Two faded drones ride the paths every
-   frame via getPointAtLength, so they always track whatever shape the
-   visitor has bent the path into. */
+   Only 3 routes (not a dense stack of lines), each a wandering Catmull-Rom
+   spline through several irregular waypoints — a more organic, hand-drawn
+   pattern than a single repeating wave. There's no separate handle dot:
+   dragging directly on the line (or its wide invisible hit twin) lifts the
+   whole route, which is far easier to grab than a tiny circle. Two faded
+   drones ride the paths every frame via getPointAtLength, so they always
+   track whatever shape the visitor has bent the path into. */
 (function(){
   const svg=document.getElementById('flowSvg');if(!svg)return;
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const VB_W=1400,VB_H=480;
 
+  /* each path is a flight route with several waypoints at irregular
+     x-positions and y-offsets — a Catmull-Rom spline through them gives a
+     wandering, hand-drawn feel instead of one repetitive symmetric wave */
   const defs=[
-    {path:'fp1',y:60, amp:22},
-    {path:'fp2',y:130,amp:-26},
-    {path:'fp3',y:200,amp:20},
-    {path:'fp4',y:280,amp:-18},
-    {path:'fp5',y:350,amp:24},
-    {path:'fp6',y:420,amp:-20},
+    {path:'fp1',y:90, waypoints:[0,26,-34,18,-10,30,0]},
+    {path:'fp2',y:220,waypoints:[0,-40,22,-16,36,-20,0]},
+    {path:'fp3',y:360,waypoints:[0,32,-22,40,-30,14,0]},
   ];
   const state={};
 
-  /* draw a smooth wave across the width using the current lift (offset)
-     applied as an extra bulge around the drag point */
+  function catmullRomPath(pts){
+    if(pts.length<2)return'';
+    let d=`M ${pts[0].x} ${pts[0].y} `;
+    for(let i=0;i<pts.length-1;i++){
+      const p0=pts[i-1]||pts[i],p1=pts[i],p2=pts[i+1],p3=pts[i+2]||p2;
+      const c1x=p1.x+(p2.x-p0.x)/6,c1y=p1.y+(p2.y-p0.y)/6;
+      const c2x=p2.x-(p3.x-p1.x)/6,c2y=p2.y-(p3.y-p1.y)/6;
+      d+=`C ${c1x} ${c1y} ${c2x} ${c2y} ${p2.x} ${p2.y} `;
+    }
+    return d;
+  }
+
+  /* build the waypoint list for a path at its current lift (vertical
+     drag offset), spanning the full width with a bit of overrun on each
+     side so the dashed line reads as continuous, off-canvas flight */
+  function buildPoints(s){
+    const n=s.waypoints.length,y=s.baseY+s.lift;
+    const pts=[{x:-40,y}];
+    s.waypoints.forEach((off,i)=>{
+      const x=(VB_W+80)*(i/(n-1))-40;
+      pts.push({x,y:y+off});
+    });
+    pts.push({x:VB_W+40,y});
+    return pts;
+  }
+
   function draw(id){
     const s=state[id],el=document.getElementById(id),hit=document.getElementById(id+'-hit');
-    const y=s.baseY+s.lift;
-    const d=`M -20 ${s.baseY} C ${VB_W*.22} ${y+s.amp} ${VB_W*.36} ${y-s.amp} ${VB_W*.5} ${y} `+
-             `C ${VB_W*.64} ${y+s.amp} ${VB_W*.78} ${y-s.amp} ${VB_W+20} ${s.baseY}`;
+    const d=catmullRomPath(buildPoints(s));
     if(el)el.setAttribute('d',d);
     if(hit)hit.setAttribute('d',d);
   }
 
   defs.forEach(d=>{
-    state[d.path]={baseY:d.y,amp:d.amp,lift:0};
+    state[d.path]={baseY:d.y,waypoints:d.waypoints,lift:0};
     draw(d.path);
   });
 
@@ -330,8 +352,8 @@ tick();setInterval(tick,1000);
 
   /* drones ride whatever shape the path currently has */
   const drones=[
-    {el:document.getElementById('fd1'),pathId:'fp2',dur:12000,delay:0},
-    {el:document.getElementById('fd2'),pathId:'fp5',dur:14500,delay:3500},
+    {el:document.getElementById('fd1'),pathId:'fp1',dur:12000,delay:0},
+    {el:document.getElementById('fd2'),pathId:'fp3',dur:14500,delay:3500},
   ].filter(d=>d.el);
 
   if(reduce){
