@@ -38,15 +38,14 @@
 
 /* ---- centered brand block ---- */
 .footer-center{grid-column:2;grid-row:1;display:flex;flex-direction:column;align-items:center;text-align:center}
-.footer-emblem{
-  width:clamp(132px,13vw,178px);aspect-ratio:1/1;
-  margin-top:calc(-1 * clamp(82px,8vw,108px) - 66px);
-  margin-bottom:14px;
-  position:relative;
-  overflow:hidden;filter:drop-shadow(5px 10px 12px rgba(0,0,0,.28));
+.footer-panel>.footer-emblem{
+  position:absolute;z-index:5;top:-100px;left:50%;
+  width:clamp(160px,16vw,200px);height:clamp(160px,16vw,200px);
+  margin:0;transform:translateX(-50%);pointer-events:none;
+  overflow:visible;filter:drop-shadow(5px 10px 12px rgba(0,0,0,.28));
 }
 .footer-model{
-  position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
+  display:block;width:100%;height:100%;max-width:100%;object-fit:contain;
 }
 .footer-word{
   font-family:'Inter',-apple-system,sans-serif;font-weight:700;
@@ -139,7 +138,7 @@
 @media(max-width:760px){
   .footer-panel{grid-template-columns:1fr 1fr;gap:40px 24px;padding:82px 24px 24px}
   .footer-center{grid-column:1/-1;grid-row:1}
-  .footer-emblem{width:112px;margin-top:-138px}
+  .footer-panel>.footer-emblem{width:150px;height:150px;top:-75px}
   .footer-contact{grid-column:1;grid-row:2;align-self:start}
   .footer-nav{grid-column:2;grid-row:2;gap:24px;align-self:start}
   .footer-col a{font-size:13px;min-height:30px}
