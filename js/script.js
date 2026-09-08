@@ -252,29 +252,34 @@ function tick(){
 }
 tick();setInterval(tick,1000);
 
-/* ---------- footer: single interactive dotted flight path + drone ----------
-   One clean sine wave spanning the panel width, dotted and animated to
-   flow. Dragging directly on the line (or its wide invisible hit twin)
-   lifts/lowers the whole wave — no separate handle dot. A single faded
-   dot rides the path every frame via getPointAtLength, so it always
-   tracks whatever shape the visitor has bent the path into.
+/* ---------- footer: physical "string" flight path + drone ----------
+   The line is simulated as a real plucked string: N mass points spaced
+   across the width, each connected to its neighbors by springs and
+   anchored (weakly) to a resting wave shape. Grabbing it anywhere only
+   deforms that area — the disturbance ripples outward through the
+   neighbor springs and settles with a damped elastic wobble, instead of
+   the whole line moving as one rigid piece. A drone rides the live,
+   ever-changing curve every frame via getPointAtLength.
 
-   Persistence model:
-   · Whoever drags the line FIRST, ever, across all visitors, permanently
-     sets the shared default for everyone. This is enforced at the
-     database level (a single row, insert-once — Postgres rejects any
-     insert after the first one, and no update/delete policy exists, so
-     it can never be changed again by anyone, including future drags).
-   · Every visitor's own drags are also saved to their own browser
-     (localStorage) and always take priority over the shared default in
-     that browser, forever, regardless of what happens to the shared
-     default. Dragging again just updates that visitor's local view. */
+   Persistence model (unchanged in spirit, adapted to a string):
+   · The resting shape has a single vertical offset ("lift"). Whoever
+     releases a drag FIRST, ever, across all visitors, permanently sets
+     the shared resting position for everyone — enforced at the database
+     level (a single row, insert-once; Postgres rejects every insert
+     after the first, and there is no update/delete policy, so it can
+     never change again for anyone, including future drags).
+   · Every visitor's own drags are saved to their own browser
+     (localStorage) and always take priority there, forever. Dragging
+     again just settles the string to a new local resting position —
+     the string still wobbles and springs elastically on every grab, it
+     just settles somewhere new. */
 (function(){
   const svg=document.getElementById('flowSvg');if(!svg)return;
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const VB_W=1400;
   const baseY=55,amp=22; /* centered in the short band between the logo and heading */
   const LS_KEY='kenwerFooterFlowLift';
+  const LIFT_MIN=-30,LIFT_MAX=30;
   let lift=0;
 
   const FLOW_SUPABASE_URL='https://rgevwosnbeglfsagfqpk.supabase.co';
@@ -284,43 +289,69 @@ tick();setInterval(tick,1000);
     :null;
 
   const el=document.getElementById('fp1'),hit=document.getElementById('fp1-hit');
+  if(!el||!hit)return;
 
-  function draw(){
-    const y=baseY+lift;
-    const d=`M -20 ${y} `+
-             `C ${VB_W*.17} ${y-amp} ${VB_W*.33} ${y-amp} ${VB_W*.5} ${y} `+
-             `C ${VB_W*.67} ${y+amp} ${VB_W*.83} ${y+amp} ${VB_W+20} ${y}`;
-    if(el)el.setAttribute('d',d);
-    if(hit)hit.setAttribute('d',d);
+  /* ---- the string: N points, evenly spaced in x, simulated in y ---- */
+  const N=22;
+  const xs=[];for(let i=0;i<N;i++)xs.push(-20+(VB_W+40)*(i/(N-1)));
+  function restYOf(i){return baseY+lift+amp*Math.sin(Math.PI*2*(i/(N-1)));}
+  const ys=xs.map((_,i)=>restYOf(i));
+  const vys=new Array(N).fill(0);
+
+  function catmullRom(pts){
+    let d=`M ${pts[0][0]} ${pts[0][1]} `;
+    for(let i=0;i<pts.length-1;i++){
+      const p0=pts[i-1]||pts[i],p1=pts[i],p2=pts[i+1],p3=pts[i+2]||p2;
+      const c1x=p1[0]+(p2[0]-p0[0])/6,c1y=p1[1]+(p2[1]-p0[1])/6;
+      const c2x=p2[0]-(p3[0]-p1[0])/6,c2y=p2[1]-(p3[1]-p1[1])/6;
+      d+=`C ${c1x} ${c1y} ${c2x} ${c2y} ${p2[0]} ${p2[1]} `;
+    }
+    return d;
   }
+  function draw(){
+    const pts=xs.map((x,i)=>[x,ys[i]]);
+    const d=catmullRom(pts);
+    el.setAttribute('d',d);
+    hit.setAttribute('d',d);
+  }
+  draw();
 
-  /* load order: this browser's own saved position wins if it exists;
-     otherwise use the shared default from the database (once fetched);
-     otherwise the hardcoded starting shape. */
+  /* ---- persistence: local override always wins; otherwise the shared
+     database default; otherwise the hardcoded starting shape ---- */
   function readLocalLift(){
     try{const v=localStorage.getItem(LS_KEY);return v===null?null:parseFloat(v)}catch(e){return null}
   }
   function saveLocalLift(v){
     try{localStorage.setItem(LS_KEY,String(v))}catch(e){}
   }
+  function applyLift(v){
+    lift=Math.max(LIFT_MIN,Math.min(LIFT_MAX,v));
+    /* points still ease toward the new rest shape via the spring sim
+       below rather than snapping, so a remote update also feels alive */
+  }
+  function tryClaimGlobalDefault(v){
+    if(!flowDb)return;
+    flowDb.from('footer_flow_settings').insert({id:1,lift:v}).then(()=>{}).catch(()=>{});
+  }
 
   const localLift=readLocalLift();
   if(localLift!==null&&!isNaN(localLift)){
-    lift=Math.max(-30,Math.min(30,localLift));
+    applyLift(localLift);
+    for(let i=0;i<N;i++)ys[i]=restYOf(i); /* start settled, no jump-in */
     draw();
-  }else{
-    draw(); /* draw the default immediately, then refine once the DB answers */
-    if(flowDb){
-      flowDb.from('footer_flow_settings').select('lift').eq('id',1).maybeSingle()
-        .then(({data})=>{
-          if(readLocalLift()!==null)return; /* visitor dragged while this was in flight */
-          if(data&&typeof data.lift==='number'){
-            lift=Math.max(-30,Math.min(30,data.lift));
+  }else if(flowDb){
+    flowDb.from('footer_flow_settings').select('lift').eq('id',1).maybeSingle()
+      .then(({data})=>{
+        if(readLocalLift()!==null)return; /* visitor already dragged while this was in flight */
+        if(data&&typeof data.lift==='number'){
+          applyLift(data.lift); /* the animated string eases toward it live */
+          if(reduce){ /* no animation loop running to pick this up — redraw once */
+            for(let i=0;i<N;i++)ys[i]=restYOf(i);
             draw();
           }
-        })
-        .catch(()=>{});
-    }
+        }
+      })
+      .catch(()=>{});
   }
 
   function svgPoint(clientX,clientY){
@@ -328,75 +359,100 @@ tick();setInterval(tick,1000);
     const ctm=svg.getScreenCTM();if(!ctm)return{x:0,y:0};
     return pt.matrixTransform(ctm.inverse());
   }
-
-  /* tries to become the permanent global default. Succeeds only if no
-     one has ever done this before (id=1 is a primary key, so the first
-     insert wins and every later attempt fails harmlessly). */
-  function tryClaimGlobalDefault(v){
-    if(!flowDb)return;
-    flowDb.from('footer_flow_settings').insert({id:1,lift:v}).then(()=>{}).catch(()=>{});
+  function nearestIndex(x){
+    let best=0,bd=Infinity;
+    for(let i=0;i<N;i++){const d=Math.abs(xs[i]-x);if(d<bd){bd=d;best=i}}
+    return best;
   }
 
-  let dragging=false,dragStartY=0,dragStartLift=0;
-  if(hit){
-    hit.addEventListener('pointerdown',e=>{
-      dragging=true;hit.classList.add('dragging');
-      const p=svgPoint(e.clientX,e.clientY);
-      dragStartY=p.y;dragStartLift=lift;
-      try{hit.setPointerCapture(e.pointerId)}catch(err){}
+  let dragIndex=-1;
+  hit.addEventListener('pointerdown',e=>{
+    const p=svgPoint(e.clientX,e.clientY);
+    dragIndex=nearestIndex(p.x);
+    hit.classList.add('dragging');
+    try{hit.setPointerCapture(e.pointerId)}catch(err){}
+    e.preventDefault();
+  });
+  hit.addEventListener('pointermove',e=>{
+    if(dragIndex<0)return;
+    const p=svgPoint(e.clientX,e.clientY);
+    /* pull the grabbed point straight to the pointer; neighbors follow
+       through the spring simulation below, not directly here */
+    ys[dragIndex]=Math.max(baseY-50,Math.min(baseY+50,p.y));
+    vys[dragIndex]=0;
+  });
+  const release=()=>{
+    if(dragIndex<0)return;
+    /* the point you released becomes the new resting equilibrium — the
+       shape still eases there elastically, it just settles somewhere new */
+    const restNoLift=baseY+amp*Math.sin(Math.PI*2*(dragIndex/(N-1)));
+    const newLift=ys[dragIndex]-restNoLift;
+    applyLift(newLift);
+    saveLocalLift(lift);
+    tryClaimGlobalDefault(lift);
+    dragIndex=-1;hit.classList.remove('dragging');
+  };
+  hit.addEventListener('pointerup',release);
+  hit.addEventListener('pointercancel',release);
+  hit.addEventListener('keydown',e=>{
+    let step=6,changed=true;
+    if(e.key==='ArrowUp')lift-=step;
+    else if(e.key==='ArrowDown')lift+=step;
+    else changed=false;
+    if(changed){
+      applyLift(lift);
       e.preventDefault();
-    });
-    hit.addEventListener('pointermove',e=>{
-      if(!dragging)return;
-      const p=svgPoint(e.clientX,e.clientY);
-      lift=Math.max(-30,Math.min(30,dragStartLift+(p.y-dragStartY)));
-      draw();
-    });
-    const release=()=>{
-      if(!dragging)return;
-      dragging=false;hit.classList.remove('dragging');
-      saveLocalLift(lift);      /* always remembered in this browser, forever */
-      tryClaimGlobalDefault(lift); /* only ever takes effect for the very first visitor to do this */
-    };
-    hit.addEventListener('pointerup',release);
-    hit.addEventListener('pointercancel',release);
-    hit.addEventListener('keydown',e=>{
-      let step=6,changed=true;
-      if(e.key==='ArrowUp')lift-=step;
-      else if(e.key==='ArrowDown')lift+=step;
-      else changed=false;
-      if(changed){
-        lift=Math.max(-30,Math.min(30,lift));
-        e.preventDefault();draw();
-        saveLocalLift(lift);
-        tryClaimGlobalDefault(lift);
-      }
-    });
-  }
+      saveLocalLift(lift);
+      tryClaimGlobalDefault(lift);
+    }
+  });
 
-  /* the drone rides whatever shape the path currently has */
+  /* ---- the drone: rides the live, ever-changing curve ---- */
   const drone=document.getElementById('fd1');
-  if(!drone||!el)return;
   const dur=9000;
+  const t0=performance.now();
 
   if(reduce){
-    const len=el.getTotalLength(),p=el.getPointAtLength(len*.5);
-    drone.style.opacity='.4';
-    drone.setAttribute('transform',`translate(${p.x} ${p.y})`);
+    for(let i=0;i<N;i++)ys[i]=restYOf(i);
+    draw();
+    if(drone){
+      const len=el.getTotalLength(),p=el.getPointAtLength(len*.5);
+      drone.style.opacity='.4';
+      drone.setAttribute('transform',`translate(${p.x} ${p.y})`);
+    }
     return;
   }
 
-  const t0=performance.now();
+  const K_NEIGHBOR=95,K_REST=16,DAMPING=7.5;
+  let lastT=performance.now();
   function frame(now){
-    const t=((now-t0)%dur+dur)%dur/dur;
-    const len=el.getTotalLength();
-    if(len){
-      const dist=t*len,p=el.getPointAtLength(dist);
-      let op=.6;
-      if(t<.08)op=.6*(t/.08);
-      else if(t>.9)op=.6*(1-(t-.9)/.1);
-      drone.style.opacity=op;
-      drone.setAttribute('transform',`translate(${p.x} ${p.y})`);
+    const dt=Math.min((now-lastT)/1000,.033);lastT=now;
+
+    /* spring-mass string simulation: each non-dragged point is pulled by
+       its neighbors and eased toward the resting wave shape */
+    for(let i=0;i<N;i++){
+      if(i===dragIndex)continue;
+      const left=ys[i-1]!==undefined?ys[i-1]:ys[i];
+      const right=ys[i+1]!==undefined?ys[i+1]:ys[i];
+      const neighborForce=K_NEIGHBOR*((left-ys[i])+(right-ys[i]));
+      const restForce=K_REST*(restYOf(i)-ys[i]);
+      const accel=neighborForce+restForce-DAMPING*vys[i];
+      vys[i]+=accel*dt;
+      ys[i]+=vys[i]*dt;
+    }
+    draw();
+
+    if(drone){
+      const t=((now-t0)%dur+dur)%dur/dur;
+      const len=el.getTotalLength();
+      if(len){
+        const dist=t*len,p=el.getPointAtLength(dist);
+        let op=.65;
+        if(t<.08)op=.65*(t/.08);
+        else if(t>.9)op=.65*(1-(t-.9)/.1);
+        drone.style.opacity=op;
+        drone.setAttribute('transform',`translate(${p.x} ${p.y})`);
+      }
     }
     requestAnimationFrame(frame);
   }
