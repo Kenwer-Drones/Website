@@ -1851,7 +1851,6 @@
       <span class="split-line"><span>Get in touch.</span></span>
     </h2>
     <p class="final-sub rv rv-d1" style="font-family:'Inter',-apple-system,sans-serif;font-style:normal;font-weight:450;font-size:clamp(15px,1.6vw,20px);color:var(--mut-d);max-width:38ch;margin:0 auto 44px;line-height:1.6;text-align:center;">Questions before the first flight? Talk to the founding team and we'll get back to you.</p>
-    <a class="btn-big rv rv-d2" href="https://cal.com/kenwer-drones-hhjia7/kenwer-intro-call" id="contactCallBtn" rel="noopener"><span class="p">(</span>Book a call<span class="p">)</span></a>
   </div>
 </section>
 
@@ -1859,28 +1858,29 @@
 <footer class="sec-light footer">
   <div class="footer-panel">
     <div class="footer-flow" aria-hidden="true">
-      <svg viewBox="0 0 1200 800" preserveAspectRatio="none">
-        <ellipse cx="600" cy="130" rx="150" ry="55"/>
-        <ellipse cx="600" cy="130" rx="230" ry="90"/>
-        <ellipse cx="600" cy="130" rx="320" ry="130"/>
-        <ellipse cx="600" cy="130" rx="420" ry="175"/>
-        <path d="M-20 40 C 200 90 380 -10 600 50 S 1000 110 1240 40"/>
-        <path d="M-20 260 C 250 320 460 210 700 280 S 1060 320 1240 260"/>
-        <path d="M-20 380 C 280 440 500 340 740 400 S 1080 440 1240 380"/>
-        <path d="M-20 500 C 310 560 530 460 780 520 S 1090 560 1240 500"/>
-        <path d="M-20 620 C 330 680 550 580 800 640 S 1100 680 1240 620"/>
-        <path d="M-20 730 C 340 780 560 700 820 750 S 1110 780 1240 730"/>
+      <svg viewBox="0 0 1200 500" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <clipPath id="footer-logo-silhouette" clipPathUnits="objectBoundingBox">
+            <path d="M.012 .045 Q.12 .002 .183 .022 Q.215 .027 .23 .065 L.258 .132 L.379 .073 Q.402 .066 .45 .079 L.758 .108 Q.865 .12 .893 .207 L.905 .823 Q.973 .838 .992 .883 Q1 .925 .954 .958 L.883 .994 Q.838 1 .796 .973 L.719 .923 L.018 .82 L.018 .666 Q.018 .639 .051 .617 L.23 .739 L.092 .596 Q.018 .555 .018 .512 Z"/>
+          </clipPath>
+        </defs>
+        <path class="flight-route" d="M-60 255 Q150 30 360 112 T810 148 Q990 160 1260 35"/>
+        <path class="flight-route flight-route-secondary" d="M-70 475 Q180 300 330 380 T730 388 Q990 170 1270 265"/>
+        <g class="flight-waypoints">
+          <circle cx="360" cy="112" r="5"/><circle cx="810" cy="148" r="5"/>
+          <circle cx="330" cy="380" r="4"/><circle cx="730" cy="388" r="4"/>
+          <circle cx="360" cy="112" r="12"/><circle cx="810" cy="148" r="12"/>
+        </g>
+        <path class="flight-heading" d="M190 102l13-6-5 14-2-9z"/>
+        <path class="flight-heading" d="M1020 292l14-3-8 12 1-8z"/>
       </svg>
     </div>
 
     <!-- centered brand block -->
     <div class="footer-center">
-      <div class="footer-emblem" aria-hidden="true">
-        <img class="footer-mark footer-mark-depth footer-mark-depth-3" src="Kenwer%20Drones.png" alt="">
-        <img class="footer-mark footer-mark-depth footer-mark-depth-2" src="Kenwer%20Drones.png" alt="">
-        <img class="footer-mark footer-mark-depth footer-mark-depth-1" src="Kenwer%20Drones.png" alt="">
-        <img class="footer-mark footer-mark-face" src="Kenwer%20Drones.png" alt="">
-      </div>
+      <button class="footer-emblem" type="button" aria-label="Rotate Kenwer logo. Drag or use arrow keys; press Escape to reset.">
+        <span class="footer-mark-face"><img class="footer-mark" src="kenwer-noir.png" alt="" draggable="false" width="491" height="581"></span>
+      </button>
       <h2 class="footer-word">Kenwer<br>Drones</h2>
       <p class="footer-tag">Where missions become intelligence</p>
       <div class="footer-cta">
@@ -1889,8 +1889,7 @@
       </div>
     </div>
 
-    <!-- lower grid: contact left, quick nav right -->
-    <div class="footer-grid">
+    <!-- Side columns frame the central brand on desktop. -->
       <div class="footer-col footer-contact">
         <h3>Contact</h3>
         <p>Tempe, Arizona<br>United States</p>
@@ -1905,7 +1904,7 @@
         </div>
       </div>
 
-      <div class="footer-nav">
+      <nav class="footer-nav" aria-label="Footer navigation">
         <div class="footer-col">
           <h3>Explore</h3>
           <a href="#gap">About</a>
@@ -1920,8 +1919,7 @@
           <a href="mailto:hello@kenwerdrones.com">Contact</a>
           <a href="#top">Back to top ↑</a>
         </div>
-      </div>
-    </div>
+      </nav>
 
     <!-- base bar -->
     <div class="footer-base">
@@ -1946,5 +1944,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="js/script.js"></script>
+<script src="js/footer-logo.js"></script>
 </body>
 </html>
