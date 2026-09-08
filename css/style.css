@@ -944,13 +944,12 @@ html:has(.menu-ov.open) nav{color:var(--tx-d)}         /* menu overlay is dark â
   background:radial-gradient(circle at 50% -8%,rgba(255,255,255,.08),transparent 29%);
 }
 
-/* Quiet mission routes with navigation waypoints. */
-.footer-flow{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;border-radius:inherit}
+/* flowing background lines: topographic contour pattern spanning the
+   full panel height, echoing the reference layout */
+.footer-flow{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.65;overflow:hidden;border-radius:inherit}
 .footer-flow svg{width:100%;height:100%;display:block}
-.flight-route{fill:none;stroke:rgba(245,243,207,.15);stroke-width:1;stroke-dasharray:5 9;stroke-linecap:round;vector-effect:non-scaling-stroke}
-.flight-route-secondary{stroke:rgba(245,243,207,.09);stroke-dasharray:2 8}
-.flight-waypoints{fill:#252523;stroke:rgba(245,243,207,.22);stroke-width:1}
-.flight-heading{fill:rgba(245,243,207,.3)}
+.footer-flow path,
+.footer-flow ellipse{fill:none;stroke:rgba(237,235,228,.13);stroke-width:1.4}
 
 .footer-panel>*{position:relative;z-index:1}
 .footer-panel>.footer-flow{position:absolute;z-index:0}
@@ -963,18 +962,18 @@ html:has(.menu-ov.open) nav{color:var(--tx-d)}         /* menu overlay is dark â
   margin-bottom:14px;
   position:relative;
   cursor:grab;touch-action:pan-y;user-select:none;perspective:700px;
-  filter:drop-shadow(5px 10px 12px rgba(0,0,0,.22));
+  filter:drop-shadow(8px 12px 8px rgba(0,0,0,.18));
 }
 .footer-emblem:active{cursor:grabbing}
 .footer-mark{
   position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:contain;
-  clip-path:url(#footer-logo-silhouette);
-  filter:invert(1) grayscale(1) contrast(1.04);
+  clip-path:polygon(1% 5%,13% 1%,21% 3%,25% 13%,40% 7%,73% 10%,87% 17%,91% 26%,91% 82%,98% 85%,100% 91%,97% 95%,87% 100%,76% 98%,69% 93%,1% 82%,1% 65%,5% 60%,16% 65%,1% 54%);
+  filter:invert(1) grayscale(1) contrast(1.15);
+  mix-blend-mode:screen;
 }
 .footer-mark-face{
-  position:absolute;inset:0;display:block;
   transform:rotateX(var(--logo-x,0deg)) rotateY(var(--logo-y,0deg));
-  transition:transform .5s var(--ease);transform-origin:center;
+  transition:transform .35s var(--ease);transform-origin:center;
 }
 .footer-emblem.is-dragging .footer-mark-face{transition:none}
 .footer-word{
