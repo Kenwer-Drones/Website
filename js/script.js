@@ -252,6 +252,112 @@ function tick(){
 }
 tick();setInterval(tick,1000);
 
+/* ---------- footer: interactive dotted flight paths + faded drones ----------
+   Each path is a quadratic curve M(start) Q(control) (end) running top to
+   bottom through the panel. The control point is exposed as a draggable
+   handle (mouse, touch, and arrow-key accessible) — dragging it reshapes
+   the dotted, animated flow live. Two faded drones ride the paths every
+   frame via getPointAtLength, so they always track whatever shape the
+   visitor has bent the path into. */
+(function(){
+  const svg=document.getElementById('flowSvg');if(!svg)return;
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const defs=[
+    {path:'fp1',handle:'fh1',x0:80,  x1:185, sign:-1},
+    {path:'fp2',handle:'fh2',x0:135, x1:290, sign:1},
+    {path:'fp3',handle:'fh3',x0:155, x1:470, sign:-1},
+    {path:'fp4',handle:'fh4',x0:350, x1:565, sign:1},
+    {path:'fp5',handle:'fh5',x0:790, x1:945, sign:-1},
+    {path:'fp6',handle:'fh6',x0:1020,x1:1190,sign:1},
+    {path:'fp7',handle:'fh7',x0:1130,x1:1290,sign:-1},
+  ];
+  const state={};
+
+  function draw(id){
+    const s=state[id],el=document.getElementById(id);
+    if(el)el.setAttribute('d',`M ${s.x0} ${s.y0} Q ${s.cx} ${s.cy} ${s.x1} ${s.y1}`);
+  }
+
+  defs.forEach(d=>{
+    state[d.path]={x0:d.x0,y0:-40,x1:d.x1,y1:840,cx:(d.x0+d.x1)/2+d.sign*120,cy:400};
+    draw(d.path);
+    const h=document.getElementById(d.handle);
+    if(h){h.setAttribute('cx',state[d.path].cx);h.setAttribute('cy',state[d.path].cy)}
+  });
+
+  function svgPoint(clientX,clientY){
+    const pt=svg.createSVGPoint();pt.x=clientX;pt.y=clientY;
+    const ctm=svg.getScreenCTM();if(!ctm)return{x:0,y:0};
+    return pt.matrixTransform(ctm.inverse());
+  }
+
+  let dragging=null;
+  defs.forEach(d=>{
+    const h=document.getElementById(d.handle);if(!h)return;
+    h.addEventListener('pointerdown',e=>{
+      dragging=d.path;h.classList.add('dragging');
+      try{h.setPointerCapture(e.pointerId)}catch(err){}
+      e.preventDefault();
+    });
+    h.addEventListener('pointermove',e=>{
+      if(dragging!==d.path)return;
+      const p=svgPoint(e.clientX,e.clientY),s=state[d.path];
+      s.cx=Math.max(-200,Math.min(1400,p.x));
+      s.cy=Math.max(-80,Math.min(900,p.y));
+      draw(d.path);h.setAttribute('cx',s.cx);h.setAttribute('cy',s.cy);
+    });
+    const release=()=>{if(dragging===d.path){dragging=null;h.classList.remove('dragging')}};
+    h.addEventListener('pointerup',release);
+    h.addEventListener('pointercancel',release);
+    h.addEventListener('keydown',e=>{
+      const s=state[d.path];let step=14,changed=true;
+      if(e.key==='ArrowUp')s.cy-=step;
+      else if(e.key==='ArrowDown')s.cy+=step;
+      else if(e.key==='ArrowLeft')s.cx-=step;
+      else if(e.key==='ArrowRight')s.cx+=step;
+      else changed=false;
+      if(changed){e.preventDefault();draw(d.path);h.setAttribute('cx',s.cx);h.setAttribute('cy',s.cy)}
+    });
+  });
+
+  /* drones ride whatever shape the path currently has */
+  const drones=[
+    {el:document.getElementById('fd1'),pathId:'fp3',dur:11000,delay:0},
+    {el:document.getElementById('fd2'),pathId:'fp5',dur:13500,delay:3000},
+  ].filter(d=>d.el);
+
+  if(reduce){
+    drones.forEach(dr=>{
+      const pathEl=document.getElementById(dr.pathId),len=pathEl.getTotalLength();
+      const p=pathEl.getPointAtLength(len*.5);
+      dr.el.style.opacity='.4';
+      dr.el.setAttribute('transform',`translate(${p.x} ${p.y})`);
+    });
+    return;
+  }
+  if(!drones.length)return;
+
+  const t0=performance.now();
+  function frame(now){
+    drones.forEach(dr=>{
+      const t=((now-t0-dr.delay)%dr.dur+dr.dur)%dr.dur/dr.dur;
+      const pathEl=document.getElementById(dr.pathId),len=pathEl.getTotalLength();
+      if(!len)return;
+      const dist=t*len,p=pathEl.getPointAtLength(dist);
+      const p2=pathEl.getPointAtLength(Math.min(len,dist+2));
+      const angle=Math.atan2(p2.y-p.y,p2.x-p.x)*180/Math.PI-90;
+      let op=.55;
+      if(t<.08)op=.55*(t/.08);
+      else if(t>.9)op=.55*(1-(t-.9)/.1);
+      dr.el.style.opacity=op;
+      dr.el.setAttribute('transform',`translate(${p.x} ${p.y}) rotate(${angle})`);
+    });
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+
 /* ---------- minimap ---------- */
 const mmRows=[...document.querySelectorAll('.minimap .rowline')];
 const secs=mmRows.map(r=>document.getElementById(r.dataset.sec));

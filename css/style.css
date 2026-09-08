@@ -944,12 +944,55 @@ html:has(.menu-ov.open) nav{color:var(--tx-d)}         /* menu overlay is dark â
   background:radial-gradient(circle at 50% -8%,rgba(255,255,255,.08),transparent 29%);
 }
 
-/* flowing background lines: topographic contour pattern spanning the
+/* flowing background lines: dotted, animated flight paths spanning the
    full panel height, echoing the reference layout */
-.footer-flow{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.65;overflow:hidden;border-radius:inherit}
-.footer-flow svg{width:100%;height:100%;display:block}
-.footer-flow path,
-.footer-flow ellipse{fill:none;stroke:rgba(237,235,228,.13);stroke-width:1.4}
+.footer-flow{position:absolute;inset:0;z-index:0;opacity:.65;overflow:hidden;border-radius:inherit;pointer-events:none}
+.footer-flow svg{width:100%;height:100%;display:block;overflow:visible}
+
+/* dotted paths that continuously march, giving the lines a sense of flow */
+.flow-path{
+  fill:none;stroke:rgba(237,235,228,.32);stroke-width:1.5;stroke-linecap:round;
+  stroke-dasharray:1 11;pointer-events:auto;
+  animation:flowMarch 5.5s linear infinite;
+  transition:stroke .3s var(--ease);
+}
+.flow-path:hover{stroke:rgba(237,235,228,.55)}
+@keyframes flowMarch{to{stroke-dashoffset:-120}}
+/* stagger each path so the flow doesn't look uniform */
+#fp1{animation-duration:6.2s}
+#fp2{animation-duration:5.4s;animation-direction:reverse}
+#fp3{animation-duration:7.1s}
+#fp4{animation-duration:4.8s;animation-direction:reverse}
+#fp5{animation-duration:6.6s}
+#fp6{animation-duration:5.9s;animation-direction:reverse}
+#fp7{animation-duration:6.9s}
+
+/* faded drone silhouettes gliding along a path â€” position + rotation are
+   driven from JS each frame so they always track the live (possibly
+   user-dragged) path shape */
+.flow-drone{
+  fill:none;stroke:rgba(237,235,228,.5);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;
+  opacity:0;pointer-events:none;
+}
+.flow-drone rect{fill:rgba(237,235,228,.16);stroke:rgba(237,235,228,.5)}
+.flow-drone .fd-rotor{fill:none;stroke:rgba(237,235,228,.32);stroke-width:1.1}
+
+/* drag handles: subtle by default, brighten on hover/focus/drag to invite
+   interaction without cluttering the visual */
+.flow-handle{
+  fill:rgba(237,235,228,.05);stroke:rgba(237,235,228,.26);stroke-width:1.2;
+  cursor:grab;pointer-events:auto;
+  transition:fill .25s var(--ease),stroke .25s var(--ease);
+  outline:none;
+}
+.flow-handle:hover,.flow-handle:focus-visible{fill:rgba(237,235,228,.14);stroke:rgba(237,235,228,.6)}
+.flow-handle.dragging{fill:rgba(237,235,228,.2);stroke:rgba(237,235,228,.8);cursor:grabbing}
+@media(max-width:760px){.flow-handle{r:12}}
+
+@media(prefers-reduced-motion:reduce){
+  .flow-path{animation:none;stroke-dasharray:2 10}
+  .flow-drone{opacity:.4}
+}
 
 .footer-panel>*{position:relative;z-index:1}
 .footer-panel>.footer-flow{position:absolute;z-index:0}

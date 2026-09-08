@@ -1734,15 +1734,43 @@
 <!-- ================= FOOTER ================= -->
 <footer class="sec-dark footer">
   <div class="footer-panel">
-    <div class="footer-flow" aria-hidden="true">
-      <svg viewBox="0 0 1200 800" preserveAspectRatio="none">
-        <path d="M80-40C15 110 170 190 120 315S-15 420 90 555 240 690 185 840"/>
-        <path d="M135-40C95 90 245 165 205 300S95 420 195 540 335 715 290 840"/>
-        <path d="M155-40C165 80 340 75 310 225S360 335 425 450 375 690 470 840"/>
-        <path d="M350-40C440 145 570-5 615 160S355 195 380 340 570 535 565 840"/>
-        <path d="M790-40C830 145 740 265 815 400S1030 540 945 840"/>
-        <path d="M1020-40C995 125 1110 225 1060 405S1130 665 1190 840"/>
-        <path d="M1130-40C1150 145 1190 210 1180 350S1230 555 1290 720"/>
+    <div class="footer-flow" id="footerFlow" aria-label="Decorative animated flight paths, draggable">
+      <svg viewBox="0 0 1200 800" preserveAspectRatio="none" id="flowSvg">
+        <!-- interactive flight paths: dotted, animated flow, each with a
+             draggable control point so the route can be reshaped live -->
+        <path class="flow-path" id="fp1"></path>
+        <path class="flow-path" id="fp2"></path>
+        <path class="flow-path" id="fp3"></path>
+        <path class="flow-path" id="fp4"></path>
+        <path class="flow-path" id="fp5"></path>
+        <path class="flow-path" id="fp6"></path>
+        <path class="flow-path" id="fp7"></path>
+
+        <!-- faded drones riding two of the paths, always tracking whatever
+             shape a visitor has bent the path into -->
+        <g class="flow-drone" id="fd1" aria-hidden="true">
+          <line x1="-9" y1="-9" x2="-16" y2="-16"/><line x1="9" y1="-9" x2="16" y2="-16"/>
+          <line x1="-9" y1="9" x2="-16" y2="16"/><line x1="9" y1="9" x2="16" y2="16"/>
+          <circle class="fd-rotor" cx="-16" cy="-16" r="5"/><circle class="fd-rotor" cx="16" cy="-16" r="5"/>
+          <circle class="fd-rotor" cx="-16" cy="16" r="5"/><circle class="fd-rotor" cx="16" cy="16" r="5"/>
+          <rect x="-9" y="-6" width="18" height="12" rx="3"/>
+        </g>
+        <g class="flow-drone" id="fd2" aria-hidden="true">
+          <line x1="-9" y1="-9" x2="-16" y2="-16"/><line x1="9" y1="-9" x2="16" y2="-16"/>
+          <line x1="-9" y1="9" x2="-16" y2="16"/><line x1="9" y1="9" x2="16" y2="16"/>
+          <circle class="fd-rotor" cx="-16" cy="-16" r="5"/><circle class="fd-rotor" cx="16" cy="-16" r="5"/>
+          <circle class="fd-rotor" cx="-16" cy="16" r="5"/><circle class="fd-rotor" cx="16" cy="16" r="5"/>
+          <rect x="-9" y="-6" width="18" height="12" rx="3"/>
+        </g>
+
+        <!-- drag handles: one per path, lets visitors reshape the flow -->
+        <circle class="flow-handle" id="fh1" data-path="fp1" r="9" tabindex="0" role="slider" aria-label="Drag to bend flight path 1"></circle>
+        <circle class="flow-handle" id="fh2" data-path="fp2" r="9" tabindex="0" role="slider" aria-label="Drag to bend flight path 2"></circle>
+        <circle class="flow-handle" id="fh3" data-path="fp3" r="9" tabindex="0" role="slider" aria-label="Drag to bend flight path 3"></circle>
+        <circle class="flow-handle" id="fh4" data-path="fp4" r="9" tabindex="0" role="slider" aria-label="Drag to bend flight path 4"></circle>
+        <circle class="flow-handle" id="fh5" data-path="fp5" r="9" tabindex="0" role="slider" aria-label="Drag to bend flight path 5"></circle>
+        <circle class="flow-handle" id="fh6" data-path="fp6" r="9" tabindex="0" role="slider" aria-label="Drag to bend flight path 6"></circle>
+        <circle class="flow-handle" id="fh7" data-path="fp7" r="9" tabindex="0" role="slider" aria-label="Drag to bend flight path 7"></circle>
       </svg>
     </div>
 
