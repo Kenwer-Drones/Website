@@ -407,19 +407,22 @@ tick();setInterval(tick,1000);
     }
   });
 
-  /* ---- the drone: rides the live, ever-changing curve ---- */
-  const drone=document.getElementById('fd1');
-  const dur=9000;
+  /* ---- the drones: ride the live, ever-changing curve ---- */
+  const drones=[
+    {el:document.getElementById('fd1'),dur:9000,delay:0,quad:false},
+    {el:document.getElementById('fd2'),dur:11000,delay:3500,quad:true},
+  ].filter(d=>d.el);
   const t0=performance.now();
 
   if(reduce){
     for(let i=0;i<N;i++)ys[i]=restYOf(i);
     draw();
-    if(drone){
-      const len=el.getTotalLength(),p=el.getPointAtLength(len*.5);
-      drone.style.opacity='.4';
-      drone.setAttribute('transform',`translate(${p.x} ${p.y})`);
-    }
+    const len=el.getTotalLength();
+    drones.forEach(dr=>{
+      const p=el.getPointAtLength(len*.5);
+      dr.el.style.opacity='.35';
+      dr.el.setAttribute('transform',`translate(${p.x} ${p.y})`);
+    });
     return;
   }
 
@@ -442,17 +445,23 @@ tick();setInterval(tick,1000);
     }
     draw();
 
-    if(drone){
-      const t=((now-t0)%dur+dur)%dur/dur;
-      const len=el.getTotalLength();
-      if(len){
+    const len=el.getTotalLength();
+    if(len){
+      drones.forEach(dr=>{
+        const t=((now-t0-dr.delay)%dr.dur+dr.dur)%dr.dur/dr.dur;
         const dist=t*len,p=el.getPointAtLength(dist);
         let op=.65;
         if(t<.08)op=.65*(t/.08);
         else if(t>.9)op=.65*(1-(t-.9)/.1);
-        drone.style.opacity=op;
-        drone.setAttribute('transform',`translate(${p.x} ${p.y})`);
-      }
+        dr.el.style.opacity=op;
+        if(dr.quad){
+          const p2=el.getPointAtLength(Math.min(len,dist+3));
+          const angle=Math.atan2(p2.y-p.y,p2.x-p.x)*180/Math.PI;
+          dr.el.setAttribute('transform',`translate(${p.x} ${p.y}) rotate(${angle})`);
+        }else{
+          dr.el.setAttribute('transform',`translate(${p.x} ${p.y})`);
+        }
+      });
     }
     requestAnimationFrame(frame);
   }
