@@ -945,18 +945,21 @@ html:has(.menu-ov.open) nav{color:var(--tx-d)}         /* menu overlay is dark â
 /* ---- centered brand block ---- */
 .footer-center{display:flex;flex-direction:column;align-items:center;text-align:center}
 .footer-mark{
-  width:clamp(64px,8vw,110px);height:auto;display:block;margin-bottom:clamp(14px,1.6vw,22px);
+  width:clamp(84px,9vw,140px);height:auto;display:block;margin-bottom:clamp(14px,1.6vw,22px);
   object-fit:contain;
+  /* source art is a black halftone dot pattern on a white card; invert +
+     screen-blend so it reads as light dots directly on the dark panel */
+  filter:invert(1);mix-blend-mode:screen;
 }
 .footer-word{
-  font-family:'Anton','Arial Narrow',sans-serif;font-weight:400;text-transform:uppercase;
-  letter-spacing:.01em;line-height:.9;color:var(--on-bg);
-  font-size:clamp(46px,8.6vw,120px);
+  font-family:'Inter',-apple-system,sans-serif;font-weight:700;
+  letter-spacing:-.01em;line-height:1.05;color:var(--on-bg);
+  font-size:clamp(28px,3.4vw,40px);
 }
 .footer-tag{
   font-family:'EB Garamond',Georgia,serif;font-style:italic;font-weight:500;
-  font-size:clamp(17px,2vw,28px);color:var(--on-bg-mut);
-  margin-top:clamp(8px,1vw,16px);
+  font-size:clamp(14px,1.4vw,18px);color:var(--on-bg-mut);
+  margin-top:clamp(6px,.8vw,10px);
 }
 
 /* ---- pill CTAs ---- */
@@ -965,19 +968,25 @@ html:has(.menu-ov.open) nav{color:var(--tx-d)}         /* menu overlay is dark â
   margin-top:clamp(24px,3vw,40px);
 }
 .foot-pill{
-  display:inline-flex;align-items:center;gap:12px;cursor:pointer;
-  background:var(--panel);color:var(--on-panel);
-  border:1px solid var(--panel);border-radius:999px;
-  font-family:'IBM Plex Mono',monospace;font-weight:500;
-  font-size:clamp(11px,1.1vw,13.5px);letter-spacing:.1em;text-transform:uppercase;
-  padding:14px 26px;
+  display:inline-flex;align-items:center;gap:14px;cursor:pointer;
+  background:#5FE07A;color:#0B2412;
+  border:1px solid #5FE07A;border-radius:999px;
+  font-family:'Inter',-apple-system,sans-serif;font-weight:600;
+  font-size:clamp(13px,1.2vw,14.5px);letter-spacing:0;text-transform:none;
+  padding:8px 8px 8px 22px;
   transition:transform .35s var(--ease),background .3s var(--ease),color .3s var(--ease),box-shadow .35s var(--ease);
 }
-.foot-pill .pill-arrow{transition:transform .35s var(--ease)}
+.foot-pill .pill-arrow{
+  display:grid;place-items:center;flex:0 0 auto;
+  width:28px;height:28px;border-radius:50%;
+  background:#0B2412;color:#5FE07A;font-size:14px;
+  transition:transform .35s var(--ease);
+}
 .foot-pill:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(0,0,0,.35)}
-.foot-pill:hover .pill-arrow{transform:translate(3px,-3px)}
-.foot-pill.ghost{background:transparent;color:var(--on-bg);border-color:var(--line-dot)}
-.foot-pill.ghost:hover{border-color:var(--on-bg);background:rgba(237,235,228,.06)}
+.foot-pill:hover .pill-arrow{transform:rotate(45deg)}
+.foot-pill.ghost{background:#0F3D22;color:var(--on-bg);border-color:#0F3D22}
+.foot-pill.ghost .pill-arrow{background:#5FE07A;color:#0B2412}
+.foot-pill.ghost:hover{background:#134B2A}
 
 /* ---- lower grid: contact + quick nav ---- */
 .footer-grid{
