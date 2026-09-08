@@ -26,42 +26,37 @@
   background:radial-gradient(circle at 50% -8%,rgba(255,255,255,.08),transparent 29%);
 }
 
-/* flowing background lines: dotted, animated flight paths spanning the
-   full panel height. Defined here (not just style.css) because this
-   stylesheet loads last and would otherwise win the cascade against the
-   ".flow-path"/".flow-handle"/".flow-drone" rules with a bare-tag override. */
-.footer-flow{position:absolute;inset:0;z-index:0;opacity:.75;overflow:hidden;border-radius:inherit;pointer-events:none}
+/* flowing background line: one clean dotted wave spanning the full panel
+   width. Defined here (not just style.css) because this stylesheet loads
+   last and would otherwise win the cascade against the
+   ".flow-path"/".flow-hit"/".flow-drone" rules with a bare-tag override. */
+.footer-flow{position:absolute;inset:0;z-index:0;opacity:.6;overflow:hidden;border-radius:inherit;pointer-events:none}
 .footer-flow svg{width:100%;height:100%;display:block;overflow:visible}
 
 .flow-path{
-  fill:none;stroke:rgba(237,235,228,.36);stroke-width:1.5;stroke-linecap:round;
-  stroke-dasharray:1 9;pointer-events:none; /* the .flow-hit twin owns all interaction */
-  animation:flowMarch 6s linear infinite;
+  fill:none;stroke:rgba(237,235,228,.4);stroke-width:1.5;stroke-linecap:round;
+  stroke-dasharray:1 10;pointer-events:none; /* the .flow-hit twin owns all interaction */
+  animation:flowMarch 9s linear infinite;
   transition:stroke .3s var(--ease);
 }
-/* invisible, generously-wide twin sits under each visible line so the
+/* invisible, generously-wide twin sits under the visible line so the
    whole path is grabbable — no separate handle dot needed */
 .flow-hit{
-  fill:none;stroke:transparent;stroke-width:26;
+  fill:none;stroke:transparent;stroke-width:30;
   cursor:grab;pointer-events:auto;outline:none;
 }
 .flow-hit:hover+.flow-path,
-.flow-hit:focus-visible+.flow-path{stroke:rgba(237,235,228,.55)}
+.flow-hit:focus-visible+.flow-path{stroke:rgba(237,235,228,.6)}
 .flow-hit.dragging{cursor:grabbing}
-.flow-hit.dragging+.flow-path{stroke:rgba(237,235,228,.7)}
-@keyframes flowMarch{to{stroke-dashoffset:-100}}
-#fp1{animation-duration:7.4s}
-#fp2{animation-duration:6.1s;animation-direction:reverse}
-#fp3{animation-duration:8.2s}
+.flow-hit.dragging+.flow-path{stroke:rgba(237,235,228,.75)}
+@keyframes flowMarch{to{stroke-dashoffset:-110}}
 
-/* minimal top-down drone silhouette: crossed arms with small prop tips
-   and a hub, faded so it reads as a distant/ambient shape */
+/* a single small dot riding the path, faded so it reads as an ambient
+   marker rather than a literal drone illustration */
 .flow-drone{
-  fill:none;stroke:rgba(237,235,228,.5);stroke-width:1.4;stroke-linecap:round;
   opacity:0;pointer-events:none;
 }
-.flow-drone circle{fill:rgba(237,235,228,.5);stroke:none}
-.flow-drone .fd-hub{fill:rgba(237,235,228,.7)}
+.flow-drone circle{fill:rgba(237,235,228,.6);stroke:none}
 
 @media(prefers-reduced-motion:reduce){
   .flow-path{animation:none;stroke-dasharray:2 8}

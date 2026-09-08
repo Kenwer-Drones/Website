@@ -252,66 +252,30 @@ function tick(){
 }
 tick();setInterval(tick,1000);
 
-/* ---------- footer: interactive dotted flight paths + faded drones ----------
-   Only 3 routes (not a dense stack of lines), each a wandering Catmull-Rom
-   spline through several irregular waypoints — a more organic, hand-drawn
-   pattern than a single repeating wave. There's no separate handle dot:
-   dragging directly on the line (or its wide invisible hit twin) lifts the
-   whole route, which is far easier to grab than a tiny circle. Two faded
-   drones ride the paths every frame via getPointAtLength, so they always
-   track whatever shape the visitor has bent the path into. */
+/* ---------- footer: single interactive dotted flight path + drone ----------
+   One clean sine wave spanning the panel width, dotted and animated to
+   flow. Dragging directly on the line (or its wide invisible hit twin)
+   lifts/lowers the whole wave — no separate handle dot. A single faded
+   dot rides the path every frame via getPointAtLength, so it always
+   tracks whatever shape the visitor has bent the path into. */
 (function(){
   const svg=document.getElementById('flowSvg');if(!svg)return;
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const VB_W=1400,VB_H=480;
+  const VB_W=1400;
+  const baseY=240,amp=34; /* one full up-down-up cycle across the width */
+  let lift=0;
 
-  /* each path is a flight route with several waypoints at irregular
-     x-positions and y-offsets — a Catmull-Rom spline through them gives a
-     wandering, hand-drawn feel instead of one repetitive symmetric wave */
-  const defs=[
-    {path:'fp1',y:90, waypoints:[0,26,-34,18,-10,30,0]},
-    {path:'fp2',y:220,waypoints:[0,-40,22,-16,36,-20,0]},
-    {path:'fp3',y:360,waypoints:[0,32,-22,40,-30,14,0]},
-  ];
-  const state={};
+  const el=document.getElementById('fp1'),hit=document.getElementById('fp1-hit');
 
-  function catmullRomPath(pts){
-    if(pts.length<2)return'';
-    let d=`M ${pts[0].x} ${pts[0].y} `;
-    for(let i=0;i<pts.length-1;i++){
-      const p0=pts[i-1]||pts[i],p1=pts[i],p2=pts[i+1],p3=pts[i+2]||p2;
-      const c1x=p1.x+(p2.x-p0.x)/6,c1y=p1.y+(p2.y-p0.y)/6;
-      const c2x=p2.x-(p3.x-p1.x)/6,c2y=p2.y-(p3.y-p1.y)/6;
-      d+=`C ${c1x} ${c1y} ${c2x} ${c2y} ${p2.x} ${p2.y} `;
-    }
-    return d;
-  }
-
-  /* build the waypoint list for a path at its current lift (vertical
-     drag offset), spanning the full width with a bit of overrun on each
-     side so the dashed line reads as continuous, off-canvas flight */
-  function buildPoints(s){
-    const n=s.waypoints.length,y=s.baseY+s.lift;
-    const pts=[{x:-40,y}];
-    s.waypoints.forEach((off,i)=>{
-      const x=(VB_W+80)*(i/(n-1))-40;
-      pts.push({x,y:y+off});
-    });
-    pts.push({x:VB_W+40,y});
-    return pts;
-  }
-
-  function draw(id){
-    const s=state[id],el=document.getElementById(id),hit=document.getElementById(id+'-hit');
-    const d=catmullRomPath(buildPoints(s));
+  function draw(){
+    const y=baseY+lift;
+    const d=`M -20 ${y} `+
+             `C ${VB_W*.17} ${y-amp} ${VB_W*.33} ${y-amp} ${VB_W*.5} ${y} `+
+             `C ${VB_W*.67} ${y+amp} ${VB_W*.83} ${y+amp} ${VB_W+20} ${y}`;
     if(el)el.setAttribute('d',d);
     if(hit)hit.setAttribute('d',d);
   }
-
-  defs.forEach(d=>{
-    state[d.path]={baseY:d.y,waypoints:d.waypoints,lift:0};
-    draw(d.path);
-  });
+  draw();
 
   function svgPoint(clientX,clientY){
     const pt=svg.createSVGPoint();pt.x=clientX;pt.y=clientY;
@@ -319,69 +283,57 @@ tick();setInterval(tick,1000);
     return pt.matrixTransform(ctm.inverse());
   }
 
-  let dragging=null,dragStartY=0,dragStartLift=0;
-  defs.forEach(d=>{
-    const hit=document.getElementById(d.path+'-hit');if(!hit)return;
+  let dragging=false,dragStartY=0,dragStartLift=0;
+  if(hit){
     hit.addEventListener('pointerdown',e=>{
-      dragging=d.path;hit.classList.add('dragging');
+      dragging=true;hit.classList.add('dragging');
       const p=svgPoint(e.clientX,e.clientY);
-      dragStartY=p.y;dragStartLift=state[d.path].lift;
+      dragStartY=p.y;dragStartLift=lift;
       try{hit.setPointerCapture(e.pointerId)}catch(err){}
       e.preventDefault();
     });
     hit.addEventListener('pointermove',e=>{
-      if(dragging!==d.path)return;
-      const p=svgPoint(e.clientX,e.clientY),s=state[d.path];
-      s.lift=Math.max(-140,Math.min(140,dragStartLift+(p.y-dragStartY)));
-      draw(d.path);
+      if(!dragging)return;
+      const p=svgPoint(e.clientX,e.clientY);
+      lift=Math.max(-140,Math.min(140,dragStartLift+(p.y-dragStartY)));
+      draw();
     });
-    const release=()=>{if(dragging===d.path){dragging=null;hit.classList.remove('dragging')}};
+    const release=()=>{dragging=false;hit.classList.remove('dragging')};
     hit.addEventListener('pointerup',release);
     hit.addEventListener('pointercancel',release);
     hit.addEventListener('keydown',e=>{
-      const s=state[d.path];let step=16,changed=true;
-      if(e.key==='ArrowUp')s.lift-=step;
-      else if(e.key==='ArrowDown')s.lift+=step;
+      let step=16,changed=true;
+      if(e.key==='ArrowUp')lift-=step;
+      else if(e.key==='ArrowDown')lift+=step;
       else changed=false;
-      if(changed){
-        s.lift=Math.max(-140,Math.min(140,s.lift));
-        e.preventDefault();draw(d.path);
-      }
+      if(changed){lift=Math.max(-140,Math.min(140,lift));e.preventDefault();draw()}
     });
-  });
+  }
 
-  /* drones ride whatever shape the path currently has */
-  const drones=[
-    {el:document.getElementById('fd1'),pathId:'fp1',dur:12000,delay:0},
-    {el:document.getElementById('fd2'),pathId:'fp3',dur:14500,delay:3500},
-  ].filter(d=>d.el);
+  /* the drone rides whatever shape the path currently has */
+  const drone=document.getElementById('fd1');
+  if(!drone||!el)return;
+  const dur=13000;
 
   if(reduce){
-    drones.forEach(dr=>{
-      const pathEl=document.getElementById(dr.pathId),len=pathEl.getTotalLength();
-      const p=pathEl.getPointAtLength(len*.5);
-      dr.el.style.opacity='.35';
-      dr.el.setAttribute('transform',`translate(${p.x} ${p.y})`);
-    });
+    const len=el.getTotalLength(),p=el.getPointAtLength(len*.5);
+    drone.style.opacity='.4';
+    drone.setAttribute('transform',`translate(${p.x} ${p.y})`);
     return;
   }
-  if(!drones.length)return;
 
   const t0=performance.now();
   function frame(now){
-    drones.forEach(dr=>{
-      const t=((now-t0-dr.delay)%dr.dur+dr.dur)%dr.dur/dr.dur;
-      const pathEl=document.getElementById(dr.pathId),len=pathEl.getTotalLength();
-      if(!len)return;
-      const dist=t*len,p=pathEl.getPointAtLength(dist);
-      const p2=pathEl.getPointAtLength(Math.min(len,dist+2));
-      const angle=Math.atan2(p2.y-p.y,p2.x-p.x)*180/Math.PI;
-      let op=.5;
-      if(t<.08)op=.5*(t/.08);
-      else if(t>.9)op=.5*(1-(t-.9)/.1);
-      dr.el.style.opacity=op;
-      dr.el.setAttribute('transform',`translate(${p.x} ${p.y}) rotate(${angle})`);
-    });
+    const t=((now-t0)%dur+dur)%dur/dur;
+    const len=el.getTotalLength();
+    if(len){
+      const dist=t*len,p=el.getPointAtLength(dist);
+      let op=.6;
+      if(t<.08)op=.6*(t/.08);
+      else if(t>.9)op=.6*(1-(t-.9)/.1);
+      drone.style.opacity=op;
+      drone.setAttribute('transform',`translate(${p.x} ${p.y})`);
+    }
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
