@@ -253,37 +253,42 @@ function tick(){
 tick();setInterval(tick,1000);
 
 /* ---------- footer: interactive dotted flight paths + faded drones ----------
-   Each path is a quadratic curve M(start) Q(control) (end) running top to
-   bottom through the panel. The control point is exposed as a draggable
-   handle (mouse, touch, and arrow-key accessible) — dragging it reshapes
-   the dotted, animated flow live. Two faded drones ride the paths every
+   Each path is a gentle horizontal wave (M start, then a series of quadratic
+   segments) running left to right through the panel. There's no separate
+   handle dot — dragging directly on the line (or its wide invisible hit
+   twin) lifts/lowers the whole wave, which feels more natural and is much
+   easier to grab than a tiny circle. Two faded drones ride the paths every
    frame via getPointAtLength, so they always track whatever shape the
    visitor has bent the path into. */
 (function(){
   const svg=document.getElementById('flowSvg');if(!svg)return;
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const VB_W=1400,VB_H=480;
 
   const defs=[
-    {path:'fp1',handle:'fh1',x0:80,  x1:185, sign:-1},
-    {path:'fp2',handle:'fh2',x0:135, x1:290, sign:1},
-    {path:'fp3',handle:'fh3',x0:155, x1:470, sign:-1},
-    {path:'fp4',handle:'fh4',x0:350, x1:565, sign:1},
-    {path:'fp5',handle:'fh5',x0:790, x1:945, sign:-1},
-    {path:'fp6',handle:'fh6',x0:1020,x1:1190,sign:1},
-    {path:'fp7',handle:'fh7',x0:1130,x1:1290,sign:-1},
+    {path:'fp1',y:60, amp:22},
+    {path:'fp2',y:130,amp:-26},
+    {path:'fp3',y:200,amp:20},
+    {path:'fp4',y:280,amp:-18},
+    {path:'fp5',y:350,amp:24},
+    {path:'fp6',y:420,amp:-20},
   ];
   const state={};
 
+  /* draw a smooth wave across the width using the current lift (offset)
+     applied as an extra bulge around the drag point */
   function draw(id){
-    const s=state[id],el=document.getElementById(id);
-    if(el)el.setAttribute('d',`M ${s.x0} ${s.y0} Q ${s.cx} ${s.cy} ${s.x1} ${s.y1}`);
+    const s=state[id],el=document.getElementById(id),hit=document.getElementById(id+'-hit');
+    const y=s.baseY+s.lift;
+    const d=`M -20 ${s.baseY} C ${VB_W*.22} ${y+s.amp} ${VB_W*.36} ${y-s.amp} ${VB_W*.5} ${y} `+
+             `C ${VB_W*.64} ${y+s.amp} ${VB_W*.78} ${y-s.amp} ${VB_W+20} ${s.baseY}`;
+    if(el)el.setAttribute('d',d);
+    if(hit)hit.setAttribute('d',d);
   }
 
   defs.forEach(d=>{
-    state[d.path]={x0:d.x0,y0:-40,x1:d.x1,y1:840,cx:(d.x0+d.x1)/2+d.sign*120,cy:400};
+    state[d.path]={baseY:d.y,amp:d.amp,lift:0};
     draw(d.path);
-    const h=document.getElementById(d.handle);
-    if(h){h.setAttribute('cx',state[d.path].cx);h.setAttribute('cy',state[d.path].cy)}
   });
 
   function svgPoint(clientX,clientY){
@@ -292,46 +297,48 @@ tick();setInterval(tick,1000);
     return pt.matrixTransform(ctm.inverse());
   }
 
-  let dragging=null;
+  let dragging=null,dragStartY=0,dragStartLift=0;
   defs.forEach(d=>{
-    const h=document.getElementById(d.handle);if(!h)return;
-    h.addEventListener('pointerdown',e=>{
-      dragging=d.path;h.classList.add('dragging');
-      try{h.setPointerCapture(e.pointerId)}catch(err){}
+    const hit=document.getElementById(d.path+'-hit');if(!hit)return;
+    hit.addEventListener('pointerdown',e=>{
+      dragging=d.path;hit.classList.add('dragging');
+      const p=svgPoint(e.clientX,e.clientY);
+      dragStartY=p.y;dragStartLift=state[d.path].lift;
+      try{hit.setPointerCapture(e.pointerId)}catch(err){}
       e.preventDefault();
     });
-    h.addEventListener('pointermove',e=>{
+    hit.addEventListener('pointermove',e=>{
       if(dragging!==d.path)return;
       const p=svgPoint(e.clientX,e.clientY),s=state[d.path];
-      s.cx=Math.max(-200,Math.min(1400,p.x));
-      s.cy=Math.max(-80,Math.min(900,p.y));
-      draw(d.path);h.setAttribute('cx',s.cx);h.setAttribute('cy',s.cy);
+      s.lift=Math.max(-140,Math.min(140,dragStartLift+(p.y-dragStartY)));
+      draw(d.path);
     });
-    const release=()=>{if(dragging===d.path){dragging=null;h.classList.remove('dragging')}};
-    h.addEventListener('pointerup',release);
-    h.addEventListener('pointercancel',release);
-    h.addEventListener('keydown',e=>{
-      const s=state[d.path];let step=14,changed=true;
-      if(e.key==='ArrowUp')s.cy-=step;
-      else if(e.key==='ArrowDown')s.cy+=step;
-      else if(e.key==='ArrowLeft')s.cx-=step;
-      else if(e.key==='ArrowRight')s.cx+=step;
+    const release=()=>{if(dragging===d.path){dragging=null;hit.classList.remove('dragging')}};
+    hit.addEventListener('pointerup',release);
+    hit.addEventListener('pointercancel',release);
+    hit.addEventListener('keydown',e=>{
+      const s=state[d.path];let step=16,changed=true;
+      if(e.key==='ArrowUp')s.lift-=step;
+      else if(e.key==='ArrowDown')s.lift+=step;
       else changed=false;
-      if(changed){e.preventDefault();draw(d.path);h.setAttribute('cx',s.cx);h.setAttribute('cy',s.cy)}
+      if(changed){
+        s.lift=Math.max(-140,Math.min(140,s.lift));
+        e.preventDefault();draw(d.path);
+      }
     });
   });
 
   /* drones ride whatever shape the path currently has */
   const drones=[
-    {el:document.getElementById('fd1'),pathId:'fp3',dur:11000,delay:0},
-    {el:document.getElementById('fd2'),pathId:'fp5',dur:13500,delay:3000},
+    {el:document.getElementById('fd1'),pathId:'fp2',dur:12000,delay:0},
+    {el:document.getElementById('fd2'),pathId:'fp5',dur:14500,delay:3500},
   ].filter(d=>d.el);
 
   if(reduce){
     drones.forEach(dr=>{
       const pathEl=document.getElementById(dr.pathId),len=pathEl.getTotalLength();
       const p=pathEl.getPointAtLength(len*.5);
-      dr.el.style.opacity='.4';
+      dr.el.style.opacity='.35';
       dr.el.setAttribute('transform',`translate(${p.x} ${p.y})`);
     });
     return;
@@ -346,10 +353,10 @@ tick();setInterval(tick,1000);
       if(!len)return;
       const dist=t*len,p=pathEl.getPointAtLength(dist);
       const p2=pathEl.getPointAtLength(Math.min(len,dist+2));
-      const angle=Math.atan2(p2.y-p.y,p2.x-p.x)*180/Math.PI-90;
-      let op=.55;
-      if(t<.08)op=.55*(t/.08);
-      else if(t>.9)op=.55*(1-(t-.9)/.1);
+      const angle=Math.atan2(p2.y-p.y,p2.x-p.x)*180/Math.PI;
+      let op=.5;
+      if(t<.08)op=.5*(t/.08);
+      else if(t>.9)op=.5*(1-(t-.9)/.1);
       dr.el.style.opacity=op;
       dr.el.setAttribute('transform',`translate(${p.x} ${p.y}) rotate(${angle})`);
     });
