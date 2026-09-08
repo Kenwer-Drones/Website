@@ -20,7 +20,8 @@ function render(t){
  const dpr=Math.min(devicePixelRatio,2),w=Math.round(c.clientWidth*dpr),h=Math.round(c.clientHeight*dpr);
  if(!w||!h)return;
  if(c.width!==w||c.height!==h){c.width=w;c.height=h;gl.viewport(0,0,w,h);}
- if(auto&&visible&&!document.hidden)yaw+=Math.min((t-last)/1000,.05)*.24;
+ // One gentle revolution per 90 seconds, independent of display refresh rate.
+ if(auto&&visible&&!document.hidden)yaw+=Math.min((t-last)/1000,.05)*(Math.PI*2/90);
  last=t;
  gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
  gl.uniform1f(uniforms.yaw,yaw);gl.uniform1f(uniforms.pitch,pitch);gl.uniform1f(uniforms.aspect,w/h);
