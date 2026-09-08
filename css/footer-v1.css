@@ -39,25 +39,16 @@
 /* ---- centered brand block ---- */
 .footer-center{grid-column:2;grid-row:1;display:flex;flex-direction:column;align-items:center;text-align:center}
 .footer-emblem{
-  width:clamp(120px,12vw,160px);aspect-ratio:491/581;
+  width:clamp(132px,13vw,178px);aspect-ratio:1/1;
   margin-top:calc(-1 * clamp(82px,8vw,108px) - 66px);
   margin-bottom:14px;
   position:relative;
-  cursor:grab;touch-action:pan-y;user-select:none;perspective:700px;
-  filter:drop-shadow(8px 12px 8px rgba(0,0,0,.18));
+  overflow:hidden;filter:drop-shadow(5px 10px 12px rgba(0,0,0,.28));
 }
-.footer-emblem:active{cursor:grabbing}
-.footer-mark{
-  position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:contain;
+.footer-model{
+  position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent;
   clip-path:polygon(1% 5%,13% 1%,21% 3%,25% 13%,40% 7%,73% 10%,87% 17%,91% 26%,91% 82%,98% 85%,100% 91%,97% 95%,87% 100%,76% 98%,69% 93%,1% 82%,1% 65%,5% 60%,16% 65%,1% 54%);
-  filter:invert(1) grayscale(1) contrast(1.15);
-  mix-blend-mode:screen;
 }
-.footer-mark-face{
-  transform:rotateX(var(--logo-x,0deg)) rotateY(var(--logo-y,0deg));
-  transition:transform .35s var(--ease);transform-origin:center;
-}
-.footer-emblem.is-dragging .footer-mark-face{transition:none}
 .footer-word{
   font-family:'Inter',-apple-system,sans-serif;font-weight:700;
   letter-spacing:-.055em;line-height:1.02;color:var(--on-bg);
