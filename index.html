@@ -31,7 +31,9 @@
   .hero-dot-scene .dot-field{opacity:.13}
   .hero-dot-scene .dot-city{opacity:.27}
   .hero-dot-scene .dot-drone{opacity:.52}
-  .hero-dot-scene .flight-trace{fill:none;stroke:rgba(237,235,228,.32);stroke-width:1.35;stroke-linecap:round}
+  .hero-dot-scene .flight-trace{fill:none;stroke:rgba(237,235,228,.32);stroke-width:1.35;stroke-linecap:round;stroke-dasharray:6 9;animation:heroFlightDash 1.2s linear infinite}
+  @keyframes heroFlightDash{from{stroke-dashoffset:0}to{stroke-dashoffset:-15}}
+  @media(prefers-reduced-motion:reduce){.hero-dot-scene .flight-trace{animation:none}}
   @media(max-width:700px){
     .hero-dot-scene{width:150%;left:-25%}
     .hero-dot-scene .dot-city{opacity:.21}
