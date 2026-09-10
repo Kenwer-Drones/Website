@@ -19,6 +19,19 @@
   Cal.ns["kenwer-intro-call"]("ui", {"styles":{"branding":{"brandColor":"#111310"}},"hideEventTypeDetails":false,"layout":"month_view"});
   Cal.ns["kenwer-intro-call"]("preload", {calLink:"kenwer-drones-hhjia7/kenwer-intro-call"});
 </script>
+<style>
+  /* Hero dotted scene: code-built city, drone, and flight path */
+  .hero::before{display:none}
+  .hero-dot-scene{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+  .hero-dot-scene .dot-field{opacity:.13}
+  .hero-dot-scene .dot-city{opacity:.34}
+  .hero-dot-scene .dot-drone{opacity:.52}
+  .hero-dot-scene .flight-trace{fill:none;stroke:rgba(237,235,228,.32);stroke-width:1.35;stroke-linecap:round}
+  @media(max-width:700px){
+    .hero-dot-scene{width:150%;left:-25%}
+    .hero-dot-scene .dot-city{opacity:.26}
+  }
+</style>
 </head>
 <body>
 
@@ -45,6 +58,41 @@
 
 <!-- ================= HERO ================= -->
 <header class="hero sec-dark" id="top">
+  <svg class="hero-dot-scene" viewBox="0 0 1440 810" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <pattern id="heroSceneDots" width="8" height="8" patternUnits="userSpaceOnUse">
+        <circle cx="1.35" cy="1.35" r="1.35" fill="#EDEBE4"/>
+      </pattern>
+      <linearGradient id="heroSceneFade" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="white" stop-opacity=".18"/>
+        <stop offset=".28" stop-color="white" stop-opacity=".82"/>
+        <stop offset=".72" stop-color="white" stop-opacity=".62"/>
+        <stop offset="1" stop-color="white" stop-opacity="0"/>
+      </linearGradient>
+      <mask id="heroSceneMask">
+        <rect width="1440" height="810" fill="url(#heroSceneFade)"/>
+      </mask>
+    </defs>
+
+    <rect class="dot-field" width="1440" height="680" fill="url(#heroSceneDots)" mask="url(#heroSceneMask)"/>
+
+    <g class="dot-city" fill="url(#heroSceneDots)" mask="url(#heroSceneMask)">
+      <path d="M0 620V330h66v290zm78 0V278h72v342zm88 0V360h58v260zm74 0V235h98v385zm112 0V306h68v314zm82 0V168h118v452zm132 0V255h82v365zm96 0V116h128v504zm144 0V220h70v400zm86 0V302h96v318zm112 0V192h88v428zm104 0V268h72v352zm88 0V145h110v475z"/>
+      <path d="M48 360h22v40H48zm52-48h28v58h-28zm192-42h22v70h-22zm174-58h28v62h-28zm46 18h21v92h-21zm196-62h26v76h-26zm42-25h30v104h-30zm274 96h25v72h-25zm138-18h31v92h-31zm184-28h26v84h-26z" opacity=".7"/>
+    </g>
+
+    <g class="dot-drone" transform="translate(360 315)" fill="url(#heroSceneDots)">
+      <path d="M-66-12h42l14-17h20l14 17h42v24H24L10 29h-20L-24 12h-42z"/>
+      <ellipse cx="-72" cy="-20" rx="48" ry="8"/>
+      <ellipse cx="72" cy="-20" rx="48" ry="8"/>
+      <ellipse cx="-66" cy="22" rx="42" ry="7"/>
+      <ellipse cx="66" cy="22" rx="42" ry="7"/>
+      <rect x="-15" y="-17" width="30" height="34" rx="8"/>
+      <circle cx="0" cy="22" r="8"/>
+    </g>
+
+    <path class="flight-trace" d="M-30 410 C110 412 168 382 214 296 C244 240 280 238 328 254 M430 330 C500 460 572 470 690 408 C746 379 726 438 658 485 C610 518 730 566 948 548 C1055 540 884 626 916 666 C958 716 1196 558 1422 618"/>
+  </svg>
   <!-- ============ hero background: a piece of the brain, modified and installed into the drone ============ -->
   <svg class="hbrain" viewBox="0 0 1440 810" preserveAspectRatio="xMidYMid slice" aria-hidden="true" fill="none">
     <!-- GIANT brain: fills the left of the hero -->
