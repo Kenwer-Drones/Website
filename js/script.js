@@ -624,7 +624,7 @@ function skyfield(id,alpha){
 (function(){
   const facts=[
     ['0','Unsupported assumptions. Ambiguity triggers a question, never a guess.'],
-    ['100%','of missions pass safety and compliance validation before anything flies.'],
+    ['95%','of missions pass safety and compliance validation before anything flies.'],
     ['4+','drone ecosystems: DJI, PX4, ArduPilot, Auterion. One intelligence layer.']
   ];
   const n=document.getElementById('gaN'),l=document.getElementById('gaL');
