@@ -56,9 +56,9 @@ requestAnimationFrame(()=>{document.getElementById('heroH').classList.add('split
     const oc=document.createElement('canvas');oc.width=iw;oc.height=ih;
     const octx=oc.getContext('2d');octx.drawImage(img,0,0);
     const px=octx.getImageData(0,0,iw,ih).data;
-    /* pick a gap that keeps the particle count sane on any screen */
-    let gap=7;const TARGET=innerWidth<820?5200:11500;
-    for(;;){const est=Math.ceil(W/gap)*Math.ceil(H/gap)*.5;if(est<=TARGET||gap>16)break;gap++;}
+    /* fixed gap by breakpoint so dot density stays consistent regardless of
+       viewport height (browser chrome, window size) */
+    const gap=innerWidth<820?9:7;
     parts=[];
     for(let y=gap/2;y<H;y+=gap){
       for(let x=gap/2;x<W;x+=gap){
