@@ -260,6 +260,12 @@ html:has(.menu-ov.open) nav{color:var(--tx-d)}         /* menu overlay is dark â
   .hd-bob,.hd-line.disc,.rotor .blades,.hd-core,.hd-rings .ring,.hd-dot{animation:none}
   .hd-rings{display:none}
 }
+.hero::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+  background-image:radial-gradient(circle,rgba(237,235,228,.14) 0 .55px,transparent .7px);
+  background-size:5px 5px;opacity:.52;
+  -webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 12%,#000 78%,transparent 100%);
+  mask-image:linear-gradient(180deg,transparent 0%,#000 12%,#000 78%,transparent 100%);
+}
 .hero::after{content:"";position:absolute;inset:0;z-index:1;background:radial-gradient(90% 70% at 50% 40%,transparent 40%,var(--hero-vignette) 100%);pointer-events:none}
 .hero-in{position:relative;z-index:2}
 .hero-h{font-size:clamp(44px,min(10.5vw,18vh),164px);color:var(--tx-d);text-align:left;width:fit-content;margin-inline:auto}
