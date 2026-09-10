@@ -530,15 +530,15 @@ html:has(.menu-ov.open) nav{color:var(--tx-d)}         /* menu overlay is dark â
 
 @media(min-width:761px){
   /* Keep a stable stage while the centered feature card expands. */
-  .pmq-view{height:clamp(520px,44vw,650px)}
+  .pmq-view{height:clamp(660px,56vw,780px)}
   .pmq-group{align-items:center}
   .pcard-flip{
-    height:clamp(400px,32vw,500px);
+    height:clamp(440px,34vw,540px);
     transition:height .55s var(--ease),transform .5s var(--ease),border-color .5s,box-shadow .5s var(--ease);
   }
   .pcard-flip.featured,
   .pcard-flip.pmq-hovered{
-    height:clamp(520px,44vw,650px);
+    height:clamp(600px,50vw,720px);
     z-index:2;
   }
   .pcard-flip.featured{
