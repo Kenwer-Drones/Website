@@ -195,10 +195,7 @@ html:has(.menu-ov.open) nav{color:var(--tx-d)}         /* menu overlay is dark â
 .sec-light{background:var(--beige);color:var(--tx-l)}
 
 /* ---------- hero ---------- */
-.hero{position:relative;isolation:isolate;min-height:100svh;display:flex;flex-direction:column;justify-content:center;overflow:hidden;padding-top:96px;background:#F5B3C4;color:#24131A}
-.hero-h{color:#24131A}
-.hero-sub{color:rgba(36,19,26,.68)}
-.hero-h .shine{background:linear-gradient(110deg,#4A1D2B 0%,#4A1D2B 38%,#8C3550 50%,#4A1D2B 62%,#4A1D2B 100%);background-size:240% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.hero{position:relative;isolation:isolate;min-height:100svh;display:flex;flex-direction:column;justify-content:center;overflow:hidden;padding-top:96px}
 /* the image now carries the brainâ†’drone story; the drawn layers stand down (restorable) */
 .hero .hbrain,.hero .hdrone{display:none}
 /* ---------- hero background: giant brain â†’ module install loop ---------- */
@@ -270,9 +267,9 @@ html:has(.menu-ov.open) nav{color:var(--tx-d)}         /* menu overlay is dark â
 .hero-h .w1{font:inherit;font-weight:inherit}
 .hero-h .eyebrow span{
   font-family:'Inter',-apple-system,sans-serif;font-weight:500;text-transform:none;
-  font-size:clamp(18px,min(3.4vw,6vh),54px);letter-spacing:-.01em;word-spacing:.08em;line-height:1.1;
+  font-size:clamp(18px,min(3.4vw,6vh),54px);letter-spacing:-.01em;line-height:1.1;
   padding-block:.06em;
-  margin-bottom:.22em;
+  margin-bottom:.08em;
 }
 .hero-h .mini{
   font-family:'Inter',-apple-system,sans-serif;font-weight:500;font-style:normal;text-transform:none;
