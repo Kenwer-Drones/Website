@@ -1348,7 +1348,7 @@ function skyfield(id,alpha){
       e.preventDefault();
       if(window.Cal&&Cal.ns&&Cal.ns['kenwer-intro-call']){
         Cal.ns['kenwer-intro-call']('modal',{
-          calLink:'kenwer-drones-hhjia7/kenwer-intro-call',
+          calLink:'kenwer-drones/30min',
           config:{layout:'month_view'}
         });
       }else{
