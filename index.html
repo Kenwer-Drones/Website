@@ -47,7 +47,15 @@
   @media(prefers-reduced-motion:reduce){.hero-flight-highlight > .flight-trace-highlight{animation:none}}
 
   .hero-grid-city{opacity:.2}
-  .hero-quad-moving{opacity:0}
+  .hero-window-sparks{fill:#FFFFFF;opacity:.78}
+  .hero-window-sparks circle{animation:heroWindowSpark 4.8s ease-in-out infinite}
+  .hero-window-sparks circle:nth-child(2){animation-delay:.9s}.hero-window-sparks circle:nth-child(3){animation-delay:2.1s}
+  .hero-window-sparks circle:nth-child(4){animation-delay:1.4s}.hero-window-sparks circle:nth-child(5){animation-delay:3.2s}
+  .hero-window-sparks circle:nth-child(6){animation-delay:2.6s}.hero-window-sparks circle:nth-child(7){animation-delay:4s}
+  .hero-window-sparks circle:nth-child(8){animation-delay:1.9s}
+  @keyframes heroWindowSpark{0%,72%,100%{opacity:.08;transform:scale(.7)}78%,86%{opacity:1;transform:scale(1.25)}}
+  @media(prefers-reduced-motion:reduce){.hero-window-sparks circle{animation:none;opacity:.55}}
+  .hero-quad-moving{opacity:.65}
   .hero-rotor{animation:heroRotorSpin .7s linear infinite}
   .hero-quad-static{display:none}
   @keyframes heroRotorSpin{to{transform:rotate(360deg)}}
@@ -82,8 +90,8 @@
 <header class="hero sec-dark" id="top">
   <svg class="hero-dot-scene" viewBox="0 0 1440 810" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
     <defs>
-      <pattern id="heroBuildingGrid" width="28" height="28" patternUnits="userSpaceOnUse">
-        <path d="M0 .5H28M.5 0V28" fill="none" stroke="#EDEBE4" stroke-opacity=".72" stroke-width="1"/>
+      <pattern id="heroBuildingGrid" width="18" height="22" patternUnits="userSpaceOnUse">
+        <path d="M0 .5H18M.5 0V22" fill="none" stroke="#EDEBE4" stroke-opacity=".62" stroke-width=".8"/>
       </pattern>
       <pattern id="heroSceneDots" width="8" height="8" patternUnits="userSpaceOnUse">
         <circle cx="1.35" cy="1.35" r="1.35" fill="#EDEBE4"/>
@@ -115,6 +123,12 @@
       <path style="fill:url(#heroBuildingGrid)" d="M1154 660V214L1228 253V660Z"/>
       <path style="fill:url(#heroBuildingGrid)" d="M1258 660V350H1280V319H1320V350H1340V660Z"/>
       <path style="fill:url(#heroBuildingGrid)" d="M1370 660V298L1422 254 1470 298V660Z"/>
+    </g>
+    <g class="hero-window-sparks" mask="url(#heroSceneMask)">
+      <circle cx="132" cy="392" r="1.8"/><circle cx="248" cy="328" r="1.8"/>
+      <circle cx="463" cy="312" r="1.8"/><circle cx="721" cy="284" r="1.8"/>
+      <circle cx="936" cy="336" r="1.8"/><circle cx="1180" cy="302" r="1.8"/>
+      <circle cx="1296" cy="408" r="1.8"/><circle cx="1404" cy="362" r="1.8"/>
     </g>
 
 
