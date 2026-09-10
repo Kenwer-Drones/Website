@@ -426,7 +426,12 @@ addEventListener('scroll',()=>{
     }
     if(row){                                           /* open → a row navigates, then minimize */
       const sec=document.getElementById(row.dataset.sec);
-      if(sec)sec.scrollIntoView({behavior:'smooth',block:'start'});
+      if(sec){
+        /* The Contact section has generous internal top padding; land inside it so the heading is immediately visible. */
+        const offset=row.dataset.sec==='contact'?130:0;
+        const top=Math.max(0,sec.getBoundingClientRect().top+window.scrollY+offset);
+        window.scrollTo({top,behavior:'smooth'});
+      }
       setOpen(false);
     }else{
       setOpen(false);                                  /* open → clicking the box body closes it */
