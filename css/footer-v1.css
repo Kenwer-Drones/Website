@@ -140,7 +140,7 @@
   display:inline-flex;align-items:center;gap:4px;width:fit-content;
 }
 .footer-col a:hover{opacity:1;transform:translateX(3px)}
-.footer-nav{grid-column:3;grid-row:1;display:flex;justify-content:space-between;gap:24px}
+.footer-nav{grid-column:3;grid-row:1;display:flex;justify-content:flex-end;gap:clamp(28px,3vw,52px)}
 .footer-contact .fb-email{overflow-wrap:anywhere;display:block}
 
 .fb-email{font-size:15px;color:var(--on-bg);opacity:.85;transition:opacity .3s var(--ease)}
