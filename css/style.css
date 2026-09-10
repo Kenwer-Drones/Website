@@ -196,17 +196,6 @@ html:has(.menu-ov.open) nav{color:var(--tx-d)}         /* menu overlay is dark �
 
 /* ---------- hero ---------- */
 .hero{position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:center;overflow:hidden;padding-top:96px}
-/* ---------- hero background: the image, rebuilt from particles ---------- */
-.hero-bg{position:absolute;inset:0;z-index:0;overflow:hidden}
-.hero-bg canvas{position:absolute;inset:0;width:100%;height:100%}
-.hero-bg img{display:none}                                /* pixel source only */
-.hero-bg::after{content:"";position:absolute;inset:0;z-index:2;background:
-  radial-gradient(ellipse 60% 52% at 50% 55%, rgba(12,12,11,.5), rgba(12,12,11,0) 72%),
-  linear-gradient(180deg, rgba(12,12,11,.94), rgba(12,12,11,.28) 24%, rgba(12,12,11,.28) 72%, rgba(12,12,11,.96))}
-@media(prefers-reduced-motion:reduce){
-  .hero-bg canvas{display:none}
-  .hero-bg img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 30%;opacity:.5}
-}
 /* the image now carries the brain→drone story; the drawn layers stand down (restorable) */
 .hero .hbrain,.hero .hdrone{display:none}
 /* ---------- hero background: giant brain → module install loop ---------- */
