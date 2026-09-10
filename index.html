@@ -47,7 +47,7 @@
   @media(prefers-reduced-motion:reduce){.hero-flight-highlight > .flight-trace-highlight{animation:none}}
 
   .hero-grid-city{opacity:.2}
-  .hero-quad-moving{opacity:.65}
+  .hero-quad-moving{opacity:0}
   .hero-rotor{animation:heroRotorSpin .7s linear infinite}
   .hero-quad-static{display:none}
   @keyframes heroRotorSpin{to{transform:rotate(360deg)}}
@@ -82,8 +82,8 @@
 <header class="hero sec-dark" id="top">
   <svg class="hero-dot-scene" viewBox="0 0 1440 810" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
     <defs>
-      <pattern id="heroBuildingGrid" width="18" height="24" patternUnits="userSpaceOnUse">
-        <rect x="3" y="3" width="11" height="16" style="fill:rgba(237,235,228,.12);stroke:#EDEBE4;stroke-opacity:.85;stroke-width:1"/>
+      <pattern id="heroBuildingGrid" width="24" height="24" patternUnits="userSpaceOnUse">
+        <rect x="4" y="4" width="16" height="16" style="fill:rgba(237,235,228,.12);stroke:#EDEBE4;stroke-opacity:.85;stroke-width:1"/>
       </pattern>
       <pattern id="heroSceneDots" width="8" height="8" patternUnits="userSpaceOnUse">
         <circle cx="1.35" cy="1.35" r="1.35" fill="#EDEBE4"/>
@@ -119,7 +119,7 @@
 
 
 
-    <path class="flight-trace" d="M-30 410 C110 412 168 382 214 296 C244 240 280 238 328 254 M430 330 C500 460 572 470 690 408 C746 379 726 438 658 485 C610 518 730 566 948 548 C1055 540 884 626 916 666 C958 716 1196 558 1422 618"/>
+    <path class="flight-trace" d="M-30 410 C110 412 168 382 214 296 C244 240 280 238 328 254 C370 268 404 282 430 330 C500 460 572 470 690 408 C746 379 726 438 658 485 C610 518 730 566 948 548 C1055 540 884 626 916 666 C958 716 1196 558 1422 618"/>
   </svg>
   <svg class="hero-flight-highlight" viewBox="0 0 1440 810" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
     <defs>
@@ -131,9 +131,8 @@
         <stop offset="1" stop-color="#EDEBE4" stop-opacity=".34"/>
       </linearGradient>
     </defs>
-    <path id="heroExistingFlightRoute" class="flight-trace-highlight" d="M-30 410 C110 412 168 382 214 296 C244 240 280 238 328 254 M430 330 C500 460 572 470 690 408 C746 379 726 438 658 485 C610 518 730 566 948 548 C1055 540 884 626 916 666 C958 716 1196 558 1422 618"/>
+    <path id="heroExistingFlightRoute" class="flight-trace-highlight" d="M-30 410 C110 412 168 382 214 296 C244 240 280 238 328 254 C370 268 404 282 430 330 C500 460 572 470 690 408 C746 379 726 438 658 485 C610 518 730 566 948 548 C1055 540 884 626 916 666 C958 716 1196 558 1422 618"/>
       <g class="hero-quad-moving">
-      <animateMotion dur="22s" repeatCount="indefinite" rotate="auto"><mpath href="#heroExistingFlightRoute"/></animateMotion>
       <g fill="#EDEBE4" stroke="#EDEBE4" stroke-width="1.3" stroke-linecap="round">
         <path d="M-12-12L12 12M12-12L-12 12" fill="none"/>
         <g transform="translate(-12 -12)"><circle r="5.5" fill="none"/><g class="hero-rotor"><path d="M-4 0H4M0-4V4"/></g></g><g transform="translate(12 -12)"><circle r="5.5" fill="none"/><g class="hero-rotor"><path d="M-4 0H4M0-4V4"/></g></g><g transform="translate(-12 12)"><circle r="5.5" fill="none"/><g class="hero-rotor"><path d="M-4 0H4M0-4V4"/></g></g><g transform="translate(12 12)"><circle r="5.5" fill="none"/><g class="hero-rotor"><path d="M-4 0H4M0-4V4"/></g></g>
