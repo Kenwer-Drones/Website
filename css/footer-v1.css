@@ -126,7 +126,7 @@
 .foot-pill.ghost:hover{background:#E8E7E1}
 
 /* ---- lower grid: contact + quick nav ---- */
-.footer-contact{grid-column:1;grid-row:1}
+.footer-contact{grid-column:1;grid-row:1;justify-self:end}
 .footer-col{display:flex;flex-direction:column;gap:4px}
 .footer-col h3{
   font-family:'Inter',-apple-system,sans-serif;font-size:20px;font-weight:650;
