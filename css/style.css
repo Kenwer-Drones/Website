@@ -266,17 +266,17 @@ html:has(.menu-ov.open) nav{color:var(--tx-d)}         /* menu overlay is dark â
 }
 .hero::after{content:"";position:absolute;inset:0;z-index:1;background:radial-gradient(90% 70% at 50% 40%,transparent 40%,var(--hero-vignette) 100%);pointer-events:none}
 .hero-in{position:relative;z-index:2}
-.hero-h{font-size:clamp(58px,10.5vw,164px);color:var(--tx-d);text-align:left;width:fit-content;margin-inline:auto}
+.hero-h{font-size:clamp(44px,min(10.5vw,18vh),164px);color:var(--tx-d);text-align:left;width:fit-content;margin-inline:auto}
 .hero-h .eyebrow{text-align:left;padding-left:.03em}
 .hero-h .w1{font:inherit;font-weight:inherit}
 .hero-h .eyebrow span{
   font-family:'Inter',-apple-system,sans-serif;font-weight:500;text-transform:none;
-  font-size:clamp(24px,3.4vw,54px);letter-spacing:-.01em;line-height:1.1;
+  font-size:clamp(18px,min(3.4vw,6vh),54px);letter-spacing:-.01em;line-height:1.1;
   margin-bottom:0;
 }
 .hero-h .mini{
   font-family:'Inter',-apple-system,sans-serif;font-weight:500;font-style:normal;text-transform:none;
-  font-size:clamp(24px,3.4vw,54px);letter-spacing:-.01em;
+  font-size:clamp(18px,min(3.4vw,6vh),54px);letter-spacing:-.01em;
   display:inline-block;margin:0 clamp(10px,1.5vw,30px) 0 clamp(8px,1.1vw,22px);vertical-align:baseline;
 }
 .shine{
