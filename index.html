@@ -48,10 +48,14 @@
   <div class="hero-world-map" aria-hidden="true">
     <svg viewBox="0 0 1440 680" preserveAspectRatio="xMidYMid slice" role="presentation">
       <defs>
+        <pattern id="fieldDots" width="24" height="24" patternUnits="userSpaceOnUse">
+          <circle cx="12" cy="12" r=".55" fill="#FFFFFF"/>
+        </pattern>
         <pattern id="worldDots" width="14" height="14" patternUnits="userSpaceOnUse">
           <circle cx="7" cy="7" r=".75" fill="#FFFFFF"/>
         </pattern>
       </defs>
+      <rect width="1440" height="680" fill="url(#fieldDots)" fill-opacity=".7"/>
       <g class="world-shapes" fill="url(#worldDots)">
         <path d="M70 118l46-44 84-18 81 15 41 34 6 42-31 31-16 57-41 18-13 49-47 28-31-38-48-12-20-53-35-35z"/>
         <path d="M273 40l52-24 55 14 11 30-36 27-53-8z"/>
