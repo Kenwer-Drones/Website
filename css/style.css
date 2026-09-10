@@ -902,6 +902,8 @@ html:has(.menu-ov.open) nav{color:var(--tx-d)}         /* menu overlay is dark â
 .final-h .l2{margin-left:clamp(24px,6vw,120px)}
 .final-h .l3{display:flex;justify-content:center;gap:clamp(12px,2vw,30px)}
 .final .btn-big{margin-top:64px}
+/* Contact ends directly above the footer monument so the statement and 3D mark stay visually connected. */
+#contact{padding-bottom:28px}
 @media(max-width:700px){
   /* size to keep "let's build autonomy" and "that proves â†’ itself" each on
      a single line so mobile mirrors the two-line desktop layout. Anton is
