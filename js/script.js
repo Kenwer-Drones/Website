@@ -982,14 +982,34 @@ function skyfield(id,alpha){
   if(!mq||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
   const view=mq.querySelector('.pmq-view'),track=document.getElementById('pmqTrack');
   const group=track.querySelector('.pmq-group'),fwd=document.getElementById('pmqFwd');
+  const cards=[...group.querySelectorAll('.pcard-flip')];
   let x=0,maxX=0,visible=false,hover=false,focused=false,fast=false,raf=0,last=0,endReached=false;
-  let pointer=null,startX=0,startY=0,startPosition=0,dragging=false,pauseUntil=0;
+  let pointer=null,startX=0,startY=0,startPosition=0,dragging=false,pauseUntil=0,featuredCard=null;
   const SPEED=60; // CSS pixels per second, independent of screen width or refresh rate.
+  function updateFeatured(){
+    if(!cards.length)return;
+    const vr=view.getBoundingClientRect(),mid=vr.left+vr.width/2;
+    let nearest=cards[0],distance=Infinity;
+    cards.forEach(card=>{
+      const cr=card.getBoundingClientRect(),d=Math.abs((cr.left+cr.width/2)-mid);
+      if(d<distance){distance=d;nearest=card;}
+    });
+    if(nearest===featuredCard)return;
+    if(featuredCard)featuredCard.classList.remove('featured');
+    featuredCard=nearest;
+    featuredCard.classList.add('featured');
+  }
+  function focusCard(card){
+    const vr=view.getBoundingClientRect(),cr=card.getBoundingClientRect();
+    x+=(cr.left+cr.width/2)-(vr.left+vr.width/2);
+    endReached=false;pauseUntil=performance.now()+1800;paint();
+  }
   function paint(){
     const reachedEnd=maxX>0&&x>=maxX-.5;
     x=Math.max(0,Math.min(maxX,x));
     if(reachedEnd)endReached=true;
     track.style.transform='translate3d('+(-x).toFixed(3)+'px,0,0)';
+    updateFeatured();
   }
   function measure(){
     // Use the track's untransformed scroll width; Safari can misreport a flex group's offsetWidth at the end.
@@ -1009,7 +1029,15 @@ function skyfield(id,alpha){
   if(matchMedia('(hover:hover) and (pointer:fine)').matches){
     mq.addEventListener('mouseenter',()=>{hover=true;});
     mq.addEventListener('mouseleave',()=>{hover=false;});
+    cards.forEach(card=>{
+      card.addEventListener('pointerenter',()=>card.classList.add('pmq-hovered'));
+      card.addEventListener('pointerleave',()=>card.classList.remove('pmq-hovered'));
+    });
   }
+  cards.forEach(card=>card.addEventListener('click',e=>{
+    if(e.target.closest('a,button'))return;
+    focusCard(card);
+  }));
   mq.addEventListener('focusin',()=>{focused=true;});
   mq.addEventListener('focusout',e=>{focused=mq.contains(e.relatedTarget);});
   view.tabIndex=0;
