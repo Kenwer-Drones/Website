@@ -979,7 +979,7 @@ function skyfield(id,alpha){
   const group=track.querySelector('.pmq-group'),fwd=document.getElementById('pmqFwd');
   let x=0,maxX=0,visible=false,hover=false,focused=false,fast=false,raf=0,last=0;
   let pointer=null,startX=0,startY=0,startPosition=0,dragging=false,pauseUntil=0;
-  const SPEED=36; // CSS pixels per second, independent of screen width or refresh rate.
+  const SPEED=48; // CSS pixels per second, independent of screen width or refresh rate.
   function paint(){
     x=Math.max(0,Math.min(maxX,x));
     track.style.transform='translate3d('+(-x).toFixed(3)+'px,0,0)';
