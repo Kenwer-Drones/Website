@@ -455,7 +455,8 @@ html:has(.menu-ov.open) nav{color:var(--tx-d)}         /* menu overlay is dark â
 .pmq-view{
   position:relative;
   overflow:hidden;
-  perspective:1400px;              /* gives the overstretch lean its 3D depth */
+  isolation:isolate;
+  overscroll-behavior-x:none;
   touch-action:pan-y;              /* horizontal swipes drag the track, vertical still scrolls page */
   cursor:grab;
   -webkit-user-select:none;user-select:none;
@@ -500,7 +501,7 @@ html:has(.menu-ov.open) nav{color:var(--tx-d)}         /* menu overlay is dark â
 }
 .pmq-fwd.off{opacity:0;pointer-events:none;transition:opacity .5s var(--ease)}
 .pmq-track{display:flex;width:max-content;will-change:transform}
-.pmq-group{display:flex;gap:26px;padding-right:26px}
+.pmq-group{display:flex;flex:none;gap:26px;padding-right:26px}
 .pmq-fwd{
   position:absolute;right:clamp(12px,2vw,34px);top:50%;transform:translateY(-50%);z-index:6;
   width:52px;height:52px;border-radius:50%;cursor:pointer;
@@ -681,7 +682,8 @@ html:has(.menu-ov.open) nav{color:var(--tx-d)}         /* menu overlay is dark â
   .fb-motes{display:none}
 }
 @media(prefers-reduced-motion:reduce){
-  .pmq-track{flex-wrap:wrap;justify-content:center;transform:none!important}
+  .pmq-track{width:100%;transform:none!important}
+  .pmq-group{width:100%;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));padding:0 16px;box-sizing:border-box}
   .pmq-group:nth-child(2){display:none}
   .pmq-end{display:none}
   .pmq-fwd{display:none}
