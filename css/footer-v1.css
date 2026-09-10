@@ -10,7 +10,7 @@
   display:grid;
   grid-template-columns:minmax(0,1fr) minmax(320px,1.3fr) minmax(0,1fr);
   column-gap:clamp(24px,3vw,56px);
-  align-items:end;
+  align-items:center;
   --on-bg:#F5F3CF;
   --on-bg-mut:#CCCAB1;
   --line:rgba(245,243,207,.15);
