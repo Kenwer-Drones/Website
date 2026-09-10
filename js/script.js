@@ -977,23 +977,25 @@ function skyfield(id,alpha){
   if(!mq||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
   const view=mq.querySelector('.pmq-view'),track=document.getElementById('pmqTrack');
   const group=track.querySelector('.pmq-group'),fwd=document.getElementById('pmqFwd');
-  let x=0,maxX=0,visible=false,hover=false,focused=false,fast=false,raf=0,last=0;
+  let x=0,maxX=0,visible=false,hover=false,focused=false,fast=false,raf=0,last=0,endReached=false;
   let pointer=null,startX=0,startY=0,startPosition=0,dragging=false,pauseUntil=0;
-  const SPEED=48; // CSS pixels per second, independent of screen width or refresh rate.
+  const SPEED=60; // CSS pixels per second, independent of screen width or refresh rate.
   function paint(){
+    const reachedEnd=maxX>0&&x>=maxX-.5;
     x=Math.max(0,Math.min(maxX,x));
+    if(reachedEnd)endReached=true;
     track.style.transform='translate3d('+(-x).toFixed(3)+'px,0,0)';
   }
   function measure(){
-    // Measure the untransformed layout, not Safari's transformed overflow bounds.
-    maxX=Math.max(0,group.offsetWidth-view.clientWidth);
+    // Use the track's untransformed scroll width; Safari can misreport a flex group's offsetWidth at the end.
+    maxX=Math.max(0,track.scrollWidth-view.clientWidth);
     paint();
   }
   function frame(ts){
     raf=0;
     if(!visible||document.hidden){last=0;return;}
     const dt=last?Math.min((ts-last)/1000,.05):0;last=ts;
-    if(pointer===null&&(!hover&&!focused||fast)&&ts>=pauseUntil){
+    if(!endReached&&pointer===null&&(!hover&&!focused||fast)&&ts>=pauseUntil){
       x+=SPEED*(fast?3:1)*dt;paint();
     }
     raf=requestAnimationFrame(frame);
@@ -1008,6 +1010,7 @@ function skyfield(id,alpha){
   view.tabIndex=0;
   view.addEventListener('keydown',e=>{
     if(e.target!==view)return;
+    endReached=false;
     if(e.key==='ArrowRight')x+=240;
     else if(e.key==='ArrowLeft')x-=240;
     else if(e.key==='Home')x=0;
@@ -1017,7 +1020,7 @@ function skyfield(id,alpha){
   });
   view.addEventListener('pointerdown',e=>{
     if(e.button!==0||pointer!==null||e.target.closest('button,a'))return;
-    pointer=e.pointerId;startX=e.clientX;startY=e.clientY;startPosition=x;dragging=false;
+    endReached=false;pointer=e.pointerId;startX=e.clientX;startY=e.clientY;startPosition=x;dragging=false;
   });
   view.addEventListener('pointermove',e=>{
     if(e.pointerId!==pointer)return;
@@ -1042,6 +1045,7 @@ function skyfield(id,alpha){
   view.addEventListener('wheel',e=>{
     if(Math.abs(e.deltaX)<=Math.abs(e.deltaY))return;
     e.preventDefault();
+    endReached=false;
     x+=e.deltaX*(e.deltaMode===1?16:e.deltaMode===2?view.clientWidth:1);
     pauseUntil=performance.now()+1800;paint();
   },{passive:false});
