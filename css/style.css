@@ -528,6 +528,24 @@ html:has(.menu-ov.open) nav{color:var(--tx-d)}         /* menu overlay is dark â
 .pcard .desc{margin-top:11px;color:var(--mut-l);font-size:14.5px;line-height:1.6;max-width:none}
 .pcard .fact{margin-top:14px}
 
+@media(min-width:761px){
+  /* Keep a stable stage while the centered feature card expands. */
+  .pmq-view{height:clamp(520px,44vw,650px)}
+  .pmq-group{align-items:center}
+  .pcard-flip{
+    height:clamp(400px,32vw,500px);
+    transition:height .55s var(--ease),transform .5s var(--ease),border-color .5s,box-shadow .5s var(--ease);
+  }
+  .pcard-flip.featured,
+  .pcard-flip.pmq-hovered{
+    height:clamp(520px,44vw,650px);
+    z-index:2;
+  }
+  .pcard-flip.featured{
+    box-shadow:0 20px 54px -28px rgba(0,0,0,.48);
+  }
+}
+
 /* ===== card 04: 3D flip â†’ exploded cognitive-identity stack =====
    Front face carries the card chrome (border, padding) so the whole card
    appears to rotate. Back face is a full-bleed dark scene. The stack starts
