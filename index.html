@@ -45,6 +45,15 @@
   .hero-in{z-index:3}
   @media(max-width:700px){.hero-flight-highlight{width:150%;left:-25%}}
   @media(prefers-reduced-motion:reduce){.hero-flight-highlight path{animation:none}}
+
+  .hero-grid-city{opacity:.2}
+  .hero-drone-route{position:absolute;top:86px;left:0;width:100%;height:clamp(90px,11vw,150px);z-index:2;pointer-events:none;overflow:visible}
+  .hero-quad-moving{opacity:.65}
+  .hero-rotor{animation:heroRotorSpin .7s linear infinite}
+  .hero-quad-static{display:none}
+  @keyframes heroRotorSpin{to{transform:rotate(360deg)}}
+  @media(max-width:700px){.hero-grid-city{opacity:.16}.hero-drone-route{top:82px}}
+  @media(prefers-reduced-motion:reduce){.hero-quad-moving{display:none}.hero-quad-static{display:block;opacity:.65}.hero-rotor{animation:none}}
 </style>
 </head>
 <body>
@@ -74,6 +83,9 @@
 <header class="hero sec-dark" id="top">
   <svg class="hero-dot-scene" viewBox="0 0 1440 810" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
     <defs>
+      <pattern id="heroBuildingGrid" width="16" height="22" patternUnits="userSpaceOnUse">
+        <path d="M16 0H0V22" fill="none" stroke="#EDEBE4" stroke-opacity=".5" stroke-width=".8"/>
+      </pattern>
       <pattern id="heroSceneDots" width="8" height="8" patternUnits="userSpaceOnUse">
         <circle cx="1.35" cy="1.35" r="1.35" fill="#EDEBE4"/>
       </pattern>
@@ -90,9 +102,20 @@
 
     <rect class="dot-field" width="1440" height="680" fill="url(#heroSceneDots)" mask="url(#heroSceneMask)"/>
 
-    <g class="dot-city" fill="url(#heroSceneDots)" mask="url(#heroSceneMask)">
-      <path d="M0 620V330h66v290zm78 0V278h72v342zm88 0V360h58v260zm74 0V235h98v385zm112 0V306h68v314zm82 0V168h118v452zm132 0V255h82v365zm96 0V116h128v504zm144 0V220h70v400zm86 0V302h96v318zm112 0V192h88v428zm104 0V268h72v352zm88 0V145h110v475z"/>
-      <path d="M48 360h22v40H48zm52-48h28v58h-28zm192-42h22v70h-22zm174-58h28v62h-28zm46 18h21v92h-21zm196-62h26v76h-26zm42-25h30v104h-30zm274 96h25v72h-25zm138-18h31v92h-31zm184-28h26v84h-26z" opacity=".7"/>
+    <g class="hero-grid-city" mask="url(#heroSceneMask)" fill="url(#heroBuildingGrid)" stroke="#EDEBE4" stroke-width="1">
+      <path d="M-20 660V382L34 343 85 382V660Z"/>
+      <path d="M100 660V315H122V281H163V315H187V660Z"/>
+      <path d="M217 660V240L248 205 282 240V660Z"/>
+      <path d="M312 660V367Q355 316 398 367V660Z"/>
+      <path d="M430 660V259H450V224H482V194H506V224H528V660Z"/>
+      <path d="M568 660V330L652 295V660Z"/>
+      <path d="M694 660V214L724 156 754 214V660Z"/>
+      <path d="M788 660V328Q828 271 868 328V660Z"/>
+      <path d="M902 660V248H924V212H970V248H990V660Z"/>
+      <path d="M1024 660V358L1072 319 1120 358V660Z"/>
+      <path d="M1154 660V214L1228 253V660Z"/>
+      <path d="M1258 660V350H1280V319H1320V350H1340V660Z"/>
+      <path d="M1370 660V298L1422 254 1470 298V660Z"/>
     </g>
 
 
@@ -111,16 +134,20 @@
     </defs>
     <path class="flight-trace-highlight" d="M-30 410 C110 412 168 382 214 296 C244 240 280 238 328 254 M430 330 C500 460 572 470 690 408 C746 379 726 438 658 485 C610 518 730 566 948 548 C1055 540 884 626 916 666 C958 716 1196 558 1422 618"/>
   </svg>
-  <svg class="hero-drone-detail" viewBox="0 0 280 90" aria-hidden="true">
-    <defs><pattern id="heroDroneDots" width="8" height="8" patternUnits="userSpaceOnUse"><circle cx="1.35" cy="1.35" r="1.35" fill="#EDEBE4"/></pattern></defs>
-    <g class="dot-drone" transform="translate(140 45)" fill="url(#heroDroneDots)">
-      <path d="M-66-12h42l14-17h20l14 17h42v24H24L10 29h-20L-24 12h-42z"/>
-      <ellipse cx="-72" cy="-20" rx="48" ry="8"/>
-      <ellipse cx="72" cy="-20" rx="48" ry="8"/>
-      <ellipse cx="-66" cy="22" rx="42" ry="7"/>
-      <ellipse cx="66" cy="22" rx="42" ry="7"/>
-      <rect x="-15" y="-17" width="30" height="34" rx="8"/>
-      <circle cx="0" cy="22" r="8"/>
+  <svg class="hero-drone-route" viewBox="0 0 1440 160" aria-hidden="true">
+    <defs><path id="heroQuadRoute" d="M230 92C330 20 455 30 540 74S748 133 855 74S1060 32 1190 90"/></defs>
+    <use href="#heroQuadRoute" fill="none" stroke="#EDEBE4" stroke-opacity=".17" stroke-width="1" stroke-dasharray="5 9"/>
+    <g class="hero-quad-moving">
+      <animateMotion dur="22s" repeatCount="indefinite" rotate="auto"><mpath href="#heroQuadRoute"/></animateMotion>
+      <g fill="#EDEBE4" stroke="#EDEBE4" stroke-width="1.3" stroke-linecap="round">
+        <path d="M-12-12L12 12M12-12L-12 12" fill="none"/>
+        <g transform="translate(-12 -12)"><circle r="5.5" fill="none"/><g class="hero-rotor"><path d="M-4 0H4M0-4V4"/></g></g><g transform="translate(12 -12)"><circle r="5.5" fill="none"/><g class="hero-rotor"><path d="M-4 0H4M0-4V4"/></g></g><g transform="translate(-12 12)"><circle r="5.5" fill="none"/><g class="hero-rotor"><path d="M-4 0H4M0-4V4"/></g></g><g transform="translate(12 12)"><circle r="5.5" fill="none"/><g class="hero-rotor"><path d="M-4 0H4M0-4V4"/></g></g>
+        <rect x="-4" y="-5" width="8" height="10" rx="2"/>
+      </g>
+    </g>
+    <g class="hero-quad-static" transform="translate(350 49)" fill="none" stroke="#EDEBE4" stroke-width="1.3">
+      <path d="M-12-12L12 12M12-12L-12 12"/>
+      <circle cx="-12" cy="-12" r="5.5"/><circle cx="12" cy="-12" r="5.5"/><circle cx="-12" cy="12" r="5.5"/><circle cx="12" cy="12" r="5.5"/><rect x="-4" y="-5" width="8" height="10" rx="2"/>
     </g>
   </svg>
   <!-- ============ hero background: a piece of the brain, modified and installed into the drone ============ -->
