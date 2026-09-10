@@ -126,7 +126,7 @@
 .foot-pill.ghost:hover{background:#E8E7E1}
 
 /* ---- lower grid: contact + quick nav ---- */
-.footer-contact{grid-column:1;grid-row:1;justify-self:end}
+.footer-contact{grid-column:1;grid-row:1}
 .footer-col{display:flex;flex-direction:column;gap:4px}
 .footer-col h3{
   font-family:'Inter',-apple-system,sans-serif;font-size:20px;font-weight:650;
@@ -180,7 +180,7 @@
   .footer-panel{grid-template-columns:1fr 1fr;gap:40px 24px;padding:82px 24px 24px}
   .footer-center{grid-column:1/-1;grid-row:1}
   .footer-panel>.footer-emblem{width:150px;height:150px;top:-75px}
-  .footer-contact{grid-column:1;grid-row:2;align-self:start;justify-self:start}
+  .footer-contact{grid-column:1;grid-row:2;align-self:start}
   .footer-nav{grid-column:2;grid-row:2;gap:24px;align-self:start}
   .footer-col a{font-size:13px;min-height:30px}
   .fb-social a{min-width:44px;min-height:44px;justify-content:center}
@@ -189,7 +189,7 @@
 }
 @media(max-width:600px){
   .footer-panel{grid-template-columns:1fr}
-  .footer-contact{grid-column:1;grid-row:2;justify-self:start}
+  .footer-contact{grid-column:1;grid-row:2}
   .footer-nav{grid-column:1;grid-row:3;justify-content:flex-start;gap:48px}
 }
 
