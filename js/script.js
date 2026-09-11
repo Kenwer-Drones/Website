@@ -203,7 +203,7 @@ tick();setInterval(tick,1000);
   const svg=document.getElementById('flowSvg');if(!svg)return;
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const VB_W=1400;
-  const baseY=55,amp=22; /* centered in the short band between the logo and heading */
+  const baseY=62,amp=14; /* centered in the short band between the logo and heading */
   const LS_KEY='kenwerFooterFlowLift';
   const LIFT_MIN=-30,LIFT_MAX=30;
   let lift=0;
