@@ -1346,6 +1346,7 @@ function skyfield(id,alpha){
     if(!btn)return;
     btn.addEventListener('click',function(e){
       e.preventDefault();
+      if(window.initKenwerBooking)window.initKenwerBooking();
       if(window.Cal&&Cal.ns&&Cal.ns['kenwer-intro-call']){
         Cal.ns['kenwer-intro-call']('modal',{
           calLink:'kenwer-drones/30min',

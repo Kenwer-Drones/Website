@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kenwer Mission Intelligence for Autonomous Drones</title>
 <link rel="canonical" href="https://www.kenwerdrones.com/">
-<link rel="icon" href="/favicon.ico" type="image/x-icon">
-<link rel="alternate icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="/favicon.png">
+<link rel="icon" href="/favicon.ico?v=kenwer-black-2" type="image/x-icon">
+<link rel="alternate icon" href="/favicon.svg?v=kenwer-black-2" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/favicon.png?v=kenwer-black-2">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.kenwerdrones.com/">
 <meta property="og:title" content="Kenwer Mission Intelligence for Autonomous Drones">
@@ -39,9 +39,13 @@
 <link rel="stylesheet" href="css/footer-v1.css?v=flight-paths-quad-2">
 <script type="text/javascript">
   (function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if(typeof namespace === "string"){cal.ns[namespace] = cal.ns[namespace] || api;p(cal.ns[namespace], ar);p(cal, ["initNamespace", namespace]);} else p(cal, ar); return;} p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
-  Cal("init", "kenwer-intro-call", {origin:"https://cal.com"});
-  Cal.ns["kenwer-intro-call"]("ui", {"styles":{"branding":{"brandColor":"#111310"}},"hideEventTypeDetails":false,"layout":"month_view"});
-  Cal.ns["kenwer-intro-call"]("preload", {calLink:"kenwer-drones/30min"});
+  // Load the booking service only when a visitor requests a call.
+  window.initKenwerBooking = function () {
+    if (window.kenwerBookingStarted) return;
+    window.kenwerBookingStarted = true;
+    Cal("init", "kenwer-intro-call", {origin:"https://cal.com"});
+    Cal.ns["kenwer-intro-call"]("ui", {"styles":{"branding":{"brandColor":"#111310"}},"hideEventTypeDetails":false,"layout":"month_view"});
+  };
 </script>
 <style>
   /* Hero dotted scene: code-built city, drone, and flight path */
@@ -1982,8 +1986,8 @@
   <div class="vp"><i id="vpBar"></i></div>
 </aside>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="js/script.js?v=footer-flow-1"></script>
+<script src="js/vendor/supabase.min.js?v=20260913"></script>
+<script src="js/script.js?v=lazy-booking-2"></script>
 <script src="js/footer-model-v3.js?v=slow-revolution-1"></script>
 </body>
 </html>
