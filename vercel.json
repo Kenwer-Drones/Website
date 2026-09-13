@@ -5,15 +5,15 @@
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "no-store, max-age=0"
+          "value": "public, max-age=3600, must-revalidate"
         },
         {
           "key": "CDN-Cache-Control",
-          "value": "no-store"
+          "value": "public, max-age=3600, must-revalidate"
         },
         {
           "key": "Vercel-CDN-Cache-Control",
-          "value": "no-store"
+          "value": "public, max-age=3600, must-revalidate"
         }
       ]
     }
