@@ -43,10 +43,17 @@
   /* ---------------------------------------------------------
      Palette, tied to the site's brand tokens
      --------------------------------------------------------- */
-  var SKY_TOP = [9, 9, 8];
-  var SKY_LOW = [20, 20, 18];
-  var FOG = [10, 10, 9];
-  var BEIGE = [237, 235, 228];
+  // Brand surfaces only: page base, raised base, off-white. Every tone in
+  // the scene is a mix of these three, so the simulator sits on the same
+  // palette as the rest of the site.
+  var BLACK = [12, 12, 11];        // --black  #0C0C0B
+  var RAISE = [26, 26, 24];        // --raise  #1A1A18
+  var BEIGE = [237, 235, 228];     // --tx-d   #EDEBE4
+  // Materials are the one place the scene leaves the brand palette: solar
+  // glass is blue because it is blue, turbine blades are near white, and
+  // conductors are bare aluminium. The chrome around them stays on brand.
+  var SKYSHEEN = [104, 136, 190];
+  var FOG = BLACK;   // replaced per scene in load()
   var ALERT = [226, 85, 63];
   var COG = [176, 139, 232];
 
@@ -60,8 +67,8 @@
   // Radiometric ramp, kept inside the brand palette so only a real defect
   // carries hue.
   var RAMP = [
-    [0.00, [26, 26, 24]], [0.40, [70, 68, 62]], [0.70, [143, 141, 133]],
-    [0.88, [222, 220, 212]], [1.00, ALERT]
+    [0.00, RAISE], [0.40, [68, 67, 63]], [0.70, [142, 140, 134]],
+    [0.88, [220, 218, 212]], [1.00, ALERT]
   ];
   function thermal(t) {
     t = t < 0 ? 0 : t > 1 ? 1 : t;
@@ -267,11 +274,11 @@
             return [ox + q[0], LEG + PL / 2 * sinT - q[1] * sinT, oz + q[1] * cosT];
           });
         face(quad, 'panel', {
-          base: [26, 32, 44], gloss: 0.85, hot: hot,
+          base: [24, 34, 58], gloss: 0.9, hot: hot,
           temp: hot ? 1 : 0.26 + noise(k) * 0.12,
           tag: hot ? 'anomaly' : null
         });
-        if (hot) { S.anomaly = quad; S.ghost = quad.map(function (p) { return [p[0] - DX * 3.4, p[1], p[2] - DZ * 1.9]; }); }
+        if (hot) { S.anomaly = quad; S.ghost = quad.map(function (p) { return [p[0] - DX * 1.1, p[1], p[2] + DZ * 2.3]; }); }
 
         // frame + legs give the array physical presence
         edge([ox - PW / 2, LEG + PL / 2 * sinT + PL / 2 * sinT, oz - PL / 2 * cosT],
@@ -291,7 +298,7 @@
               [ex + PW / 2, LEG + PL / 2 * sinT + PL / 2 * sinT, ez - PL / 2 * cosT],
               [ex + PW / 2, LEG, ez + PL / 2 * cosT],
               [ex - PW / 2, LEG, ez + PL / 2 * cosT]],
-             'panel', { base: [26, 32, 44], gloss: 0.6, temp: 0.26 + noise(er * 40 + ec) * 0.1 });
+             'panel', { base: [24, 34, 58], gloss: 0.7, temp: 0.26 + noise(er * 40 + ec) * 0.1 });
         edge([ex, 0, ez], [ex, LEG, ez], { alpha: 0.16, w: 1.5 });
       }
     }
@@ -340,18 +347,18 @@
       face([[cx + q[0] * TB, 0, cz + q[1] * TB], [cx + q[2] * TB, 0, cz + q[3] * TB],
             [cx + q[2] * TT, HUB[1] - 60 * k, cz + q[3] * TT],
             [cx + q[0] * TT, HUB[1] - 60 * k, cz + q[1] * TT]],
-           'metal', { base: opts.base || [58, 58, 54] });
+           'metal', { base: opts.base || [168, 168, 164] });
     });
 
     // nacelle
     [-1, 1].forEach(function (sg) {
       face([[cx - 70 * k, HUB[1] - NA, cz + sg * NA], [cx + 78 * k, HUB[1] - NA, cz + sg * NA],
             [cx + 78 * k, HUB[1] + NA, cz + sg * NA], [cx - 70 * k, HUB[1] + NA, cz + sg * NA]],
-           'metal', { base: opts.nac || [66, 66, 61] });
+           'metal', { base: opts.nac || [178, 178, 174] });
     });
     face([[cx - 70 * k, HUB[1] + NA, cz - NA], [cx + 78 * k, HUB[1] + NA, cz - NA],
           [cx + 78 * k, HUB[1] + NA, cz + NA], [cx - 70 * k, HUB[1] + NA, cz + NA]],
-         'metal', { base: opts.top || [104, 104, 98] });
+         'metal', { base: opts.top || [196, 196, 192] });
 
     // hub spinner, so the three blades visibly meet at one point
     var HZ = cz - 62 * k, HR = 34 * k, spin = [];
@@ -359,7 +366,7 @@
       var ha = (h / 10) * Math.PI * 2;
       spin.push([cx + Math.cos(ha) * HR, HUB[1] + Math.sin(ha) * HR, HZ - 6 * k]);
     }
-    face(spin, 'metal', { base: opts.hub || [120, 120, 112] });
+    face(spin, 'metal', { base: opts.hub || [186, 186, 182] });
 
     // three blades, 120 degrees apart, tapered root to tip
     [-118, 2, 122].forEach(function (deg, bi) {
@@ -376,7 +383,7 @@
           [p1[0] - nx * w1, p1[1] - ny * w1, HZ], [p0[0] - nx * w0, p0[1] - ny * w0, HZ]
         ];
         face(quad, 'panel', {
-          base: opts.blade || [86, 86, 81], gloss: 0.35, hot: hot,
+          base: opts.blade || [206, 206, 202], gloss: 0.3, hot: hot,
           temp: hot ? 1 : 0.24 + noise(bi * 9 + sg) * 0.1
         });
         if (hot) anomaly = quad;
@@ -387,14 +394,14 @@
 
   SCENES.wind = function () {
     S.anomaly = turbine(0, 0, 1, { anomaly: true });
-    S.ghost = S.anomaly.map(function (p) { return [p[0] - 150, p[1] - 230, p[2]]; });
+    S.ghost = S.anomaly.map(function (p) { return [p[0] + 90, p[1] - 330, p[2]]; });
 
     // the rest of the farm: the same machine, seen small and hazy
     [[-1900, -2100, 0.62], [1500, -1900, 0.70], [2700, -1150, 0.52],
      [-2700, -1400, 0.46]].forEach(function (t) {
       turbine(t[0], t[1], t[2], {
-        base: [40, 44, 44], nac: [44, 48, 48], top: [56, 60, 60],
-        hub: [58, 62, 62], blade: [54, 58, 58]
+        base: [118, 118, 116], nac: [126, 126, 124], top: [138, 138, 136],
+        hub: [132, 132, 130], blade: [146, 146, 144]
       });
     });
 
@@ -419,7 +426,7 @@
     [[-1, -1, 1, -1], [1, -1, 1, 1], [1, 1, -1, 1], [-1, 1, -1, -1]].forEach(function (q) {
       face([[tx + q[0] * bw, 0, q[1] * bw], [tx + q[2] * bw, 0, q[3] * bw],
             [tx + q[2] * tw, TOP, q[3] * tw], [tx + q[0] * tw, TOP, q[1] * tw]],
-           'metal', { base: opts.base || [52, 52, 48] });
+           'metal', { base: opts.base || [104, 107, 112] });
     });
     for (var i = 0; i < 7; i++) {
       var y0 = i * TOP / 7, y1 = (i + 1) * TOP / 7;
@@ -431,7 +438,7 @@
     [TOP - 60 * k, TOP - 190 * k].forEach(function (ay) {
       face([[tx - 230 * k, ay + 9 * k, -9 * k], [tx + 230 * k, ay + 9 * k, -9 * k],
             [tx + 230 * k, ay - 9 * k, 9 * k], [tx - 230 * k, ay - 9 * k, 9 * k]],
-           'metal', { base: opts.arm || [62, 62, 58] });
+           'metal', { base: opts.arm || [116, 119, 124] });
     });
   }
 
@@ -441,7 +448,7 @@
     for (var i = 0; i <= N; i++) {
       var t = i / N;
       var p = [x0 + (x1 - x0) * t, yTop - Math.sin(t * Math.PI) * 210 * k, zOff];
-      if (prev) edge(prev, p, { alpha: alpha === undefined ? 0.5 : alpha, w: 2 });
+      if (prev) edge(prev, p, { col: [150, 154, 160], alpha: alpha === undefined ? 0.75 : alpha, w: 2.2 });
       prev = p;
     }
   }
@@ -464,15 +471,15 @@
       var a2 = pts[q], b2 = pts[q + 1], hot = (q === 12);
       var quad = [[a2[0], a2[1] + 19, -19], [b2[0], b2[1] + 19, -19],
                   [b2[0], b2[1] - 19, 19], [a2[0], a2[1] - 19, 19]];
-      face(quad, 'panel', { base: [62, 62, 58], gloss: 0.3, hot: hot, temp: hot ? 1 : 0.27 + noise(q) * 0.09 });
-      if (hot) { S.anomaly = quad; S.ghost = quad.map(function (p) { return [p[0] - 70, p[1] - 300, p[2]]; }); }
+      face(quad, 'panel', { base: [138, 142, 148], gloss: 0.45, hot: hot, temp: hot ? 1 : 0.27 + noise(q) * 0.09 });
+      if (hot) { S.anomaly = quad; S.ghost = quad.map(function (p) { return [p[0] + 80, p[1] - 300, p[2]]; }); }
     }
 
     // the circuit continuing over the ridge, still strung together
     var chain = [[950, 1], [1900, 0.74], [2650, 0.55], [3250, 0.42]];
     for (var c = 1; c < chain.length; c++) {
       var kk = chain[c][1], kAvg = (chain[c - 1][1] + kk) / 2;
-      pylon(chain[c][0], kk, { base: [38, 36, 33], arm: [44, 42, 39], brace: 0.2 });
+      pylon(chain[c][0], kk, { base: [72, 74, 78], arm: [80, 82, 86], brace: 0.24 });
       [[-230, 820 * kAvg - 60], [0, 820 * kAvg - 190], [230, 820 * kAvg - 60]].forEach(function (ph) {
         conductor(chain[c - 1][0], chain[c][0], ph[0] * kAvg, ph[1], kAvg, 0.28);
       });
@@ -553,7 +560,7 @@
     // glossy panels pick up a cool sky bounce
     if (fc.gloss && !S.flags.thermal) {
       var spec = Math.pow(Math.max(0, dot(norm([n[0] + SUN[0], n[1] + SUN[1], n[2] + SUN[2]]), [-viewDir[0], -viewDir[1], -viewDir[2]])), 22);
-      col = mix(col, [150, 168, 200], fc.gloss * 0.18 + spec * fc.gloss * 0.5);
+      col = mix(col, SKYSHEEN, fc.gloss * 0.2 + spec * fc.gloss * 0.6);
     }
     return col;
   }
@@ -597,6 +604,9 @@
 
   // Each site gets its own landscape: arid flats for the solar farm, a damp
   // coastal upland for the turbine, a dry ridge corridor for the powerline.
+  // Each site gets its own light. Arid warmth over the solar farm, a damp
+  // cool coast for the turbine, low dry sun on the powerline ridge. The UI
+  // chrome stays on the brand palette; the world does not have to.
   var ENV = {
     solar: {
       sky: ['rgb(7,7,8)', 'rgb(18,17,17)', 'rgb(38,33,29)', 'rgb(72,60,47)'],
@@ -992,8 +1002,8 @@
       // bay floor and four rim walls, leaving the bay itself open so the
       // aircraft inside is visible once the doors retract
       solid(boxFaces(d[0], 7, d[2], W, 7, L), [30, 30, 28]);
-      solid(boxFaces(d[0] - W + TW, H / 2, d[2], TW, H / 2, L), [58, 58, 54]);
-      solid(boxFaces(d[0] + W - TW, H / 2, d[2], TW, H / 2, L), [58, 58, 54]);
+      solid(boxFaces(d[0] - W + TW, H / 2, d[2], TW, H / 2, L), [46, 46, 43]);
+      solid(boxFaces(d[0] + W - TW, H / 2, d[2], TW, H / 2, L), [46, 46, 43]);
       solid(boxFaces(d[0], H / 2, d[2] - L + TW, W, H / 2, TW), [52, 52, 48]);
       solid(boxFaces(d[0], H / 2, d[2] + L - TW, W, H / 2, TW), [64, 64, 60]);
 
@@ -1161,7 +1171,7 @@
       var fog = fogAmount(z);
       col = mix(col, FOG, fog);
       var colB = fc.kind === 'panel' && !S.flags.thermal
-        ? mix(col, [96, 118, 156], 0.42)
+        ? mix(col, SKYSHEEN, 0.4)
         : mix(col, [0, 0, 0], 0.22);
       items.push({ z: z, draw: function () {
         drawPolyGrad(ctx, s, col, colB, 1, rgb(BEIGE, 0.08 * (1 - fog)));
@@ -1245,6 +1255,10 @@
       var built = (SCENES[key] || SCENES.solar)();
       S.ground = built.ground;
       S.site = built.site || { halfX: 900, halfZ: 700 };
+      // distant geometry fades into the same air the sky is made of
+      var env = ENV[key] || ENV.solar;
+      var m = /rgb\((\d+),\s*(\d+),\s*(\d+)\)/.exec(env.ground[1]);
+      FOG = m ? [+m[1], +m[2], +m[3]] : BLACK;
       S.shots = built.shots;
       S.wide = built.wide || built.shots[2];
       S.cam = S.wide;
