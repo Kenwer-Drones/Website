@@ -1,5 +1,5 @@
 /* ============================================================
-   Kenwer, Autonomous Mission Simulator
+   Kenwer, Mission Simulator
    ------------------------------------------------------------
    A scroll-driven state machine over a tactical HUD.
 
@@ -85,7 +85,7 @@
       '</g>';
   }
 
-  // Drone-in-a-box pad, drawn around the origin and translated onto the
+  // Docking pad, drawn around the origin and translated onto the
   // start of the flight path once the path is measurable.
   function dockSvg() {
     var locks = [[-46, -30], [46, -30], [-46, 30], [46, 30]].map(function (p) {
@@ -108,192 +108,10 @@
       '</g>';
   }
 
-  // Wraps per-scenario geometry in the layers every scene needs.
-  // The scene is authored in a 1280x520 box, a wide format that matches the
-  // shape of the centred stage so nothing has to be cropped or letterboxed.
-  function assemble(parts) {
-    var wp = (parts.waypoints || []).map(function (p) {
-      return '<circle class="wp" cx="' + p[0] + '" cy="' + p[1] + '" r="2.6"/>' +
-             '<circle class="wp-ring" cx="' + p[0] + '" cy="' + p[1] + '" r="6.5"/>';
-    }).join('');
-
-    return '' +
-      '<rect class="ground" x="0" y="0" width="1280" height="520"/>' +
-      '<g class="geo">' + parts.geo + '</g>' +
-      '<g class="grid-layer">' + (parts.bound || '') +
-        '<path class="lane" d="' + parts.flight + '"/>' + wp +
-      '</g>' +
-      dockSvg() +
-      '<g class="flight-layer">' +
-        '<path class="trace" id="flightPath" d="' + parts.flight + '"/>' +
-        '<path class="trace-done" id="flightDone" d="' + parts.flight + '"/>' +
-        '<path class="divert" id="divertPath" d=""/>' +
-      '</g>' +
-      // The aircraft lives outside .flight-layer so it stays on screen while
-      // docked, during the swap cycle and after landing, not just in cruise.
-      '<g class="drone-layer">' + droneSvg() + '</g>' +
-      '<rect class="sweep" x="0" y="-80" width="1280" height="80" fill="url(#sweepGrad)"/>';
-  }
-
-  /* ---------------------------------------------------------
-     Scene builders. Each returns geometry plus the boxes the HTML
-     overlays get pinned to, all in 1280x520 viewBox units.
-     --------------------------------------------------------- */
-
-  function buildSolar() {
-    var geo = '', lanes = [], waypoints = [], anomaly = null;
-    var ROWS = 5, PER_ROW = 8, GAP = 14;
-    var y = 108, k = 0;
-
-    for (var r = 0; r < ROWS; r++) {
-      var h = 28 + r * 5;
-      var left = 300 - r * 56;
-      var width = 680 + r * 112;
-      var shear = 20 - r * 3;
-      var pw = (width - GAP * (PER_ROW - 1)) / PER_ROW;
-
-      for (var c = 0; c < PER_ROW; c++, k++) {
-        var x = left + c * (pw + GAP);
-        var hot = (r === 2 && c === 4);
-        var temp = hot ? 1 : 0.24 + noise(k) * 0.13 + r * 0.012;
-        geo += panel(
-          x + ',' + (y + h) + ' ' + (x + pw) + ',' + (y + h) + ' ' +
-          (x + pw + shear) + ',' + y + ' ' + (x + shear) + ',' + y, temp);
-        if (hot) anomaly = { x: x - 4, y: y - 4, w: pw + shear + 8, h: h + 8 };
-      }
-
-      geo += '<line class="detail" x1="' + left + '" y1="' + (y + h + 5) + '" x2="' +
-             (left + width) + '" y2="' + (y + h + 5) + '"/>';
-
-      var ly = y + h * 0.5;
-      var a = [left - 26, ly], b = [left + width + 26, ly];
-      lanes.push(r % 2 === 0 ? [a, b] : [b, a]);
-      y += h + 22 + r * 6;
-    }
-
-    // The survey grid launches from, and returns to, the pad at bottom left.
-    var d = 'M96,468';
-    lanes.forEach(function (seg) {
-      d += ' L' + seg[0][0] + ',' + seg[0][1] + ' L' + seg[1][0] + ',' + seg[1][1];
-      waypoints.push(seg[0], seg[1], [(seg[0][0] + seg[1][0]) / 2, seg[0][1]]);
-    });
-
-    return {
-      svg: assemble({
-        geo: geo, flight: d, waypoints: waypoints,
-        bound: '<path class="bound" d="M26,86 L1254,86 L1254,444 L26,444 Z"/>'
-      }),
-      anomaly: anomaly,
-      ghostOffset: { dx: -186, dy: -74 }
-    };
-  }
-
-  function buildWind() {
-    var hub = [660, 272], L = 182, geo = '', anomaly = null;
-
-    geo += '<rect class="ground" x="0" y="470" width="1280" height="50" style="fill:#080807"/>';
-    geo += '<line class="detail" x1="0" y1="470" x2="1280" y2="470"/>';
-    geo += '<polygon class="struct-fill" points="646,470 674,470 666,274 654,274"/>';
-    geo += '<rect class="struct-fill" x="632" y="254" width="56" height="24" rx="9"/>';
-    geo += '<circle class="struct-fill" cx="660" cy="272" r="10"/>';
-
-    [-125, -5, 115].forEach(function (deg, bi) {
-      var rad = deg * Math.PI / 180;
-      var dx = Math.cos(rad), dy = Math.sin(rad);
-      var nx = -dy, ny = dx;
-      for (var s2 = 0; s2 < 6; s2++) {
-        var t0 = s2 / 6, t1 = (s2 + 1) / 6;
-        var w0 = 9.5 - t0 * 7, w1 = 9.5 - t1 * 7;
-        var p0 = [hub[0] + dx * L * t0, hub[1] + dy * L * t0];
-        var p1 = [hub[0] + dx * L * t1, hub[1] + dy * L * t1];
-        var hot = (bi === 0 && s2 === 4);
-        geo += panel(
-          (p0[0] + nx * w0) + ',' + (p0[1] + ny * w0) + ' ' +
-          (p1[0] + nx * w1) + ',' + (p1[1] + ny * w1) + ' ' +
-          (p1[0] - nx * w1) + ',' + (p1[1] - ny * w1) + ' ' +
-          (p0[0] - nx * w0) + ',' + (p0[1] - ny * w0),
-          hot ? 1 : 0.22 + noise(bi * 10 + s2) * 0.1, '#1b1b19');
-        if (hot) {
-          anomaly = { x: (p0[0] + p1[0]) / 2 - 36, y: (p0[1] + p1[1]) / 2 - 30, w: 72, h: 60 };
-        }
-      }
-    });
-
-    var d = 'M130,452 C300,440 392,374 470,316 C528,272 538,214 572,176';
-    return {
-      svg: assemble({
-        geo: geo, flight: d,
-        waypoints: [[130, 452], [470, 316], [572, 176], [660, 272]],
-        bound: '<path class="bound" d="M430,70 L900,70 L900,470 L430,470 Z"/>'
-      }),
-      anomaly: anomaly,
-      ghostOffset: { dx: -200, dy: 108 }
-    };
-  }
-
-  function buildPowerline() {
-    var geo = '', anomaly = null;
-
-    geo += '<rect class="ground" x="0" y="452" width="1280" height="68" style="fill:#080807"/>';
-    geo += '<line class="detail" x1="0" y1="452" x2="1280" y2="452"/>';
-
-    [360, 1040].forEach(function (tx, ti) {
-      geo += '<polygon class="struct-fill" points="' +
-        (tx - 34) + ',452 ' + (tx - 11) + ',132 ' + (tx + 11) + ',132 ' + (tx + 34) + ',452"/>';
-      for (var i2 = 0; i2 < 7; i2++) {
-        var y0 = 452 - i2 * 46, y1 = y0 - 46;
-        var w0 = 34 - i2 * 3.3, w1 = 34 - (i2 + 1) * 3.3;
-        geo += '<path class="struct" d="M' + (tx - w0) + ',' + y0 + ' L' + (tx + w1) + ',' + y1 +
-               ' M' + (tx + w0) + ',' + y0 + ' L' + (tx - w1) + ',' + y1 + '"/>';
-      }
-      [168, 216].forEach(function (ay) {
-        geo += '<path class="struct" d="M' + (tx - 62) + ',' + ay + ' L' + (tx + 62) + ',' + ay + '"/>';
-        geo += '<path class="struct" d="M' + (tx - 30) + ',' + (ay + 15) + ' L' + (tx - 30) + ',' + ay +
-               ' M' + (tx + 30) + ',' + (ay + 15) + ' L' + (tx + 30) + ',' + ay + '"/>';
-      });
-      geo += '<text x="' + tx + '" y="484" fill="rgba(156,154,146,.5)" font-size="11" ' +
-             'font-family="monospace" text-anchor="middle">TWR-' + (ti === 0 ? '114' : '115') + '</text>';
-    });
-
-    var spans = [
-      { p0: [392, 170], p1: [700, 262], p2: [1008, 170], sample: false },
-      { p0: [392, 218], p1: [700, 326], p2: [1008, 218], sample: true },
-      { p0: [330, 232], p1: [700, 350], p2: [1070, 232], sample: false }
-    ];
-
-    spans.forEach(function (sp, si) {
-      geo += '<path class="struct" d="M' + sp.p0 + ' Q' + sp.p1 + ' ' + sp.p2 + '"/>';
-      if (!sp.sample) return;
-      for (var i3 = 0; i3 < 20; i3++) {
-        var a = quadPoint(sp.p0, sp.p1, sp.p2, i3 / 20);
-        var b = quadPoint(sp.p0, sp.p1, sp.p2, (i3 + 1) / 20);
-        var ang = Math.atan2(b.y - a.y, b.x - a.x);
-        var nx = -Math.sin(ang) * 5, ny = Math.cos(ang) * 5;
-        var hot = (i3 === 10);
-        geo += panel(
-          (a.x + nx) + ',' + (a.y + ny) + ' ' + (b.x + nx) + ',' + (b.y + ny) + ' ' +
-          (b.x - nx) + ',' + (b.y - ny) + ' ' + (a.x - nx) + ',' + (a.y - ny),
-          hot ? 1 : 0.26 + noise(si * 30 + i3) * 0.1, '#1b1b19');
-        if (hot) {
-          anomaly = { x: (a.x + b.x) / 2 - 38, y: (a.y + b.y) / 2 - 30, w: 76, h: 60 };
-        }
-      }
-    });
-
-    var d = 'M150,438 C230,398 300,330 420,300 Q700,406 980,300 C1040,282 1090,300 1130,338';
-    return {
-      svg: assemble({
-        geo: geo, flight: d,
-        waypoints: [[420, 300], [560, 356], [700, 376], [840, 356], [980, 300]],
-        bound: '<path class="bound" d="M280,118 L1120,118 L1120,452 L280,452 Z"/>'
-      }),
-      anomaly: anomaly,
-      ghostOffset: { dx: -40, dy: 112 }
-    };
-  }
+  var Scene = window.KenwerScene;
 
   /* =========================================================
-     3. Scenario dictionary: 7-step autonomous lifecycle
+     3. Scenario dictionary: 8-step mission lifecycle
      ========================================================= */
 
   var SCENARIOS = {
@@ -301,7 +119,7 @@
     /* ---------------- SOLAR (primary showcase) ---------------- */
     solar: {
       label: 'Solar Farm',
-      build: buildSolar,
+      objective: 'Find the failing string',
       overlay: {
         liveTag: 'ERR: STRING DIODE OVERHEAT +18.4°C',
         liveSub: 'PANEL_ID_#8492 · CONF 0.94',
@@ -334,7 +152,7 @@
           title: 'Connect the drones you <mark>already fly</mark>',
           body: 'Nothing gets replaced. Kenwer Core attaches to your existing airframe over the companion '
                 + 'SDK, takes custody of the flight controller and the payload bus, and proves the link '
-                + 'before anything is allowed to arm. Your fleet keeps its airframes; it gains a memory.',
+                + 'before anything is allowed to arm. Your pilots keep the controls; the fleet gains a memory.',
           facts: [['Supported', 'PX4 · DJI M350/M300 · Autel'], ['Link', 'AES-256 encrypted'], ['Onboarding', 'One site at a time']],
           hud: {
             status: 'LINKING // KENWER CORE HANDSHAKE',
@@ -357,32 +175,29 @@
           ]
         },
         {
-          tag: 'DOCK · DiaB', tone: 'link',
-          title: 'Docking handshake and <mark>robotic battery swap</mark>',
-          body: 'The aircraft never needs a human. It sits on the pad at <strong>18% state of charge</strong>, ' +
-                'Kenwer takes custody over the encrypted companion link, the mechanical tray ejects the spent ' +
-                'pack and seats a fresh one, and the pre-flight self-test signs off before the lids open.',
-          facts: [['Dock', 'Bay 01 · universal DiaB'], ['Swap cycle', '96 s tray-to-lock'], ['Airframe', 'DJI M350 RTK']],
+          tag: 'DOCK', tone: 'link',
+          title: 'Docking station and <mark>system reset</mark>',
+          body: 'The pad is where a sortie starts and ends. The moment Kenwer confirms the aircraft is back on it, or has landed anywhere else, it <strong>resets the mission state</strong> so the next flight begins from a known-clean baseline. The pilot in command keeps the controls throughout; what Kenwer removes is the bookkeeping, not the pilot.',
+          facts: [['Dock', 'Bay 01'], ['Reset', 'On confirmed landing'], ['Airframe', 'DJI M350 RTK']],
           hud: {
-            status: 'DOCK_BAY_01 // BATTERY_SWAP_CYCLE',
+            status: 'DOCK_BAY_01 // SYSTEM RESET',
             batt: 100, battNote: '25.2V 6S', alt: 0, spd: 0, sat: 24, satNote: 'RTK FIXED',
-            a: { l: 'Swap', v: 'COMPLETE' }, b: { l: 'Self-test', v: 'PASS' }, modes: ['rgb']
+            a: { l: 'Reset', v: 'COMPLETE' }, b: { l: 'Self-test', v: 'PASS' }, modes: ['rgb']
           },
           scene: { dock: true, dockCard: true, dockLocked: true, flightT: 0 },
-          seq: 'swap',
           dock: {
             title: 'Dock Bay 01 · pre-flight',
-            checks: [['Mechanical lock', '4/4 ENGAGED'], ['Battery swap', '18% → 100%'],
+            checks: [['Landing state', 'CONFIRMED ON PAD'], ['Mission state', 'CLEARED'],
                      ['Pack voltage', '25.2V BALANCED'], ['Encrypted link', 'AES-256 OK'],
                      ['IMU / compass', 'SELF-TEST PASS']]
           },
           logs: [
-            { t: '00:00:01', k: 'DOCK', m: 'Bay 01 handshake · airframe seated, 4/4 locks engaged' },
-            { t: '00:00:02', k: 'PWR', m: 'State of charge 18% · swap subroutine requested', tone: 'warn' },
-            { t: '00:00:04', k: 'SEC', m: 'Encrypted link verified · AES-256 session key rotated', tone: 'good' },
-            { t: '00:00:48', k: 'PWR', m: 'Spent pack ejected · fresh pack seated and latched' },
-            { t: '00:01:36', k: 'PWR', m: 'Battery 100% · 25.2V 6S balanced · cells within 0.02V', tone: 'good' },
-            { t: '00:01:40', k: 'PRE', m: 'Self-test PASS · IMU, compass, ESC, payload bus', tone: 'good' }
+            { t: '00:00:01', k: 'DOCK', m: 'Bay 01 handshake · airframe seated on the pad, 4/4 locks engaged' },
+            { t: '00:00:03', k: 'CORE', m: 'Landing confirmed · mission state cleared for the next sortie' },
+            { t: '00:00:05', k: 'SEC', m: 'Encrypted link verified · AES-256 session key rotated', tone: 'good' },
+            { t: '00:00:09', k: 'PWR', m: 'Pack 25.2V BALANCED · endurance checked against the planned lane', tone: 'good' },
+            { t: '00:00:12', k: 'PRE', m: 'Self-test PASS · IMU, compass, ESC, payload bus', tone: 'good' },
+            { t: '00:00:14', k: 'CREW', m: 'Pilot in command holds the controls · ready to launch', tone: 'good' }
           ]
         },
         {
@@ -414,7 +229,7 @@
         },
         {
           tag: 'SORTIE', tone: 'nominal',
-          title: 'Autonomous takeoff and <mark>dual-sensor cruise</mark>',
+          title: 'Automatic takeoff and <mark>dual-sensor cruise</mark>',
           body: 'Lids retract, the aircraft lifts off the pad under precision vertical control and transitions ' +
                 'to cruise. It captures synchronized optical and radiometric LWIR frames on the same trigger, ' +
                 'so every thermal pixel has an RGB twin at the same instant and the same geotag.',
@@ -512,7 +327,7 @@
             { raw: '> Event: Localized Wind Shear Spike (15.2 m/s)', tone: 'bad' },
             { raw: '> Action: Precision Return to Safe Zone / Alternate Docking LZ', tone: 'warn' },
             { raw: '> State: Waypoint #43/184 locked in persistent memory', tone: 'cog' },
-            { raw: '> Autonomous Resume available upon environmental clearance', tone: 'good' }
+            { raw: '> Resume available to the pilot upon environmental clearance', tone: 'good' }
           ]
         },
         {
@@ -553,7 +368,7 @@
     /* ---------------- WIND ---------------- */
     wind: {
       label: 'Wind Turbine',
-      build: buildWind,
+      objective: 'Find the blade defect',
       overlay: {
         liveTag: 'ERR: LAMINATE DELAM 1.9 m²',
         liveSub: 'BLADE_A_#T44 · CONF 0.91',
@@ -586,7 +401,7 @@
           title: 'Connect the drones you <mark>already fly</mark>',
           body: 'Nothing gets replaced. Kenwer Core attaches to your existing airframe over the companion '
                 + 'SDK, takes custody of the flight controller and the payload bus, and proves the link '
-                + 'before anything is allowed to arm. Your fleet keeps its airframes; it gains a memory.',
+                + 'before anything is allowed to arm. Your pilots keep the controls; the fleet gains a memory.',
           facts: [['Supported', 'DJI M300 RTK · PX4'], ['Link', 'AES-256 encrypted'], ['Onboarding', 'One site at a time']],
           hud: {
             status: 'LINKING // KENWER CORE HANDSHAKE',
@@ -609,31 +424,29 @@
           ]
         },
         {
-          tag: 'DOCK · DiaB', tone: 'link',
-          title: 'Docking handshake and <mark>robotic battery swap</mark>',
-          body: 'The pad sits at the turbine base. Kenwer takes the payload bus, the tray swaps a spent pack ' +
-                'for a fresh one at <strong>18% state of charge</strong>, and the aircraft also registers the ' +
-                'turbine rotor-lock and yaw state before it is allowed to arm.',
-          facts: [['Dock', 'Bay 04 · tower base'], ['Swap cycle', '96 s tray-to-lock'], ['Airframe', 'DJI M300 RTK']],
+          tag: 'DOCK', tone: 'link',
+          title: 'Docking station and <mark>system reset</mark>',
+          body: 'The pad sits at the turbine base. The moment Kenwer confirms the aircraft is back on it, or has landed anywhere else, it <strong>resets the mission state</strong> so the next flight begins from a known-clean baseline. Rotor lock and yaw are registered here too, and the pilot in command keeps the controls throughout.',
+          facts: [['Dock', 'Bay 04 · tower base'], ['Reset', 'On confirmed landing'], ['Airframe', 'DJI M300 RTK']],
           hud: {
-            status: 'DOCK_BAY_04 // BATTERY_SWAP_CYCLE',
+            status: 'DOCK_BAY_04 // SYSTEM RESET',
             batt: 100, battNote: '25.2V 6S', alt: 0, spd: 0, sat: 22, satNote: 'RTK FIXED',
-            a: { l: 'Swap', v: 'COMPLETE' }, b: { l: 'Rotor', v: 'LOCKED' }, modes: ['rgb']
+            a: { l: 'Reset', v: 'COMPLETE' }, b: { l: 'Self-test', v: 'PASS' }, modes: ['rgb']
           },
           scene: { dock: true, dockCard: true, dockLocked: true, flightT: 0 },
-          seq: 'swap',
           dock: {
             title: 'Dock Bay 04 · pre-flight',
-            checks: [['Mechanical lock', '4/4 ENGAGED'], ['Battery swap', '18% → 100%'],
-                     ['Turbine rotor', 'LOCKED · YAW 212°'], ['Encrypted link', 'AES-256 OK'],
+            checks: [['Landing state', 'CONFIRMED ON PAD'], ['Mission state', 'CLEARED'],
+                     ['Pack voltage', '25.2V BALANCED'], ['Encrypted link', 'AES-256 OK'],
                      ['IMU / compass', 'SELF-TEST PASS']]
           },
           logs: [
-            { t: '00:00:01', k: 'DOCK', m: 'Bay 04 handshake · airframe seated, 4/4 locks engaged' },
-            { t: '00:00:02', k: 'PWR', m: 'State of charge 18% · swap subroutine requested', tone: 'warn' },
-            { t: '00:00:04', k: 'SCADA', m: 'Turbine T44 rotor locked · yaw 212° confirmed', tone: 'good' },
-            { t: '00:01:36', k: 'PWR', m: 'Battery 100% · 25.2V 6S balanced', tone: 'good' },
-            { t: '00:01:40', k: 'PRE', m: 'Self-test PASS · IMU, compass, ESC, payload bus', tone: 'good' }
+            { t: '00:00:01', k: 'DOCK', m: 'Bay 04 handshake · airframe seated at the tower base, 4/4 locks engaged' },
+            { t: '00:00:03', k: 'CORE', m: 'Landing confirmed · mission state cleared for the next sortie' },
+            { t: '00:00:05', k: 'SEC', m: 'Encrypted link verified · AES-256 session key rotated', tone: 'good' },
+            { t: '00:00:09', k: 'PWR', m: 'Pack 25.2V BALANCED · endurance checked against the planned lane', tone: 'good' },
+            { t: '00:00:12', k: 'PRE', m: 'Self-test PASS · IMU, compass, ESC, payload bus', tone: 'good' },
+            { t: '00:00:14', k: 'CREW', m: 'Pilot in command holds the controls · ready to launch', tone: 'good' }
           ]
         },
         {
@@ -665,7 +478,7 @@
         },
         {
           tag: 'SORTIE', tone: 'nominal',
-          title: 'Autonomous takeoff and <mark>blade sweep</mark>',
+          title: 'Automatic takeoff and <mark>blade sweep</mark>',
           body: 'The aircraft climbs the blade capturing synchronized optical and radiometric LWIR frames. ' +
                 'Thermal matters here: sub-surface damage is invisible in RGB but shows as a signature as ' +
                 'the laminate sheds heat unevenly.',
@@ -760,7 +573,7 @@
             { raw: '> Event: Localized Wind Shear Spike (15.2 m/s)', tone: 'bad' },
             { raw: '> Action: Precision Return to Safe Zone / Tower Base LZ', tone: 'warn' },
             { raw: '> State: Waypoint #61/96 locked in persistent memory', tone: 'cog' },
-            { raw: '> Autonomous Resume available upon environmental clearance', tone: 'good' }
+            { raw: '> Resume available to the pilot upon environmental clearance', tone: 'good' }
           ]
         },
         {
@@ -797,7 +610,7 @@
     /* ---------------- POWERLINE ---------------- */
     powerline: {
       label: 'HV Powerline',
-      build: buildPowerline,
+      objective: 'Find the hot splice',
       overlay: {
         liveTag: 'ERR: SPLICE HOTSPOT +41.7°C',
         liveSub: 'SPLICE_ID_#L1149 · CONF 0.96',
@@ -830,7 +643,7 @@
           title: 'Connect the drones you <mark>already fly</mark>',
           body: 'Nothing gets replaced. Kenwer Core attaches to your existing airframe over the companion '
                 + 'SDK, takes custody of the flight controller and the payload bus, and proves the link '
-                + 'before anything is allowed to arm. Your fleet keeps its airframes; it gains a memory.',
+                + 'before anything is allowed to arm. Your pilots keep the controls; the fleet gains a memory.',
           facts: [['Supported', 'Autel EVO Max 4T · PX4'], ['Link', 'AES-256 encrypted'], ['Onboarding', 'One site at a time']],
           hud: {
             status: 'LINKING // KENWER CORE HANDSHAKE',
@@ -853,31 +666,29 @@
           ]
         },
         {
-          tag: 'DOCK · DiaB', tone: 'link',
-          title: 'Docking handshake and <mark>robotic battery swap</mark>',
-          body: 'Corridor work runs BVLOS from a remote pad, so nobody is on site. The dock swaps a spent ' +
-                'pack for a fresh one at <strong>18% state of charge</strong> and the encrypted link, RTK fix ' +
-                'and radiometric calibration are all logged for the utility\'s audit trail.',
-          facts: [['Dock', 'Bay 07 · corridor pad'], ['Swap cycle', '96 s tray-to-lock'], ['Airframe', 'Autel EVO Max 4T']],
+          tag: 'DOCK', tone: 'link',
+          title: 'Docking station and <mark>system reset</mark>',
+          body: 'The corridor pad is where a sortie starts and ends. The moment Kenwer confirms the aircraft is back on it, or has landed anywhere else, it <strong>resets the mission state</strong> so the next flight begins from a known-clean baseline. The pilot in command keeps the controls throughout, with the BVLOS waiver logged against the flight.',
+          facts: [['Dock', 'Bay 07 · corridor pad'], ['Reset', 'On confirmed landing'], ['Airframe', 'Autel EVO Max 4T']],
           hud: {
-            status: 'DOCK_BAY_07 // BATTERY_SWAP_CYCLE',
+            status: 'DOCK_BAY_07 // SYSTEM RESET',
             batt: 100, battNote: '25.2V 6S', alt: 0, spd: 0, sat: 26, satNote: 'RTK FIXED',
-            a: { l: 'Swap', v: 'COMPLETE' }, b: { l: 'BVLOS', v: 'WAIVER OK' }, modes: ['rgb']
+            a: { l: 'Reset', v: 'COMPLETE' }, b: { l: 'Self-test', v: 'PASS' }, modes: ['rgb']
           },
           scene: { dock: true, dockCard: true, dockLocked: true, flightT: 0 },
-          seq: 'swap',
           dock: {
             title: 'Dock Bay 07 · pre-flight',
-            checks: [['Mechanical lock', '4/4 ENGAGED'], ['Battery swap', '18% → 100%'],
-                     ['Pack voltage', '25.2V BALANCED'], ['BVLOS waiver', 'ACTIVE'],
-                     ['Emissivity', 'SET 0.92 ACSR']]
+            checks: [['Landing state', 'CONFIRMED ON PAD'], ['Mission state', 'CLEARED'],
+                     ['Pack voltage', '25.2V BALANCED'], ['Encrypted link', 'AES-256 OK'],
+                     ['IMU / compass', 'SELF-TEST PASS']]
           },
           logs: [
-            { t: '00:00:01', k: 'DOCK', m: 'Bay 07 handshake · airframe seated, 4/4 locks engaged' },
-            { t: '00:00:02', k: 'PWR', m: 'State of charge 18% · swap subroutine requested', tone: 'warn' },
-            { t: '00:00:04', k: 'SEC', m: 'Encrypted link verified · AES-256 · BVLOS waiver active', tone: 'good' },
-            { t: '00:01:36', k: 'PWR', m: 'Battery 100% · 25.2V 6S balanced', tone: 'good' },
-            { t: '00:01:40', k: 'PLD', m: 'Radiometric LWIR calibrated · emissivity 0.92 (ACSR)', tone: 'good' }
+            { t: '00:00:01', k: 'DOCK', m: 'Bay 07 handshake · airframe seated on the corridor pad, 4/4 locks engaged' },
+            { t: '00:00:03', k: 'CORE', m: 'Landing confirmed · mission state cleared for the next sortie' },
+            { t: '00:00:05', k: 'SEC', m: 'Encrypted link verified · AES-256 session key rotated', tone: 'good' },
+            { t: '00:00:09', k: 'PWR', m: 'Pack 25.2V BALANCED · endurance checked against the planned lane', tone: 'good' },
+            { t: '00:00:12', k: 'PRE', m: 'Self-test PASS · IMU, compass, ESC, payload bus', tone: 'good' },
+            { t: '00:00:14', k: 'CREW', m: 'Pilot in command holds the controls · ready to launch', tone: 'good' }
           ]
         },
         {
@@ -909,7 +720,7 @@
         },
         {
           tag: 'SORTIE', tone: 'nominal',
-          title: 'Autonomous takeoff and <mark>corridor run</mark>',
+          title: 'Automatic takeoff and <mark>corridor run</mark>',
           body: 'The aircraft tracks the conductors capturing synchronized RGB and radiometric LWIR. Every ' +
                 'splice, damper and insulator string gets an optical record and an absolute temperature in ' +
                 'the same frame pair.',
@@ -1005,7 +816,7 @@
             { raw: '> Event: Localized Wind Shear Spike (15.2 m/s)', tone: 'bad' },
             { raw: '> Action: Precision Return to Safe Zone / Alternate Docking LZ', tone: 'warn' },
             { raw: '> State: Waypoint #118/212 locked in persistent memory', tone: 'cog' },
-            { raw: '> Autonomous Resume available upon environmental clearance', tone: 'good' }
+            { raw: '> Resume available to the pilot upon environmental clearance', tone: 'good' }
           ]
         },
         {
@@ -1052,8 +863,13 @@
   var statusTxt = $('hudStatus');
   var stepCount = $('stepCount');
   var stepName = $('hudStepName');
+  var hudObjective = $('hudObjective');
   var spine = $('spine');
   var logFilter = $('logFilter');
+  var logAlerts = $('logAlerts');
+  var logReplay = $('logReplay');
+  var logCopy = $('logCopy');
+  var logPaused = $('logPaused');
   var hudBody = document.querySelector('.hud-body');
   var hudRail = $('hudRail');
   var spine = $('spine');
@@ -1106,6 +922,9 @@
     manualMode: null,       // sensor override, cleared when the step changes
     logFilter: 'all',       // 'all' | 'step'
     stick: true,            // keep the log pinned to the newest line
+    queue: [],              // pending log reveals, so hovering can hold them
+    pumpTimer: 0,
+    paused: false,
     geometry: null,
     io: null,
     ioNarrow: null,
@@ -1189,8 +1008,38 @@
     termClock.textContent = 'T+' + (stamp || '00:00:00');
   }
 
+  // Reveals run through a queue driven one item at a time. A plain chain of
+  // timeouts cannot be held; this can, which is what lets hovering pause it.
+  function pumpQueue() {
+    if (state.pumpTimer || state.paused || !state.queue.length) return;
+    var item = state.queue.shift();
+    state.pumpTimer = setTimeout(function () {
+      state.pumpTimer = 0;
+      item.fn();
+      pumpQueue();
+    }, item.gap);
+  }
+
+  function enqueue(fn, gap) {
+    state.queue.push({ fn: fn, gap: reduce.matches ? 0 : gap });
+    pumpQueue();
+  }
+
+  function clearQueue() {
+    state.queue.length = 0;
+    if (state.pumpTimer) { clearTimeout(state.pumpTimer); state.pumpTimer = 0; }
+  }
+
+  function setPaused(on) {
+    if (state.paused === on) return;
+    state.paused = on;
+    if (logPaused) logPaused.hidden = !on || !state.queue.length;
+    if (!on) pumpQueue();
+  }
+
   function rebuildLogs(target) {
     clearTimers(state.logTimers);
+    clearQueue();
     termBody.innerHTML = '';
     var from = state.logFilter === 'step' ? target : 0;
     for (var i = from; i <= target; i++) {
@@ -1211,23 +1060,22 @@
   // step in view.
   function renderLogs(target) {
     clearTimers(state.logTimers);
+    clearQueue();
     if (state.logFilter === 'step' || target <= state.rendered) {
       rebuildLogs(target);
       return;
     }
 
-    var delay = 0;
     for (var st = state.rendered + 1; st <= target; st++) {
       (function (si) {
-        state.logTimers.push(setTimeout(function () { logGroupHeader(si); }, delay));
+        enqueue(function () { logGroupHeader(si); }, 220);
         state.steps[si].logs.forEach(function (entry) {
-          delay += reduce.matches ? 0 : 420;
-          state.logTimers.push(setTimeout(function () { logLine(entry, si); }, delay));
+          enqueue(function () { logLine(entry, si); }, 420);
         });
       })(st);
     }
+    enqueue(function () { updateClock(target); if (logPaused) logPaused.hidden = true; }, 120);
     state.rendered = target;
-    state.logTimers.push(setTimeout(function () { updateClock(target); }, delay));
   }
 
   /* =========================================================
@@ -1240,116 +1088,46 @@
     requestAnimationFrame(function () { placeQueued = false; placeOverlays(); });
   }
 
-  function toPx(box) {
-    var ctm = scene.getScreenCTM();
-    if (!ctm) return null;
-    var wrap = sceneWrap.getBoundingClientRect();
-    var p = scene.createSVGPoint();
-    p.x = box.x; p.y = box.y;
-    var a = p.matrixTransform(ctm);
-    p.x = box.x + box.w; p.y = box.y + box.h;
-    var b = p.matrixTransform(ctm);
-    return { x: a.x - wrap.left, y: a.y - wrap.top, w: b.x - a.x, h: b.y - a.y };
-  }
-
   function applyBox(el, b) {
+    if (!b) { el.style.opacity = '0'; return; }
+    el.style.removeProperty('opacity');
     el.style.left = b.x.toFixed(1) + 'px';
     el.style.top = b.y.toFixed(1) + 'px';
-    el.style.width = b.w.toFixed(1) + 'px';
-    el.style.height = b.h.toFixed(1) + 'px';
+    el.style.width = Math.max(8, b.w).toFixed(1) + 'px';
+    el.style.height = Math.max(8, b.h).toFixed(1) + 'px';
   }
 
+  // The renderer knows where the defect is on screen for the current shot,
+  // so the callouts stay pinned to it while the camera moves.
   function placeOverlays() {
-    if (!state.geometry || !state.geometry.anomaly) return;
-    var live = toPx(state.geometry.anomaly);
-    if (!live) return;
+    var live = Scene.anomalyBox();
+    var ghost = Scene.ghostBox();
     applyBox(anomLive, live);
-
-    var off = state.geometry.ghostOffset;
-    var g = toPx({
-      x: state.geometry.anomaly.x + off.dx, y: state.geometry.anomaly.y + off.dy,
-      w: state.geometry.anomaly.w, h: state.geometry.anomaly.h
-    });
-    applyBox(anomGhost, g);
-
-    var l = memoryLink.firstElementChild;
-    l.setAttribute('x1', (g.x + g.w / 2).toFixed(1));
-    l.setAttribute('y1', (g.y + g.h / 2).toFixed(1));
-    l.setAttribute('x2', (live.x + live.w / 2).toFixed(1));
-    l.setAttribute('y2', (live.y + live.h / 2).toFixed(1));
+    applyBox(anomGhost, ghost);
+    if (live && ghost) {
+      var l = memoryLink.firstElementChild;
+      l.setAttribute('x1', (ghost.x + ghost.w / 2).toFixed(1));
+      l.setAttribute('y1', (ghost.y + ghost.h / 2).toFixed(1));
+      l.setAttribute('x2', (live.x + live.w / 2).toFixed(1));
+      l.setAttribute('y2', (live.y + live.h / 2).toFixed(1));
+    }
   }
 
   /* =========================================================
      9. Flight loop: one rAF drives every continuous motion
      ========================================================= */
-  function pointAt(t) {
-    var len = state.flight.len;
-    var c = Math.max(0, Math.min(len, t * len));
-    var p = state.flight.path.getPointAtLength(c);
-    var q = state.flight.path.getPointAtLength(Math.min(len, c + 1));
-    return { x: p.x, y: p.y, a: Math.atan2(q.y - p.y, q.x - p.x) * 180 / Math.PI };
-  }
-
-  // The aircraft parks at the point on the path closest to the anomaly.
-  function solveHold() {
-    if (!state.geometry || !state.geometry.anomaly || !state.flight.path) return 0.6;
-    var a = state.geometry.anomaly, cx = a.x + a.w / 2, cy = a.y + a.h / 2;
-    var best = 0.6, bestD = Infinity;
-    for (var i = 0; i <= 220; i++) {
-      var t = i / 220, p = pointAt(t);
-      var d = (p.x - cx) * (p.x - cx) + (p.y - cy) * (p.y - cy);
-      if (d < bestD) { bestD = d; best = t; }
-    }
-    return best;
-  }
-
-  var RATE = 0.075;        // fraction of the route covered per second
-  var EASE_BAND = 0.09;    // ease out over the last stretch
-
   function tick(now) {
     state.raf = 0;
-    var dt = Math.min(64, now - (state.last || now));
-    state.last = now;
-
-    var f = state.flight;
-    if (!f.path) return;
-
-    // Constant rate of travel. An exponential ease moves proportionally to
-    // the distance left, which made a long leg (the return to the pad) look
-    // much faster than a short one. This covers the same fraction of the
-    // route per second whichever way the aircraft is heading, easing only
-    // over the last stretch so it settles instead of stopping dead.
-    var diff = f.target - f.t;
-    var dist = Math.abs(diff);
-    if (dist > 0.0006) {
-      var rate = RATE * (dt / 1000);
-      if (dist < EASE_BAND) rate *= Math.max(0.22, dist / EASE_BAND);
-      f.t += (diff > 0 ? 1 : -1) * Math.min(rate, dist);
-    } else {
-      f.t = f.target;
-    }
-
-    var p = pointAt(f.t);
-    var hovering = scene.classList.contains('is-hover');
-    var docked = f.target === 0 && scene.classList.contains('show-dock');
-    var bob = (!reduce.matches && hovering) ? Math.sin(now / 420) * 3 : 0;
-
-    f.drone.setAttribute('transform',
-      'translate(' + p.x.toFixed(2) + ',' + (p.y + bob).toFixed(2) + ') rotate(' + p.a.toFixed(1) + ')' +
-      (docked ? ' scale(.82)' : ''));
-    f.done.style.strokeDashoffset = (f.len * (1 - f.t)).toFixed(1);
-
-    // Instruments: heading tape + artificial horizon track the flight.
+    // Motion and the aircraft are the renderer's job now. This loop only
+    // keeps the heading tape and artificial horizon in step with it.
     if (!reduce.matches && sceneWrap.classList.contains('show-horizon')) {
-      var hdg = (p.a + 90 + 360) % 360;
-      var delta = ((hdg - state.headingShown + 540) % 360) - 180;
-      state.headingShown = (state.headingShown + delta * 0.08 + 360) % 360;
+      var t = Scene.at();
+      state.headingShown = (state.headingShown + 0.6) % 360;
       headingTape.style.transform = 'translateX(' + (-state.headingShown * 0.52).toFixed(1) + 'px)';
-      var roll = Math.max(-9, Math.min(9, delta * 0.35)) + Math.sin(now / 1600) * 1.2;
-      var pitch = Math.sin(now / 2100) * 3 + (Math.abs(diff) > 0.002 ? -4 : 0);
+      var roll = Math.sin(now / 2400) * 4;
+      var pitch = Math.sin(now / 2100) * 3 - (t > 0.02 && t < 0.98 ? 3 : 0);
       horizonBall.style.transform = 'rotate(' + roll.toFixed(2) + 'deg) translateY(' + pitch.toFixed(2) + 'px)';
     }
-
     if (state.visible) schedule();
   }
 
@@ -1357,10 +1135,20 @@
     if (!state.raf) state.raf = requestAnimationFrame(tick);
   }
 
+  // The camera moves between shots, so the callouts are re-pinned every
+  // frame rather than only on resize.
+  (function follow() {
+    placeOverlays();
+    requestAnimationFrame(follow);
+  })();
+
   /* =========================================================
      10. Scene flags
      ========================================================= */
   function applyScene(sc) {
+    Scene.flags(sc);
+    Scene.target(sc.flightT === 'hold' ? 'hold' : (sc.flightT || 0));
+
     scene.classList.toggle('show-grid', !!sc.grid);
     scene.classList.toggle('show-flight', !!sc.flight);
     scene.classList.toggle('is-capturing', !!sc.capture);
@@ -1421,21 +1209,6 @@
       if (reduce.matches) { el.classList.add('ok'); return; }
       state.seqTimers.push(setTimeout(function () { el.classList.add('ok'); }, 420 + i * 430));
     });
-  }
-
-  // Scripted battery-swap subroutine for step 01 / the operator trigger.
-  function runSwapSequence() {
-    if (reduce.matches) {
-      scene.classList.add('dock-open', 'dock-locked');
-      return;
-    }
-    scene.classList.remove('dock-open');
-    scene.classList.add('dock-locked');
-    state.seqTimers.push(setTimeout(function () { scene.classList.add('dock-open'); }, 700));
-    state.seqTimers.push(setTimeout(function () { scene.classList.add('dock-swapping'); }, 2400));
-    state.seqTimers.push(setTimeout(function () { scene.classList.remove('dock-swapping'); }, 5200));
-    state.seqTimers.push(setTimeout(function () { scene.classList.add('dock-charging'); }, 5700));
-    state.seqTimers.push(setTimeout(function () { scene.classList.remove('dock-charging'); }, 8200));
   }
 
   /* =========================================================
@@ -1502,10 +1275,8 @@
       $('alertResume').textContent = step.alert.resume;
     }
     if (step.scene.contingency) drawDivert();
-    if (step.seq === 'swap' && changed) runSwapSequence();
 
-    state.flight.target = step.scene.flightT === 'hold' ? state.flight.hold : (step.scene.flightT || 0);
-    if (reduce.matches) state.flight.t = state.flight.target;
+    Scene.shot(index);
     schedule();
 
     narrative.querySelectorAll('.step').forEach(function (el, i) {
@@ -1515,14 +1286,7 @@
     if (changed) renderLogs(index);
   }
 
-  // Abort vector: straight line from wherever the aircraft is back to the pad.
-  function drawDivert() {
-    if (!state.flight.divert) return;
-    var p = pointAt(state.flight.t);
-    var d = state.flight.dock;
-    state.flight.divert.setAttribute('d', 'M' + p.x.toFixed(1) + ',' + p.y.toFixed(1) +
-      ' L' + d.x.toFixed(1) + ',' + d.y.toFixed(1));
-  }
+  function drawDivert() { /* the renderer draws the abort vector */ }
 
   /* =========================================================
      12. Operator-triggered contingency events
@@ -1535,6 +1299,23 @@
       button: function () { return ctlBattery; },
       phases: [
         {
+          hold: 3200, note: 'launch', tone: 'nominal',
+          status: 'LAUNCH // AUTO TAKEOFF',
+          run: function () {
+            applyScene({ dock: true, dockOpen: true, flight: true, capture: true,
+                         reticle: true, horizon: true, radar: true, flightT: 0.42 });
+            countTo(tele.batt, 34, 0);
+            countTo(tele.alt, 45.2, 1);
+            countTo(tele.spd, 6.5, 1);
+            tele.spdNote.textContent = 'm/s';
+            tele.spdCell.classList.remove('hot');
+          },
+          logs: [
+            { raw: '> Operator trigger: Low Battery Simulation', tone: 'warn' },
+            { raw: '> Auto takeoff executed, pilot in command, resuming the survey lane', tone: '' }
+          ]
+        },
+        {
           hold: 2800, note: 'reserve breach', tone: 'anomaly',
           status: 'PWR ALERT // STATE OF CHARGE 17%',
           run: function () {
@@ -1543,7 +1324,6 @@
             tele.battCell.classList.add('low');
           },
           logs: [
-            { raw: '> Operator trigger: Low Battery Simulation', tone: 'warn' },
             { raw: '> State of Charge 17% is below the 20% reserve threshold', tone: 'bad' }
           ]
         },
@@ -1567,13 +1347,13 @@
             tele.spdCell.classList.add('hot');
           },
           logs: [
-            { raw: '> Action: Precision return to Dock Bay, obstacle envelope clear', tone: 'warn' },
+            { raw: '> Action: Return to Dock Bay recommended, obstacle envelope clear', tone: 'warn' },
             { raw: '> Descending to pad · alignment markers acquired', tone: '' }
           ]
         },
         {
-          hold: 5600, note: 'tray cycle', tone: 'link',
-          status: 'DOCK_BAY // BATTERY_SWAP_CYCLE',
+          hold: 5600, note: 'landing and reset', tone: 'link',
+          status: 'DOCK_BAY // LANDED, SYSTEM RESET',
           run: function () {
             applyScene({ dock: true, dockCard: true, dockLocked: true, flightT: 0 });
             countTo(tele.alt, 0, 1);
@@ -1581,12 +1361,11 @@
             tele.spdNote.textContent = 'm/s';
             tele.spdCell.classList.remove('hot');
             renderDockCard({
-              title: 'Dock recall · swap subroutine',
-              checks: [['Airframe seated', '4/4 LOCKS'], ['Spent pack', 'EJECTED'],
-                       ['Fresh pack', 'SEATED AND LATCHED'], ['Cell balance', 'WITHIN 0.02V'],
-                       ['Charge', '17% TO 100%']]
+              title: 'Recovered · system reset',
+              checks: [['Landing state', 'CONFIRMED ON PAD'], ['Airframe seated', '4/4 LOCKS'],
+                       ['Resume point', 'HELD IN MEMORY'], ['Mission state', 'RESET'],
+                       ['Next launch', 'AWAITING PILOT']]
             });
-            runSwapSequence();
             state.eventTimers.push(setTimeout(function () {
               countTo(tele.batt, 100, 0);
               tele.battNote.textContent = '25.2V 6S';
@@ -1594,15 +1373,15 @@
             }, 2600));
           },
           logs: [
-            { raw: '> Tray cycle: spent pack ejected, fresh pack seated and latched', tone: 'cog' },
-            { raw: '> Battery 100% · 25.2V 6S balanced', tone: 'good' }
+            { raw: '> Touchdown confirmed on the pad, mission state reset', tone: 'cog' },
+            { raw: '> Fresh pack fitted by the crew · 100% · 25.2V 6S balanced', tone: 'good' }
           ]
         },
         {
           hold: 3000, note: 'resume armed', tone: 'nominal',
-          status: 'AUTONOMOUS RESUME ARMED',
+          status: 'RESUME ARMED // AWAITING PILOT',
           logs: [
-            { raw: '> Mission resumes from the saved waypoint, not from zero', tone: 'good' },
+            { raw: '> Pilot relaunches from the saved waypoint, not from zero', tone: 'good' },
             { raw: '> Total interruption: 4 min 12 s of a 22 min sortie', tone: 'good' }
           ]
         }
@@ -1613,16 +1392,34 @@
       button: function () { return ctlWind; },
       phases: [
         {
-          hold: 2800, note: 'gust detected', tone: 'anomaly',
+          hold: 3200, note: 'on the lane', tone: 'nominal',
+          status: 'IN_TRANSIT // SURVEY LANE',
+          run: function () {
+            applyScene({ dock: true, dockOpen: true, flight: true, capture: true,
+                         reticle: true, horizon: true, radar: true, flightT: 0.5 });
+            countTo(tele.alt, 45.2, 1);
+            countTo(tele.spd, 6.5, 1);
+            tele.spdNote.textContent = 'm/s';
+            tele.spdCell.classList.remove('hot');
+          },
+          logs: [
+            { raw: '> Operator trigger: High Wind Simulation', tone: 'warn' },
+            { raw: '> Airframe on the survey lane, micro-weather nominal at 5.4 m/s', tone: '' }
+          ]
+        },
+        {
+          hold: 3400, note: 'gust hits', tone: 'anomaly',
           status: 'MET ALERT // WIND SHEAR 15.2 M/S',
           run: function () {
+            applyScene({ dock: true, dockOpen: true, flight: true, gust: true,
+                         reticle: true, horizon: true, radar: true, flightT: 0.5 });
             countTo(tele.spd, 15.2, 1);
             tele.spdNote.textContent = 'GUST';
             tele.spdCell.classList.add('hot');
           },
           logs: [
-            { raw: '> Operator trigger: High Wind Simulation', tone: 'warn' },
-            { raw: '> Event: Localized wind shear spike 15.2 m/s against an 8.0 m/s envelope', tone: 'bad' }
+            { raw: '> Event: Localized wind shear spike 15.2 m/s against an 8.0 m/s envelope', tone: 'bad' },
+            { raw: '> Attitude hold degraded, drift 26 cm, capture suspended', tone: 'bad' }
           ]
         },
         {
@@ -1638,7 +1435,8 @@
           status: 'CONTINGENCY_HANDLING // DIVERT TO ALTERNATE LZ',
           run: function () {
             applyScene({
-              flight: true, contingency: true, alert: true, reticle: true, flightT: 0
+              flight: true, contingency: true, alert: true, gust: true,
+              reticle: true, dock: true, flightT: 0
             });
             $('alertTitle').textContent = 'Contingency · wind shear';
             $('alertBody').textContent = 'Localized gust 15.2 m/s exceeds the 8.0 m/s envelope.\nFlying the safe abort vector to the alternate docking LZ.';
@@ -1676,13 +1474,13 @@
         },
         {
           hold: 3000, note: 'resume available', tone: 'nominal',
-          status: 'ENVIRONMENT CLEAR // AUTONOMOUS RESUME AVAILABLE',
+          status: 'ENVIRONMENT CLEAR // RESUME AVAILABLE',
           run: function () {
             countTo(tele.spd, 0, 1);
           },
           logs: [
             { raw: '> Micro-weather back inside envelope: 5.9 m/s', tone: 'good' },
-            { raw: '> Autonomous resume available · mission restarts at the saved waypoint', tone: 'good' }
+            { raw: '> Resume available · the pilot restarts at the saved waypoint', tone: 'good' }
           ]
         }
       ]
@@ -1709,6 +1507,8 @@
     ev.button().classList.add('live');
     ctlBattery.disabled = true;
     ctlWind.disabled = true;
+    // pull back so the recovery is visible rather than happening off frame
+    Scene.wideShot();
 
     var at = 0;
     ev.phases.forEach(function (ph, i) {
@@ -1820,7 +1620,7 @@
   // Short names for the spine. The step tags are written for the narrative
   // column, which is wordier than a rail can carry.
   var SPINE_LABEL = {
-    'CONNECT': 'Connect', 'DOCK · DiaB': 'Dock', 'PLAN': 'Plan', 'SORTIE': 'Sortie',
+    'CONNECT': 'Connect', 'DOCK': 'Dock', 'PLAN': 'Plan', 'SORTIE': 'Sortie',
     'EDGE AI': 'Detect', 'COGNITIVE LAYER': 'Revise', 'CONTINGENCY': 'Failover',
     'DISPATCH': 'Dispatch'
   };
@@ -1857,17 +1657,23 @@
   }
   function pad3(n) { return (n < 100 ? (n < 10 ? '00' : '0') : '') + n; }
 
+  // Sweep blips laid out around the ring; the radar reads as an instrument
+  // rather than a survey of the exact route.
   function buildRadarBlips() {
     var out = '';
-    for (var i = 0; i <= 7; i++) {
-      var p = pointAt(i / 7);
-      var dx = (p.x - 640) / 640 * 40, dy = (p.y - 260) / 260 * 40;
-      var r = Math.sqrt(dx * dx + dy * dy);
-      if (r > 42) { dx = dx / r * 42; dy = dy / r * 42; }
-      out += '<circle class="blip" cx="' + (50 + dx).toFixed(1) + '" cy="' + (50 + dy).toFixed(1) +
-             '" r="1.6" opacity="' + (0.35 + 0.45 * (i / 7)).toFixed(2) + '"/>';
+    for (var i = 0; i < 7; i++) {
+      var ang = (i / 7) * Math.PI * 2 + 0.4;
+      var rad = 16 + noiseAt(i) * 24;
+      out += '<circle class="blip" cx="' + (50 + Math.cos(ang) * rad).toFixed(1) +
+             '" cy="' + (50 + Math.sin(ang) * rad).toFixed(1) +
+             '" r="1.6" opacity="' + (0.3 + 0.4 * (i / 7)).toFixed(2) + '"/>';
     }
     radarBlips.innerHTML = out;
+  }
+
+  function noiseAt(i) {
+    var x = Math.sin(i * 127.1 + 311.7) * 43758.5453;
+    return x - Math.floor(x);
   }
 
   function loadScenario(key, opts) {
@@ -1877,27 +1683,9 @@
     state.cfg = cfg;
     state.steps = cfg.steps;
 
-    var built = cfg.build();
-    var defs = scene.querySelector('defs');
-    scene.innerHTML = '';
-    if (defs) scene.appendChild(defs);
-    scene.insertAdjacentHTML('beforeend', built.svg);
-    state.geometry = { anomaly: built.anomaly, ghostOffset: built.ghostOffset };
+    Scene.load(key);
 
-    var f = state.flight;
-    f.path = $('flightPath');
-    f.done = $('flightDone');
-    f.divert = $('divertPath');
-    f.drone = $('drone');
-    f.dockLayer = $('dockLayer');
-    f.len = f.path.getTotalLength();
-    f.done.style.strokeDasharray = f.len;
-    f.done.style.strokeDashoffset = f.len;
-    f.t = 0; f.target = 0;
-    f.hold = solveHold();
-    f.dock = pointAt(0);
-    f.dockLayer.setAttribute('transform', 'translate(' + f.dock.x.toFixed(1) + ',' + f.dock.y.toFixed(1) + ')');
-
+    if (hudObjective) hudObjective.textContent = cfg.objective || '';
     buildRadarBlips();
     buildSpine(cfg);
     renderOverlayText(cfg);
@@ -1919,20 +1707,42 @@
     // SVGElement.className is a read-only SVGAnimatedString, so it has to be
     // reset through the attribute. Assigning to it throws under "use strict"
     // and would abort the rest of this function.
-    scene.setAttribute('class', 'scene');
     sceneWrap.className = 'scene-wrap';
+
+    // Switching scenario starts the new mission from the top. The scroll has
+    // to happen before the observer runs, and instantly rather than smoothly:
+    // easing up from step 6 would drag the reader back through every step in
+    // between, flashing each one's logs on the way past. scrollIntoView is
+    // wrong here too, since 'start' parks the card behind the sticky window
+    // and the focus line then picks a later step.
+    if (opts && opts.scroll) {
+      var first = narrative.querySelector('.step');
+      if (first) {
+        // Settle onto step one rather than guessing at it. focusLine() is
+        // measured from the sticky window, and scrolling moves that window,
+        // so the target shifts underneath a single calculation. Iterating on
+        // the remaining error converges in two or three passes; a fixed
+        // number of blind jumps was landing between steps 2 and 3.
+        for (var pass = 0; pass < 8; pass++) {
+          var r = first.getBoundingClientRect();
+          var delta = (r.top + r.height / 2) - focusLine();
+          if (Math.abs(delta) < 2) break;
+          var to = Math.max(0, window.pageYOffset + delta);
+          if (Math.abs(to - window.pageYOffset) < 1) break;
+          window.scrollTo(0, to);
+        }
+      }
+    }
 
     observeSteps();
     applyStep(0);
+    // scrollTo above queues a scroll event; run the detector now so it agrees
+    // with the position rather than fighting it on the next frame
+    updateActiveStep();
 
     document.querySelectorAll('.pill[data-scenario]').forEach(function (p) {
       p.setAttribute('aria-pressed', String(p.dataset.scenario === key));
     });
-
-    if (opts && opts.scroll) {
-      var first = narrative.querySelector('.step');
-      if (first) first.scrollIntoView({ behavior: reduce.matches ? 'auto' : 'smooth', block: 'start' });
-    }
   }
 
   /* =========================================================
@@ -1991,6 +1801,7 @@
   document.querySelectorAll('.pill[data-scenario]').forEach(function (pill) {
     pill.addEventListener('click', function () {
       if (pill.dataset.scenario === state.key) return;
+      stopPlay(false);
       loadScenario(pill.dataset.scenario, { scroll: true });
       try { history.replaceState(null, '', '?scenario=' + pill.dataset.scenario); } catch (err) { /* file:// */ }
     });
@@ -2017,15 +1828,86 @@
     });
   }
 
+  function jumpToStep(i) {
+    var card = narrative.querySelectorAll('.step')[i];
+    if (!card) return;
+    var r = card.getBoundingClientRect();
+    var top = window.pageYOffset + r.top + r.height / 2 - focusLine();
+    window.scrollTo({ top: Math.max(0, top), behavior: reduce.matches ? 'auto' : 'smooth' });
+  }
+
   if (spine) {
     spine.addEventListener('click', function (e) {
       var btn = e.target.closest ? e.target.closest('.spine-step') : null;
-      if (!btn) return;
-      var card = narrative.querySelectorAll('.step')[parseInt(btn.dataset.jump, 10)];
-      if (!card) return;
-      var r = card.getBoundingClientRect();
-      var top = window.pageYOffset + r.top + r.height / 2 - focusLine();
-      window.scrollTo({ top: Math.max(0, top), behavior: reduce.matches ? 'auto' : 'smooth' });
+      if (btn) jumpToStep(parseInt(btn.dataset.jump, 10));
+    });
+  }
+
+  // every log line carries its step, so clicking one takes you to it
+  termBody.addEventListener('click', function (e) {
+    var line = e.target.closest ? e.target.closest('.tl') : null;
+    if (!line || !line.dataset.step) return;
+    jumpToStep(parseInt(line.dataset.step, 10));
+  });
+
+  // hold the reveal while someone is reading
+  termBody.addEventListener('pointerenter', function () { setPaused(true); });
+  termBody.addEventListener('pointerleave', function () { setPaused(false); });
+  termBody.addEventListener('focusin', function () { setPaused(true); });
+  termBody.addEventListener('focusout', function () { setPaused(false); });
+
+  if (logAlerts) {
+    logAlerts.addEventListener('click', function () {
+      var on = termBody.classList.toggle('only-alerts');
+      logAlerts.setAttribute('aria-pressed', String(on));
+    });
+  }
+
+  if (logReplay) {
+    logReplay.addEventListener('click', function () {
+      var i = Math.max(0, state.current);
+      clearQueue();
+      clearTimers(state.logTimers);
+      clearTimers(state.seqTimers);
+      // drop this step's lines, then let applyStep lay them down again
+      Array.prototype.slice.call(termBody.children).forEach(function (el) {
+        if (el.dataset.step === String(i)) termBody.removeChild(el);
+      });
+      state.rendered = i - 1;
+      state.current = -1;                     // force the full re-apply
+      state.stick = true;
+      applyStep(i);
+    });
+  }
+
+  if (logCopy) {
+    logCopy.addEventListener('click', function () {
+      var text = Array.prototype.slice.call(termBody.children)
+        .filter(function (el) { return el.offsetParent !== null || !el.offsetParent; })
+        .filter(function (el) { return getComputedStyle(el).display !== 'none'; })
+        .map(function (el) { return el.textContent; })
+        .join('\n');
+      function done() {
+        logCopy.classList.add('done');
+        logCopy.textContent = 'Copied';
+        setTimeout(function () {
+          logCopy.classList.remove('done');
+          logCopy.textContent = 'Copy';
+        }, 1400);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, fallback);
+      } else { fallback(); }
+      function fallback() {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done(); } catch (err) { /* blocked */ }
+        document.body.removeChild(ta);
+      }
     });
   }
 
@@ -2112,17 +1994,106 @@
     }
   } catch (err) { /* storage blocked */ }
 
+  /* ---------------------------------------------------------
+     Autoplay. Rather than jumping between steps, the page is
+     scrolled at a slow constant rate and the existing scroll
+     machinery does the rest, so a played mission and a scrolled
+     one are the same thing. Any manual input hands control back.
+     --------------------------------------------------------- */
+  var ctlPlay = $('ctlPlay');
+  var ctlPlayLabel = $('ctlPlayLabel');
+  var play = { on: false, raf: 0, last: 0, carry: 0 };
+  var PLAY_PXS = 30;                      // pixels per second
+
+  function playEnd() {
+    var last = narrative.querySelectorAll('.step');
+    if (!last.length) return 0;
+    var el = last[last.length - 1];
+    return window.pageYOffset + el.getBoundingClientRect().bottom - window.innerHeight + 40;
+  }
+
+  function stopPlay(done) {
+    if (!play.on) return;
+    play.on = false;
+    if (play.raf) { cancelAnimationFrame(play.raf); play.raf = 0; }
+    if (ctlPlay) ctlPlay.setAttribute('aria-pressed', 'false');
+    if (ctlPlayLabel) ctlPlayLabel.textContent = done ? 'Replay mission' : 'Play mission';
+  }
+
+  function playTick(now) {
+    if (!play.on) return;
+    var dt = Math.min(64, now - (play.last || now));
+    play.last = now;
+
+    play.carry += PLAY_PXS * (dt / 1000);
+    var whole = Math.floor(play.carry);
+    if (whole >= 1) {
+      play.carry -= whole;
+      play.ignore = true;                 // our own scroll, not the reader's
+      window.scrollBy(0, whole);
+      play.ignore = false;
+    }
+    if (window.pageYOffset >= playEnd() - 2) { stopPlay(true); return; }
+    play.raf = requestAnimationFrame(playTick);
+  }
+
+  function startPlay() {
+    if (play.on) return;
+    // begin at the first step so a played mission always runs start to finish
+    var first = narrative.querySelector('.step');
+    if (first) {
+      var r = first.getBoundingClientRect();
+      var top = window.pageYOffset + r.top + r.height / 2 - focusLine();
+      if (window.pageYOffset > top + 40 || window.pageYOffset < top - 40) {
+        window.scrollTo({ top: Math.max(0, top), behavior: reduce.matches ? 'auto' : 'smooth' });
+      }
+    }
+    play.on = true;
+    play.last = 0;
+    play.carry = 0;
+    if (ctlPlay) ctlPlay.setAttribute('aria-pressed', 'true');
+    if (ctlPlayLabel) ctlPlayLabel.textContent = 'Pause';
+    play.raf = requestAnimationFrame(function (t) {
+      // let the smooth scroll to the first step settle before taking over
+      setTimeout(function () { play.last = 0; play.raf = requestAnimationFrame(playTick); }, 700);
+    });
+  }
+
+  if (ctlPlay) {
+    ctlPlay.addEventListener('click', function () {
+      if (play.on) stopPlay(false); else startPlay();
+    });
+  }
+
+  // Any deliberate scrolling from the reader takes the wheel back, but
+  // working the HUD does not: pressing Play, orbiting the scene or reading
+  // the log should not cancel the run.
+  function insideHud(t) { return !!(t && t.closest && t.closest('.hud')); }
+  ['wheel', 'touchstart', 'pointerdown'].forEach(function (ev) {
+    window.addEventListener(ev, function (e) {
+      if (!insideHud(e.target)) stopPlay(false);
+    }, { passive: true });
+  });
+  window.addEventListener('keydown', function (e) {
+    if (['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' '].indexOf(e.key) >= 0) stopPlay(false);
+  });
+
+  var ctlReset = $('ctlReset');
+  if (ctlReset) ctlReset.addEventListener('click', function () { Scene.resetView(); });
+
   ctlBattery.addEventListener('click', function () { runEvent('battery'); });
   ctlWind.addEventListener('click', function () { runEvent('wind'); });
 
   if ('IntersectionObserver' in window) {
     new IntersectionObserver(function (entries) {
       state.visible = entries[0].isIntersecting && !document.hidden;
+      Scene.setVisible(state.visible);
       if (state.visible) { state.last = 0; schedule(); }
     }, { threshold: 0 }).observe(hud);
   }
   document.addEventListener('visibilitychange', function () {
     state.visible = !document.hidden;
+    Scene.setVisible(state.visible);
     if (state.visible) { state.last = 0; schedule(); }
   });
 
@@ -2137,6 +2108,7 @@
   /* =========================================================
      16. Boot
      ========================================================= */
+  Scene.mount(scene);
   buildHeadingTape();
 
   var start = 'solar';

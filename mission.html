@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Simulated Mission | Kenwer Drones</title>
-<meta name="description" content="Fly a full Kenwer mission: drone-in-a-box battery swap, autonomous sortie, edge anomaly detection, belief revision from temporal memory, and contingency divert with mission resume.">
+<meta name="description" content="Fly a full Kenwer mission: docking station reset on landing, automatic takeoff, dual-sensor sortie, edge anomaly detection, belief revision from temporal memory, and contingency divert with mission resume.">
 <link rel="canonical" href="https://www.kenwerdrones.com/mission.html">
 <link rel="icon" href="/favicon.ico?v=kenwer-black-2" type="image/x-icon">
 <link rel="alternate icon" href="/favicon.svg?v=kenwer-black-2" type="image/svg+xml">
@@ -13,7 +13,7 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.kenwerdrones.com/mission.html">
 <meta property="og:title" content="Simulated Mission | Kenwer Drones">
-<meta property="og:description" content="Docking station to dispatched work order: a scroll-driven walkthrough of an end-to-end autonomous inspection, including belief revision and contingency failover.">
+<meta property="og:description" content="Docking station to dispatched work order: a scroll-driven walkthrough of a full inspection sortie, including belief revision and contingency failover.">
 <meta property="og:image" content="https://www.kenwerdrones.com/kenwer-noir.png">
 <meta name="twitter:card" content="summary_large_image">
 
@@ -22,7 +22,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=EB+Garamond:wght@400;500;600&family=Inter:wght@400;450;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css?v=featured-cards-2">
 <link rel="stylesheet" href="css/footer-v1.css?v=flight-paths-quad-2">
-<link rel="stylesheet" href="css/mission.css?v=sim-10">
+<link rel="stylesheet" href="css/mission.css?v=v20-5">
 </head>
 <body class="sim-page">
 
@@ -55,12 +55,12 @@
   <header class="mhero sec-dark" id="top">
     <div class="wrap">
       <p class="plabel"><i aria-hidden="true"></i> Simulated mission · representative telemetry</p>
-      <h1 class="disp">Dock to dispatched<br><em>work order.</em> No pilot.</h1>
+      <h1 class="disp">Dock to dispatched<br><em>work order.</em></h1>
       <p class="lede">
-        Kenwer runs the whole loop: the drone-in-a-box swaps its own battery, flies the grid, catches the
-        defect at the edge, then asks <strong>what this asset looked like last time</strong> and revises what
-        it believes. When the weather turns, it saves its place and comes home. Scroll to fly the mission,
-        or trigger a contingency yourself from the HUD.
+        Your pilot stays in command. Kenwer takes the work either side of the stick: automatic takeoff,
+        the capture plan, edge detection, and the part no one else does, asking <strong>what this asset
+        looked like last time</strong> and revising what it believes. Land, and the system resets itself
+        for the next sortie. Scroll to fly the mission, or trigger a contingency yourself from the HUD.
       </p>
 
       <div class="scenarios" role="group" aria-label="Choose an inspection scenario">
@@ -84,7 +84,8 @@
 
           <div class="hud-title">
             <span class="ht-name">Dock to dispatched work order</span>
-            <span class="ht-sep" aria-hidden="true"></span>
+            <span class="ht-obj" id="hudObjective">Find the failing string</span>
+            <nav class="spine" id="spine" aria-label="Mission stages"></nav>
             <span class="ht-step" id="hudStepName">01 · Connect</span>
           </div>
 
@@ -92,8 +93,6 @@
           <span class="bracket tr" aria-hidden="true"></span>
           <span class="bracket bl" aria-hidden="true"></span>
           <span class="bracket br" aria-hidden="true"></span>
-
-          <nav class="spine" id="spine" aria-label="Mission stages"></nav>
 
           <div class="hud-top">
             <div class="status-row">
@@ -122,27 +121,12 @@
           <div class="hud-view">
             <div class="scene-wrap" id="sceneWrap">
 
-              <!-- "meet" (not "slice") so the dock pad and the outer array rows
-                   are never cropped on wide, short viewports. -->
-              <svg class="scene" id="scene" viewBox="0 0 1280 520" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-                <defs>
-                  <linearGradient id="sweepGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0" stop-color="#EDEBE4" stop-opacity="0"/>
-                    <stop offset=".5" stop-color="#EDEBE4" stop-opacity=".16"/>
-                    <stop offset="1" stop-color="#EDEBE4" stop-opacity="0"/>
-                  </linearGradient>
-                </defs>
-                <!-- geometry, dock, grid, flight and drone layers injected by mission.js -->
-              </svg>
+              <canvas class="scene" id="scene" aria-hidden="true"></canvas>
 
               <div class="instruments" aria-hidden="true">
-                <svg class="reticle" viewBox="0 0 1280 520" preserveAspectRatio="xMidYMid meet">
-                  <line x1="640" y1="236" x2="640" y2="252"/>
-                  <line x1="640" y1="268" x2="640" y2="284"/>
-                  <line x1="604" y1="260" x2="620" y2="260"/>
-                  <line x1="660" y1="260" x2="676" y2="260"/>
-                  <circle cx="640" cy="260" r="44"/>
-                </svg>
+<div class="reticle" aria-hidden="true">
+                  <span class="rt-v"></span><span class="rt-h"></span><span class="rt-o"></span>
+                </div>
 
                 <div class="horizon">
                   <div class="heading"><div class="heading-tape" id="headingTape"></div></div>
@@ -220,10 +204,19 @@
             <section class="rail-panel panel-log">
               <header class="rail-head">
                 <i aria-hidden="true"></i> Mission log
-                <button class="log-filter" type="button" id="logFilter" aria-pressed="false"
-                        title="Show only the current step">This step</button>
                 <span class="rt" id="termClock">T+00:00:00</span>
               </header>
+              <div class="log-tools">
+                <button class="log-btn" type="button" id="logFilter" aria-pressed="false"
+                        title="Show only the step you are on">This step</button>
+                <button class="log-btn" type="button" id="logAlerts" aria-pressed="false"
+                        title="Show only warnings and failures">Alerts</button>
+                <button class="log-btn" type="button" id="logReplay"
+                        title="Run this step again">Replay</button>
+                <button class="log-btn" type="button" id="logCopy"
+                        title="Copy the visible log">Copy</button>
+                <span class="log-paused" id="logPaused" hidden>paused</span>
+              </div>
               <div class="term-body" id="termBody" role="log" aria-live="polite" aria-label="Mission log"></div>
             </section>
 
@@ -240,10 +233,12 @@
           </div>
 
           <div class="hud-controls">
+            <button class="ctl play" type="button" id="ctlPlay" aria-pressed="false"><span class="play-ico" aria-hidden="true"></span><span id="ctlPlayLabel">Play mission</span></button>
             <span class="lbl">Contingency</span>
-            <button class="ctl batt" type="button" id="ctlBattery"><i aria-hidden="true"></i>Simulate low battery / swap</button>
+            <button class="ctl batt" type="button" id="ctlBattery"><i aria-hidden="true"></i>Simulate low battery</button>
             <button class="ctl wind" type="button" id="ctlWind"><i aria-hidden="true"></i>Simulate high wind</button>
-            <span class="hint" id="ctlHint">Subroutines run live in the viewport</span>
+            <button class="ctl" type="button" id="ctlReset"><i aria-hidden="true"></i>Reset view</button>
+            <span class="hint" id="ctlHint">Drag to orbit &middot; scroll to zoom &middot; shift-drag to slide</span>
           </div>
 
         </div>
@@ -255,13 +250,14 @@
           <article class="step is-active">
             <h2>Mission walkthrough</h2>
             <p>
-              This simulator runs on JavaScript. The seven-step autonomous lifecycle it animates is:
-              <strong>01</strong> docking-station handshake and robotic battery swap;
+              This simulator runs on JavaScript. The eight-step mission lifecycle it animates is:
+              <strong>01</strong> connecting your existing drones to Kenwer;
+              <strong>02</strong> the docking station and the system reset on confirmed landing;
               <strong>02</strong> waypoint synthesis with micro-weather and airspace clearing;
               <strong>03</strong> precision takeoff and RTK-locked cruise sortie;
               <strong>04</strong> on-board edge inference flagging a thermal anomaly;
               <strong>05</strong> the Cognitive Identity Layer querying temporal memory and revising its
-              diagnosis; <strong>06</strong> autonomous contingency handling, a wind-shear divert with the
+              diagnosis; <strong>07</strong> contingency handling, a wind-shear divert with the
               resume point written to persistent memory; and <strong>07</strong> orthomosaic ingestion, ERP
               work-order dispatch, and the drone back on charge contacts.
             </p>
@@ -344,6 +340,7 @@
 
 <script src="js/script.js?v=footer-flow-1"></script>
 <script src="js/footer-model-v3.js?v=slow-revolution-1"></script>
-<script src="js/mission.js?v=sim-10"></script>
+<script src="js/mission-3d.js?v=v20-5"></script>
+<script src="js/mission.js?v=v20-5"></script>
 </body>
 </html>
