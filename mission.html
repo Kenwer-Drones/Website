@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulated Mission | Kenwer Drones</title>
+<meta name="description" content="Fly a full Kenwer mission: drone-in-a-box battery swap, autonomous sortie, edge anomaly detection, belief revision from temporal memory, and contingency divert with mission resume.">
+<link rel="canonical" href="https://www.kenwerdrones.com/mission.html">
+<link rel="icon" href="/favicon.ico?v=kenwer-black-2" type="image/x-icon">
+<link rel="alternate icon" href="/favicon.svg?v=kenwer-black-2" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/favicon.png?v=kenwer-black-2">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.kenwerdrones.com/mission.html">
+<meta property="og:title" content="Simulated Mission | Kenwer Drones">
+<meta property="og:description" content="Docking station to dispatched work order: a scroll-driven walkthrough of an end-to-end autonomous inspection, including belief revision and contingency failover.">
+<meta property="og:image" content="https://www.kenwerdrones.com/kenwer-noir.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=EB+Garamond:wght@400;500;600&family=Inter:wght@400;450;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css?v=featured-cards-2">
+<link rel="stylesheet" href="css/footer-v1.css?v=flight-paths-quad-2">
+<link rel="stylesheet" href="css/mission.css?v=sim-10">
+</head>
+<body class="sim-page">
+
+<div class="grain" aria-hidden="true"></div>
+
+<!-- ================= NAV (same shell as the home page) ================= -->
+<nav id="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="index.html" aria-label="Kenwer Drones"><span>KENW<span class="o">E</span>R</span><span>Drones</span></a>
+    <a class="nav-mark" id="navMark" href="index.html" aria-label="Kenwer">
+      <svg viewBox="0 0 200 200"><path d="M 6.4,11.2 C 5.9,11.7 5.9,104.0 6.5,105.2 C 6.7,105.8 6.9,106.5 6.9,106.9 C 6.9,107.8 7.6,109.4 8.5,110.4 C 9.0,110.9 9.3,111.5 9.3,111.6 C 9.3,112.0 14.0,116.7 15.7,117.9 C 16.3,118.4 17.9,119.4 19.1,120.2 C 20.4,121.1 21.8,122.1 22.4,122.6 C 23.3,123.3 23.8,123.7 26.4,125.6 C 26.9,125.9 27.8,126.6 28.5,127.1 C 29.7,128.1 31.4,129.4 32.8,130.4 C 33.3,130.7 34.2,131.4 34.8,131.9 C 37.5,134.0 38.6,134.8 41.0,136.4 C 42.4,137.4 43.8,138.5 44.2,138.9 C 44.5,139.3 45.9,140.3 47.1,141.1 C 48.4,141.9 50.1,143.2 50.9,143.9 C 51.7,144.7 52.8,145.6 53.3,146.0 C 54.3,146.8 54.6,147.3 54.0,147.3 C 53.6,147.3 47.6,144.3 46.7,143.6 C 46.2,143.3 44.1,142.1 41.9,141.0 C 39.8,139.9 37.8,138.8 37.5,138.7 C 37.3,138.4 36.0,137.7 34.7,137.0 C 33.4,136.3 32.2,135.6 31.9,135.4 C 31.7,135.2 29.4,134.0 26.7,132.6 C 24.1,131.3 21.8,130.1 21.6,129.8 C 16.8,125.5 8.6,127.4 6.6,133.3 C 6.0,135.4 5.7,176.9 6.4,177.6 C 6.6,177.8 23.2,177.9 79.0,177.9 C 160.0,177.9 153.4,177.7 154.6,180.1 C 155.7,182.4 162.0,187.5 163.8,187.5 C 164.0,187.5 164.9,187.9 165.8,188.3 C 168.5,189.5 176.2,189.5 178.8,188.3 C 179.8,187.9 180.7,187.5 180.9,187.5 C 181.5,187.5 187.5,183.1 187.5,182.7 C 187.5,182.5 188.0,181.8 188.7,181.1 C 189.4,180.4 189.9,179.7 189.9,179.6 C 189.9,179.4 190.2,178.9 190.5,178.5 C 190.9,178.1 191.8,176.0 192.5,173.7 C 194.6,167.6 194.5,164.2 192.2,159.1 C 191.8,158.3 191.5,157.5 191.5,157.3 C 191.5,157.1 191.2,156.5 190.7,155.9 C 190.3,155.4 189.9,154.8 189.9,154.6 C 189.9,154.4 189.6,154.1 189.3,153.8 C 189.0,153.5 188.6,152.9 188.4,152.4 C 188.2,151.9 187.6,151.2 186.9,150.8 C 186.3,150.4 185.4,149.8 185.0,149.4 C 183.1,147.7 178.6,145.9 175.9,145.9 C 174.1,145.9 173.0,145.6 172.7,144.9 C 172.6,144.7 172.4,119.2 172.3,88.2 C 172.2,42.6 172.1,31.8 171.8,30.8 C 170.7,27.1 170.4,26.1 169.7,24.7 C 169.3,23.9 168.7,22.8 168.3,22.4 C 167.9,21.9 167.5,21.4 167.5,21.2 C 167.5,20.7 163.1,16.3 161.4,15.3 C 159.1,13.7 157.9,13.2 151.5,11.4 C 149.6,10.8 81.7,10.7 80.3,11.3 C 79.8,11.5 78.9,11.7 78.4,11.7 C 76.8,11.7 72.1,13.4 70.3,14.6 C 69.5,15.3 68.2,16.1 67.6,16.6 C 65.8,17.9 64.4,19.2 64.4,19.6 C 64.4,19.8 63.9,20.5 63.3,21.2 C 61.7,22.9 58.8,28.8 58.8,30.3 C 58.8,30.9 58.6,31.8 58.4,32.4 C 57.9,33.7 57.9,40.0 58.4,41.3 C 58.6,41.8 58.8,42.7 58.8,43.4 C 58.8,44.1 59.2,45.2 60.0,46.9 C 60.7,48.3 61.2,49.5 61.2,49.7 C 61.2,49.9 61.6,50.8 62.0,51.7 C 62.5,52.7 62.8,53.6 62.8,53.7 C 62.8,53.9 63.2,54.8 63.6,55.7 C 64.1,56.7 64.4,57.6 64.4,57.7 C 64.4,57.9 65.0,59.1 65.6,60.5 C 66.3,61.9 66.8,63.1 66.8,63.3 C 66.8,63.5 67.4,64.7 68.0,66.1 C 68.7,67.5 69.2,68.7 69.2,68.9 C 69.2,69.0 69.6,69.9 70.0,70.9 C 70.5,71.8 70.8,72.7 70.8,72.9 C 70.8,73.1 71.3,74.3 72.0,75.7 C 72.7,77.1 73.2,78.3 73.2,78.5 C 73.2,78.6 73.6,79.5 74.0,80.5 C 74.5,81.4 74.8,82.3 74.8,82.5 C 74.8,82.6 75.2,83.5 75.6,84.5 C 76.1,85.4 76.4,86.3 76.4,86.5 C 76.4,86.7 76.9,87.9 77.6,89.3 C 78.3,90.6 78.8,91.9 78.8,92.1 C 78.8,92.2 79.3,93.5 80.0,94.9 C 80.7,96.2 81.2,97.5 81.2,97.7 C 81.2,97.8 81.7,99.1 82.4,100.4 C 83.0,101.8 83.7,103.6 84.0,104.5 C 84.3,105.4 85.0,107.2 85.7,108.6 C 86.3,109.9 86.8,111.2 86.8,111.5 C 86.8,111.7 87.1,112.4 87.5,113.2 C 88.2,114.7 88.3,114.8 87.7,114.8 C 87.5,114.8 86.9,113.8 86.2,112.5 C 85.6,111.3 84.9,110.0 84.5,109.6 C 84.2,109.2 83.0,107.2 82.0,105.0 C 80.9,102.9 79.9,101.0 79.7,100.9 C 79.5,100.7 78.8,99.4 78.1,98.1 C 77.4,96.7 76.7,95.4 76.4,95.2 C 76.1,94.9 75.8,94.2 75.6,93.6 C 75.5,93.0 75.2,92.3 74.9,92.1 C 74.7,91.9 74.0,90.6 73.3,89.3 C 72.7,87.9 71.9,86.7 71.7,86.5 C 71.5,86.3 70.4,84.3 69.3,82.1 C 68.2,79.9 67.1,77.9 66.9,77.7 C 66.7,77.5 65.8,75.9 64.9,74.1 C 64.0,72.3 63.1,70.7 62.9,70.5 C 62.7,70.3 61.6,68.3 60.5,66.1 C 59.4,63.9 58.3,61.9 58.1,61.7 C 57.9,61.5 57.2,60.3 56.5,58.9 C 55.9,57.6 55.2,56.3 54.9,56.1 C 54.7,56.0 53.5,53.6 52.1,50.9 C 50.8,48.2 49.5,45.9 49.3,45.7 C 49.1,45.5 48.6,44.6 48.1,43.7 C 47.7,42.8 47.2,41.9 47.0,41.8 C 46.7,41.6 45.5,39.2 44.1,36.5 C 42.8,33.8 41.5,31.5 41.3,31.3 C 41.1,31.1 40.6,30.3 40.2,29.3 C 39.7,28.4 39.2,27.5 39.0,27.3 C 38.7,27.2 38.0,25.9 37.4,24.5 C 36.7,23.2 36.0,21.9 35.8,21.8 C 35.5,21.6 34.8,20.3 34.2,19.0 C 32.3,15.1 29.7,13.0 25.1,11.4 C 23.1,10.7 7.0,10.5 6.4,11.2"/></svg>
+    </a>
+    <div class="nav-right">
+      <a class="contact-nav-link" href="index.html">← Back to site</a>
+      <div class="contact-drop" id="contactDrop">
+        <button class="contact-nav-link" id="contactToggle" aria-expanded="false" aria-haspopup="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Contact<svg class="contact-chevron" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+        <div class="contact-menu" id="contactMenu" aria-hidden="true">
+          <a href="https://www.linkedin.com/company/kenwer-drones/" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>LinkedIn</a>
+          <a href="https://x.com/KenwerDrones" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>X</a>
+          <a href="mailto:hello@kenwerdrones.com"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Email us</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+  <!-- ================= HERO ================= -->
+  <header class="mhero sec-dark" id="top">
+    <div class="wrap">
+      <p class="plabel"><i aria-hidden="true"></i> Simulated mission · representative telemetry</p>
+      <h1 class="disp">Dock to dispatched<br><em>work order.</em> No pilot.</h1>
+      <p class="lede">
+        Kenwer runs the whole loop: the drone-in-a-box swaps its own battery, flies the grid, catches the
+        defect at the edge, then asks <strong>what this asset looked like last time</strong> and revises what
+        it believes. When the weather turns, it saves its place and comes home. Scroll to fly the mission,
+        or trigger a contingency yourself from the HUD.
+      </p>
+
+      <div class="scenarios" role="group" aria-label="Choose an inspection scenario">
+        <span class="lbl">Scenario</span>
+        <button class="pill" type="button" data-scenario="solar" aria-pressed="true"><i aria-hidden="true"></i>Solar Farm</button>
+        <button class="pill" type="button" data-scenario="wind" aria-pressed="false"><i aria-hidden="true"></i>Wind Turbine</button>
+        <button class="pill" type="button" data-scenario="powerline" aria-pressed="false"><i aria-hidden="true"></i>HV Powerline</button>
+      </div>
+
+      <p class="scroll-cue"><span aria-hidden="true"></span> Scroll to begin the sortie</p>
+    </div>
+  </header>
+
+  <!-- ================= SIMULATION ================= -->
+  <section class="sim sec-dark" id="sim" aria-label="Mission simulation">
+    <div class="wrap sim-grid">
+
+      <!-- The simulation window: pinned to the top while the narrative scrolls under it. -->
+      <div class="stage">
+        <div class="hud" id="hud" data-tone="link">
+
+          <div class="hud-title">
+            <span class="ht-name">Dock to dispatched work order</span>
+            <span class="ht-sep" aria-hidden="true"></span>
+            <span class="ht-step" id="hudStepName">01 · Connect</span>
+          </div>
+
+          <span class="bracket tl" aria-hidden="true"></span>
+          <span class="bracket tr" aria-hidden="true"></span>
+          <span class="bracket bl" aria-hidden="true"></span>
+          <span class="bracket br" aria-hidden="true"></span>
+
+          <nav class="spine" id="spine" aria-label="Mission stages"></nav>
+
+          <div class="hud-top">
+            <div class="status-row">
+              <span class="status-dot" aria-hidden="true"></span>
+              <span class="status-txt" id="hudStatus" role="status" aria-live="polite">STANDBY // AWAITING LINK</span>
+              <span class="step-count" id="stepCount">STEP 01/08</span>
+            </div>
+
+            <dl class="telemetry" id="telemetry">
+              <div class="tele" data-cell="batt"><dt>Battery</dt><dd><span data-tele="batt">0</span>%<small data-note="batt">·</small></dd></div>
+              <div class="tele"><dt>Alt</dt><dd><span data-tele="alt">0.0</span><small>m</small></dd></div>
+              <div class="tele" data-cell="spd"><dt>Spd</dt><dd><span data-tele="spd">0.0</span><small data-note="spd">m/s</small></dd></div>
+              <div class="tele" data-slot="a" hidden><dt data-label="a">·</dt><dd><span data-tele="a">·</span></dd></div>
+            </dl>
+
+            <div class="sensor-row" role="group" aria-label="Sensor mode">
+              <span class="lbl">Sensor</span>
+              <button class="mode" type="button" data-mode="rgb" aria-pressed="false">RGB Optical</button>
+              <button class="mode" type="button" data-mode="thermal" aria-pressed="false">Radiometric LWIR</button>
+              <button class="mode" type="button" data-mode="memory" aria-pressed="false">Cognitive Memory</button>
+              <span class="srcstate" id="srcState"><b>AUTO</b> <span id="srcNote">synced to step</span></span>
+            </div>
+          </div>
+
+          <div class="hud-body">
+          <div class="hud-view">
+            <div class="scene-wrap" id="sceneWrap">
+
+              <!-- "meet" (not "slice") so the dock pad and the outer array rows
+                   are never cropped on wide, short viewports. -->
+              <svg class="scene" id="scene" viewBox="0 0 1280 520" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                <defs>
+                  <linearGradient id="sweepGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#EDEBE4" stop-opacity="0"/>
+                    <stop offset=".5" stop-color="#EDEBE4" stop-opacity=".16"/>
+                    <stop offset="1" stop-color="#EDEBE4" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <!-- geometry, dock, grid, flight and drone layers injected by mission.js -->
+              </svg>
+
+              <div class="instruments" aria-hidden="true">
+                <svg class="reticle" viewBox="0 0 1280 520" preserveAspectRatio="xMidYMid meet">
+                  <line x1="640" y1="236" x2="640" y2="252"/>
+                  <line x1="640" y1="268" x2="640" y2="284"/>
+                  <line x1="604" y1="260" x2="620" y2="260"/>
+                  <line x1="660" y1="260" x2="676" y2="260"/>
+                  <circle cx="640" cy="260" r="44"/>
+                </svg>
+
+                <div class="horizon">
+                  <div class="heading"><div class="heading-tape" id="headingTape"></div></div>
+                  <div class="horizon-box">
+                    <div class="horizon-ball" id="horizonBall"></div>
+                    <span class="fix"></span>
+                  </div>
+                </div>
+
+                <svg class="radar" viewBox="0 0 100 100">
+                  <circle class="rim" cx="50" cy="50" r="47"/>
+                  <circle class="ring" cx="50" cy="50" r="32"/>
+                  <circle class="ring" cx="50" cy="50" r="17"/>
+                  <line class="cross" x1="3" y1="50" x2="97" y2="50"/>
+                  <line class="cross" x1="50" y1="3" x2="50" y2="97"/>
+                  <g class="sweep-arm">
+                    <line x1="50" y1="50" x2="50" y2="3" stroke="#EDEBE4" stroke-width="1" opacity=".55"/>
+                  </g>
+                  <g id="radarBlips"></g>
+                  <circle class="blip self" cx="50" cy="50" r="2.2"/>
+                </svg>
+              </div>
+
+              <div class="overlays" id="overlays">
+                <div class="cog-wash" aria-hidden="true"></div>
+                <svg class="memory-link" id="memoryLink" aria-hidden="true"><line x1="0" y1="0" x2="0" y2="0"/></svg>
+
+                <div class="anom ghost" id="anomGhost" aria-hidden="true">
+                  <span class="tagline" id="ghostTag">T-30 DAYS</span>
+                  <span class="subline" id="ghostSub">archived</span>
+                </div>
+
+                <div class="anom" id="anomLive" aria-hidden="true">
+                  <span class="tagline" id="liveTag">ANOMALY</span>
+                  <span class="subline" id="liveSub">analysing</span>
+                </div>
+
+                <div class="card memory-card" id="memoryCard">
+                  <h4><i aria-hidden="true"></i> <span id="memTitle">Cognitive Identity · Temporal Memory</span></h4>
+                  <div class="mrow past">
+                    <div class="k"><span id="memPastK">Prior</span><b id="memPastV">·</b></div>
+                    <div class="bar"><i id="memPastBar"></i></div>
+                  </div>
+                  <div class="mrow crit">
+                    <div class="k"><span id="memNowK">Current</span><b id="memNowV">·</b></div>
+                    <div class="bar"><i id="memNowBar"></i></div>
+                  </div>
+                  <div class="mrow">
+                    <div class="k"><span>Belief confidence</span><b id="memConfV">·</b></div>
+                    <div class="bar"><i id="memConfBar"></i></div>
+                  </div>
+                </div>
+
+                <div class="card result-card" id="resultCard">
+                  <div class="result-head">
+                    <h4><i aria-hidden="true"></i> <span id="resultTitle">Work order dispatched</span></h4>
+                    <span class="wo" id="resultWO">·</span>
+                  </div>
+                  <dl class="result-metrics" id="resultMetrics"></dl>
+                </div>
+
+                <div class="alert" id="alertBox" role="alert">
+                  <h4 id="alertTitle">Contingency</h4>
+                  <p id="alertBody">·</p>
+                  <p class="resume" id="alertResume">·</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="rsz rsz-x" id="rszRail" role="separator" aria-orientation="vertical"
+               tabindex="0" aria-label="Resize the mission log and dock panels"></div>
+
+          <aside class="hud-rail" id="hudRail">
+            <section class="rail-panel panel-log">
+              <header class="rail-head">
+                <i aria-hidden="true"></i> Mission log
+                <button class="log-filter" type="button" id="logFilter" aria-pressed="false"
+                        title="Show only the current step">This step</button>
+                <span class="rt" id="termClock">T+00:00:00</span>
+              </header>
+              <div class="term-body" id="termBody" role="log" aria-live="polite" aria-label="Mission log"></div>
+            </section>
+
+            <div class="rsz rsz-y" id="rszLog" role="separator" aria-orientation="horizontal"
+                 tabindex="0" aria-label="Resize the mission log"></div>
+
+            <section class="rail-panel panel-dock">
+              <header class="rail-head">
+                <i aria-hidden="true"></i> <span id="dockTitle">Dock bay</span>
+              </header>
+              <div class="checks" id="dockChecks"></div>
+            </section>
+          </aside>
+          </div>
+
+          <div class="hud-controls">
+            <span class="lbl">Contingency</span>
+            <button class="ctl batt" type="button" id="ctlBattery"><i aria-hidden="true"></i>Simulate low battery / swap</button>
+            <button class="ctl wind" type="button" id="ctlWind"><i aria-hidden="true"></i>Simulate high wind</button>
+            <span class="hint" id="ctlHint">Subroutines run live in the viewport</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Narrative, below the window. Scrolling this is what drives the simulation. -->
+      <div class="narrative" id="narrative">
+        <noscript>
+          <article class="step is-active">
+            <h2>Mission walkthrough</h2>
+            <p>
+              This simulator runs on JavaScript. The seven-step autonomous lifecycle it animates is:
+              <strong>01</strong> docking-station handshake and robotic battery swap;
+              <strong>02</strong> waypoint synthesis with micro-weather and airspace clearing;
+              <strong>03</strong> precision takeoff and RTK-locked cruise sortie;
+              <strong>04</strong> on-board edge inference flagging a thermal anomaly;
+              <strong>05</strong> the Cognitive Identity Layer querying temporal memory and revising its
+              diagnosis; <strong>06</strong> autonomous contingency handling, a wind-shear divert with the
+              resume point written to persistent memory; and <strong>07</strong> orthomosaic ingestion, ERP
+              work-order dispatch, and the drone back on charge contacts.
+            </p>
+          </article>
+        </noscript>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ================= FOOTER (same as the home page) ================= -->
+<footer class="sec-dark footer">
+  <div class="footer-panel">
+    <div class="footer-flow" id="footerFlow" aria-label="Decorative animated flight path. Click and drag the line to reshape it.">
+      <svg viewBox="0 0 1400 110" preserveAspectRatio="none" id="flowSvg">
+        <path class="flow-hit" id="fp1-hit" data-path="fp1" tabindex="0" role="slider" aria-label="Drag flight path"></path>
+        <path class="flow-path" id="fp1"></path>
+        <g class="flow-drone flow-quad" id="fd2" aria-hidden="true">
+          <line class="fq-arm" x1="-8" y1="-8" x2="8" y2="8"/>
+          <line class="fq-arm" x1="8" y1="-8" x2="-8" y2="8"/>
+          <circle class="fq-rotor" cx="-8" cy="-8" r="3"/>
+          <circle class="fq-rotor" cx="8" cy="-8" r="3"/>
+          <circle class="fq-rotor" cx="-8" cy="8" r="3"/>
+          <circle class="fq-rotor" cx="8" cy="8" r="3"/>
+          <circle class="fq-hub" r="2.4"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="footer-emblem">
+      <canvas class="footer-model" width="200" height="200" tabindex="0" role="img" aria-label="Interactive 3D Kenwer logo. Drag or use arrow keys to rotate. Space pauses rotation. Escape resets."></canvas>
+    </div>
+
+    <div class="footer-center">
+      <h2 class="footer-word">Kenwer<br>Drones</h2>
+      <p class="footer-tag">Where missions become intelligence</p>
+      <div class="footer-cta">
+        <a class="foot-pill" href="https://cal.com/kenwer-drones/30min" id="footCallBtn" rel="noopener">Book an intro call <span class="pill-arrow" aria-hidden="true">→</span></a>
+        <a class="foot-pill ghost" href="mailto:hello@kenwerdrones.com">Email the team <span class="pill-arrow" aria-hidden="true">→</span></a>
+      </div>
+    </div>
+
+      <div class="footer-col footer-contact">
+        <h3>Contact</h3>
+        <p>Tempe, Arizona<br>United States</p>
+        <a class="fb-email" href="mailto:hello@kenwerdrones.com">hello@kenwerdrones.com <span aria-hidden="true">↗</span></a>
+        <div class="fb-social">
+          <a href="https://www.linkedin.com/company/kenwer-drones/" target="_blank" rel="noopener noreferrer" aria-label="Kenwer Drones on LinkedIn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </a>
+          <a href="https://x.com/KenwerDrones" target="_blank" rel="noopener noreferrer" aria-label="Kenwer Drones on X (Twitter)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-nav" role="navigation" aria-label="Footer navigation">
+        <div class="footer-col">
+          <h3>Explore</h3>
+          <a href="index.html#gap">About</a>
+          <a href="index.html#platform">Platform</a>
+          <a href="index.html#deploy">Industries</a>
+          <a href="index.html#journey">Process</a>
+          <a href="index.html#faq">FAQs</a>
+        </div>
+        <div class="footer-col">
+          <h3>Company</h3>
+          <a href="index.html#careers">Careers</a>
+          <a href="mailto:hello@kenwerdrones.com">Contact</a>
+          <a href="#top">Back to top ↑</a>
+        </div>
+      </div>
+
+    <div class="footer-base">
+      <span class="foot-status"><span id="clock">Tempe, AZ --:--:--</span> <span class="muted" id="clockDate"></span></span>
+      <span class="foot-legal muted">Onboarding early partners · ©2026 KENWER LLC</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/script.js?v=footer-flow-1"></script>
+<script src="js/footer-model-v3.js?v=slow-revolution-1"></script>
+<script src="js/mission.js?v=sim-10"></script>
+</body>
+</html>

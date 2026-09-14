@@ -32,7 +32,8 @@ let _rvPolls=0;const _rvTimer=setInterval(()=>{forceRevealInView();if(++_rvPolls
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(align);
   align();
 })();
-requestAnimationFrame(()=>{document.getElementById('heroH').classList.add('split-in');document.querySelectorAll('.hero .rv').forEach(el=>el.classList.add('in'))});
+/* guarded: this script is shared with pages that have no hero (mission.html) */
+requestAnimationFrame(()=>{const hh=document.getElementById('heroH');if(hh)hh.classList.add('split-in');document.querySelectorAll('.hero .rv').forEach(el=>el.classList.add('in'))});
 
 /* ---------- nav bg ---------- */
 const nav=document.getElementById('nav');
