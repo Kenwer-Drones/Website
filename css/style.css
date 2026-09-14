@@ -920,6 +920,18 @@ html:has(.menu-ov.open) nav{color:var(--tx-d)}         /* menu overlay is dark â
 .final-h .l2{margin-left:clamp(24px,6vw,120px)}
 .final-h .l3{display:flex;justify-content:center;gap:clamp(12px,2vw,30px)}
 .final .btn-big{margin-top:64px}
+/* Three closing sections run back to back, and without a break they read as
+   one long block. A hairline rule plus a section label separates them. */
+.final + .final{border-top:1px solid var(--line-d)}
+.final + .final{padding-top:120px}
+.final-eyebrow{
+  display:block;text-align:center;color:var(--mut-d);
+  margin:0 auto clamp(26px,3vw,40px);
+}
+@media(max-width:700px){
+  .final + .final{padding-top:88px}
+}
+
 /* Contact ends directly above the footer monument so the statement and 3D mark stay visually connected. */
 #contact{padding-bottom:28px}
 @media(max-width:700px){
