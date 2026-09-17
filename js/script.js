@@ -138,10 +138,17 @@ function activate(el){
   items.forEach(i=>i.classList.toggle('active',i===el));
   pvT.textContent=el.dataset.t;pvD.textContent=el.dataset.d;pvM.textContent=el.dataset.m;
   const im=document.getElementById('pvImg');
-  if(im&&el.dataset.img&&im.src!==el.dataset.img){
+  im.classList.toggle('ph-normal',el.dataset.blend==='normal');
+  if(im&&el.dataset.img&&im.getAttribute('src')!==el.dataset.img){
     im.style.opacity=0;
     const nx=el.dataset.img;
-    setTimeout(()=>{im.parentElement.style.display='';im.src=nx;im.onload=()=>{im.style.opacity=''}},180);
+    setTimeout(()=>{
+      im.parentElement.style.display='';
+      const show=()=>{im.style.opacity='';im.onload=null};
+      im.onload=show;
+      im.src=nx;
+      if(im.complete) show();
+    },180);
   }
   pv.style.transform='rotate('+(Math.random()*4-2)+'deg)';
   placePv(el);
