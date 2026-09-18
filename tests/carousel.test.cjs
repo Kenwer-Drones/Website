@@ -118,6 +118,30 @@ test('last-card measurement and drag never expose out-of-range track space',()=>
   s.win.dispatch('pointerup',{pointerId:1});
 });
 
+test('finger swipes drag the cards left and right',()=>{
+  const s=setup();
+  const target={closest:()=>null};
+  const start={identifier:7,clientX:320,clientY:100};
+  const left={identifier:7,clientX:100,clientY:105};
+  let prevented=false;
+
+  s.view.dispatch('touchstart',{touches:[start],changedTouches:[start],target});
+  s.view.dispatch('touchmove',{
+    changedTouches:[left],cancelable:true,
+    preventDefault(){prevented=true;}
+  });
+  assert.equal(s.x(),220);
+  assert.equal(prevented,true);
+  s.view.dispatch('touchend',{changedTouches:[left]});
+
+  const restart={identifier:8,clientX:100,clientY:100};
+  const right={identifier:8,clientX:420,clientY:104};
+  s.view.dispatch('touchstart',{touches:[restart],changedTouches:[restart],target});
+  s.view.dispatch('touchmove',{changedTouches:[right],cancelable:true,preventDefault(){}});
+  assert(Math.abs(s.x())<.001);
+  s.view.dispatch('touchend',{changedTouches:[right]});
+});
+
 test('hidden document pauses without catching up when restored',()=>{
   const s=setup();
   s.step(2);
