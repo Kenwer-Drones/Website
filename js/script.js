@@ -983,14 +983,14 @@ function skyfield(id,alpha){
   document.addEventListener('click',function(e){if(!wrap.contains(e.target))wrap.classList.remove('open');});
 })();
 
-/* ---------- platform: one bounded track, slow drift, no automatic rewind ---------- */
+/* ---------- platform: one bounded track, slow back-and-forth drift ---------- */
 (function(){
   const mq=document.getElementById('pmarquee');
   if(!mq||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
   const view=mq.querySelector('.pmq-view'),track=document.getElementById('pmqTrack');
   const group=track.querySelector('.pmq-group'),fwd=document.getElementById('pmqFwd');
   const cards=[...group.querySelectorAll('.pcard-flip')];
-  let x=0,maxX=0,visible=false,hover=false,focused=false,fast=false,raf=0,last=0,endReached=false;
+  let x=0,maxX=0,direction=1,visible=false,hover=false,focused=false,fast=false,raf=0,last=0;
   let pointer=null,startX=0,startY=0,startPosition=0,dragging=false,pauseUntil=0,featuredCard=null;
   const SPEED=60; // CSS pixels per second, independent of screen width or refresh rate.
   function updateFeatured(){
@@ -1009,26 +1009,35 @@ function skyfield(id,alpha){
   function focusCard(card){
     const vr=view.getBoundingClientRect(),cr=card.getBoundingClientRect();
     x+=(cr.left+cr.width/2)-(vr.left+vr.width/2);
-    endReached=false;pauseUntil=performance.now()+1800;paint();
+    pauseUntil=performance.now()+1800;paint();
   }
   function paint(){
-    const reachedEnd=maxX>0&&x>=maxX-.5;
     x=Math.max(0,Math.min(maxX,x));
-    if(reachedEnd)endReached=true;
+    if(maxX<=0||x<=.5)direction=1;
+    else if(x>=maxX-.5)direction=-1;
     track.style.transform='translate3d('+(-x).toFixed(3)+'px,0,0)';
     updateFeatured();
   }
   function measure(){
-    // Use the track's untransformed scroll width; Safari can misreport a flex group's offsetWidth at the end.
-    maxX=Math.max(0,track.scrollWidth-view.clientWidth);
+    /* Derive the end from the final visible card rather than scrollWidth.
+       WebKit can include stale transformed flex overflow in scrollWidth, which
+       lets the track travel into blank space. Adding x removes the current
+       track transform from the card rectangle, so this stays stable in Safari. */
+    const lastCard=cards[cards.length-1];
+    if(lastCard){
+      const vr=view.getBoundingClientRect(),cr=lastCard.getBoundingClientRect();
+      maxX=Math.max(0,x+cr.right-vr.right);
+    }else{
+      maxX=Math.max(0,track.scrollWidth-view.clientWidth);
+    }
     paint();
   }
   function frame(ts){
     raf=0;
     if(!visible||document.hidden){last=0;return;}
     const dt=last?Math.min((ts-last)/1000,.05):0;last=ts;
-    if(!endReached&&pointer===null&&(!hover&&!focused||fast)&&ts>=pauseUntil){
-      x+=SPEED*(fast?3:1)*dt;paint();
+    if(pointer===null&&(!hover&&!focused||fast)&&ts>=pauseUntil){
+      x+=direction*SPEED*(fast?3:1)*dt;paint();
     }
     raf=requestAnimationFrame(frame);
   }
@@ -1050,7 +1059,6 @@ function skyfield(id,alpha){
   view.tabIndex=0;
   view.addEventListener('keydown',e=>{
     if(e.target!==view)return;
-    endReached=false;
     if(e.key==='ArrowRight')x+=240;
     else if(e.key==='ArrowLeft')x-=240;
     else if(e.key==='Home')x=0;
@@ -1060,7 +1068,7 @@ function skyfield(id,alpha){
   });
   view.addEventListener('pointerdown',e=>{
     if(e.button!==0||pointer!==null||e.target.closest('button,a'))return;
-    endReached=false;pointer=e.pointerId;startX=e.clientX;startY=e.clientY;startPosition=x;dragging=false;
+    pointer=e.pointerId;startX=e.clientX;startY=e.clientY;startPosition=x;dragging=false;
   });
   view.addEventListener('pointermove',e=>{
     if(e.pointerId!==pointer)return;
@@ -1085,7 +1093,6 @@ function skyfield(id,alpha){
   view.addEventListener('wheel',e=>{
     if(Math.abs(e.deltaX)<=Math.abs(e.deltaY))return;
     e.preventDefault();
-    endReached=false;
     x+=e.deltaX*(e.deltaMode===1?16:e.deltaMode===2?view.clientWidth:1);
     pauseUntil=performance.now()+1800;paint();
   },{passive:false});
