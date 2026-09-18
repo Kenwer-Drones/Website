@@ -555,7 +555,7 @@ html:has(.menu-ov.open) nav{color:var(--tx-d)}         /* menu overlay is dark â
   /* keep the base pcard transitions (transform, border-color) AND add box-shadow
      for the hover boundary halo â€” otherwise setting a new transition here would
      replace them, killing the lift animation */
-  transition:transform .5s var(--ease),border-color .5s,box-shadow .38s var(--ease)}
+  transition:height .55s var(--ease),transform .5s var(--ease),border-color .5s,box-shadow .38s var(--ease)}
 /* subtle boundary + soft halo while the card is being viewed \u2014 draws the eye
    to the active card in the marquee without competing with the flip motion.
    Applied on .flipped (touch, active state) and on :hover (mouse users). */
