@@ -1067,7 +1067,9 @@ function skyfield(id,alpha){
     e.preventDefault();paint();
   });
   view.addEventListener('pointerdown',e=>{
-    if(e.button!==0||pointer!==null||e.target.closest('button,a'))return;
+    /* Touch gets its own path below. Safari can cancel a Pointer Event before
+       the horizontal threshold is crossed, which made finger swipes inert. */
+    if(e.pointerType==='touch'||e.button!==0||pointer!==null||e.target.closest('button,a'))return;
     pointer=e.pointerId;startX=e.clientX;startY=e.clientY;startPosition=x;dragging=false;
   });
   view.addEventListener('pointermove',e=>{
@@ -1090,6 +1092,38 @@ function skyfield(id,alpha){
   view.addEventListener('pointercancel',release);
   view.addEventListener('lostpointercapture',release);
   view.addEventListener('click',e=>{if(dragging){e.preventDefault();e.stopPropagation();}},true);
+
+  /* Native touch fallback for Safari/iOS. Keep vertical gestures available to
+     the page, but once a gesture is clearly horizontal, drag the card track. */
+  let touch=null;
+  view.addEventListener('touchstart',e=>{
+    if(touch!==null||pointer!==null||e.touches.length!==1||e.target.closest('button,a'))return;
+    const t=e.changedTouches[0];
+    touch=t.identifier;startX=t.clientX;startY=t.clientY;startPosition=x;dragging=false;
+  },{passive:true});
+  view.addEventListener('touchmove',e=>{
+    if(touch===null)return;
+    const t=[...e.changedTouches].find(item=>item.identifier===touch);
+    if(!t)return;
+    const dx=t.clientX-startX,dy=t.clientY-startY;
+    if(!dragging){
+      if(Math.max(Math.abs(dx),Math.abs(dy))<7)return;
+      if(Math.abs(dy)>Math.abs(dx)){touch=null;return;}
+      dragging=true;view.classList.add('dragging');
+    }
+    x=startPosition-dx;paint();
+    if(e.cancelable)e.preventDefault();
+  },{passive:false});
+  function releaseTouch(e){
+    if(touch===null)return;
+    const t=[...e.changedTouches].find(item=>item.identifier===touch);
+    if(!t)return;
+    touch=null;view.classList.remove('dragging');pauseUntil=performance.now()+1800;
+    setTimeout(()=>{dragging=false;},0);
+  }
+  view.addEventListener('touchend',releaseTouch,{passive:true});
+  view.addEventListener('touchcancel',releaseTouch,{passive:true});
+
   view.addEventListener('wheel',e=>{
     if(Math.abs(e.deltaX)<=Math.abs(e.deltaY))return;
     e.preventDefault();
