@@ -75,8 +75,8 @@ Deno.serve(async (req: Request) => {
     const position = val(data,"position",160) || null;
     const linkedin = val(data,"linkedin",500) || null;
     const experience = val(data,"experience",5000) || null;
-    if (!full_name || !/^\\S+@\\S+\\.\\S+$/.test(email) || !phone || !college ||
-        !/^\\d{4}-(0[1-9]|1[0-2])$/.test(gradMonth)) {
+    if (!full_name || !/^\S+@\S+\.\S+$/.test(email) || !phone || !college ||
+        !/^\d{4}-(0[1-9]|1[0-2])$/.test(gradMonth)) {
       return response(400,{error:"Complete all required fields."},origin);
     }
     const resume = validateFile(data.get("resume"),true)!;
