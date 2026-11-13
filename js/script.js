@@ -1338,6 +1338,7 @@ function skyfield(id,alpha){
     oldOpenCareers();
     initCareersTurnstile();
   };
+  window.initCareersTurnstile=initCareersTurnstile;
   window.addEventListener('load',initCareersTurnstile);
 
   async function careersRequest(data){
