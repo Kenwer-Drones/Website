@@ -12,7 +12,7 @@ create table if not exists public.applicants (
   position text,
   linkedin text,
   experience text,
-  resume_path text not null,
+  resume_path text not null unique,
   cover_letter_path text
 );
 alter table public.applicants enable row level security;
