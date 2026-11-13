@@ -1337,9 +1337,15 @@ function skyfield(id,alpha){
 
     var valid=true;
     form.querySelectorAll('[required]').forEach(function(el){if(!el.value.trim())valid=false;});
-    var resumeFile=form.resume.files[0],coverFile=form.coverLetter.files[0]||null;
+    // Access named controls explicitly: HTMLFormElement properties can collide with native methods.
+    var field=function(name){return form.elements.namedItem(name);};
+    var resumeFile=field('resume').files[0],coverFile=field('coverLetter').files[0]||null;
     if(!valid||!resumeFile){alert('Please fill in all required fields and attach your resume.');return;}
     if(resumeFile.size>MAX_FILE_BYTES||(coverFile&&coverFile.size>MAX_FILE_BYTES)){alert('Resume and cover letter must each be under 5 MB.');return;}
+    var allowedExt=/\.(pdf|doc|docx)$/i;
+    if(!allowedExt.test(resumeFile.name)||(coverFile&&!allowedExt.test(coverFile.name))){
+      alert('Please upload PDF or Word files only.');return;
+    }
     if(!sb){alert('Application system is temporarily unavailable. Please email us directly instead.');return;}
 
     var submitBtn=form.querySelector('.cf-submit');
@@ -1348,38 +1354,48 @@ function skyfield(id,alpha){
     submitBtn.innerHTML='Submitting…';
 
     var stamp=randomStamp();
-    var resumePath=stamp+'/resume-'+resumeFile.name;
-    var coverPath=coverFile?stamp+'/cover-letter-'+coverFile.name:null;
-    var gradDateVal=form.gradDate.value?form.gradDate.value+'-01':null;
+    var safeName=function(file){return file.name.replace(/[^a-zA-Z0-9._-]/g,'_').slice(-100);};
+    var resumePath=stamp+'/resume-'+safeName(resumeFile);
+    var coverPath=coverFile?stamp+'/cover-letter-'+safeName(coverFile):null;
+    var gradDateVal=field('gradDate').value?field('gradDate').value+'-01':null;
+    var stage='resume upload';
 
-    sb.storage.from('resumes').upload(resumePath,resumeFile)
+    function checked(result){
+      if(result.error)throw result.error;
+      return result;
+    }
+
+    sb.storage.from('resumes').upload(resumePath,resumeFile,{upsert:false})
       .then(function(res){
-        if(res.error)throw res.error;
-        return coverFile?sb.storage.from('resumes').upload(coverPath,coverFile):Promise.resolve({error:null});
+        checked(res);
+        if(!coverFile)return null;
+        stage='cover letter upload';
+        return sb.storage.from('resumes').upload(coverPath,coverFile,{upsert:false}).then(checked);
       })
-      .then(function(res){
-        if(res.error)throw res.error;
+      .then(function(){
+        stage='application record';
         return sb.from('applicants').insert({
-          full_name:form.fullName.value.trim(),
-          email:form.email.value.trim(),
-          phone:form.phone.value.trim(),
-          college:form.college.value.trim(),
+          full_name:field('fullName').value.trim(),
+          email:field('email').value.trim(),
+          phone:field('phone').value.trim(),
+          college:field('college').value.trim(),
           grad_date:gradDateVal,
-          position:form.position.value||null,
-          linkedin:form.linkedin.value.trim()||null,
-          experience:form.experience.value.trim()||null,
+          position:field('position').value||null,
+          linkedin:field('linkedin').value.trim()||null,
+          experience:field('experience').value.trim()||null,
           resume_path:resumePath,
           cover_letter_path:coverPath
-        });
+        }).then(checked);
       })
-      .then(function(res){
-        if(res.error)throw res.error;
+      .then(function(){
         form.style.display='none';
         document.getElementById('cfSuccess').style.display='block';
       })
       .catch(function(err){
-        console.error('Careers form submission failed:',err);
-        alert('Something went wrong submitting your application. Please try again or email us directly.');
+        console.error('Careers form submission failed at '+stage+':',err);
+        var code=err&&(err.code||err.statusCode||err.status);
+        var reason=code?' (error '+String(code)+')':'';
+        alert('We could not complete your '+stage+reason+'. Your application has NOT been confirmed. Please email hello@kenwerdrones.com or contact us with this error.');
         submitBtn.disabled=false;
         submitBtn.innerHTML=originalHTML;
       });
