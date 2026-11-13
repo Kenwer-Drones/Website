@@ -1334,7 +1334,7 @@ function skyfield(id,alpha){
     var resumeFile=field('resume').files[0];
     var coverFile=field('coverLetter').files[0]||null;
     if(!resumeFile){alert('Please attach your resume.');return;}
-    var allowedExt=/\\.(pdf|doc|docx)$/i;
+    var allowedExt=/\.(pdf|doc|docx)$/i;
     if(!allowedExt.test(resumeFile.name)||(coverFile&&!allowedExt.test(coverFile.name))){
       alert('Please use PDF or Word files.');return;
     }
