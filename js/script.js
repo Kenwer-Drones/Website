@@ -1296,6 +1296,10 @@ function skyfield(id,alpha){
           <span class="cf-hint">PDF or Word · Max 5 MB · Optional</span>
         </div>
       </div>
+      <div style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden" aria-hidden="true">
+        <label for="cfCompanyWebsite">Leave this field blank</label>
+        <input id="cfCompanyWebsite" name="companyWebsite" type="text" tabindex="-1" autocomplete="off">
+      </div>
       <button type="submit" class="cf-submit">Submit Application <span class="sq">→</span></button>
     </form>
     <div class="cf-success" id="cfSuccess">
@@ -1318,87 +1322,59 @@ function skyfield(id,alpha){
   if(footLink)footLink.addEventListener('click',function(e){e.preventDefault();openCareers();});
   /* removed: click-outside-to-close — only the X button closes the careers modal */
 
-  /* ---- Supabase: stores the application row + uploads the two files ---- */
-  var SUPABASE_URL='https://rgevwosnbeglfsagfqpk.supabase.co';
-  var SUPABASE_KEY='sb_publishable_npilwVrdEihiu09ks9a0qQ_XomiqUFr';
-  var sb=(window.supabase&&window.supabase.createClient)
-    ?window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY)
-    :null;
-
+  /* ---- Careers: single secure submission via Supabase Edge Function ---- */
+  var CAREERS_ENDPOINT='https://imoulrezdhgbqtzfvsxx.supabase.co/functions/v1/careers-submit';
   var MAX_FILE_BYTES=5*1024*1024;
+  var careersSubmissionId=(window.crypto&&window.crypto.randomUUID)
+    ?window.crypto.randomUUID():null;
 
-  function randomStamp(){
-    return Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8);
-  }
-
-  document.getElementById('careersForm').addEventListener('submit',function(e){
+  document.getElementById('careersForm').addEventListener('submit',async function(e){
     e.preventDefault();
     var form=this;
-
-    var valid=true;
-    form.querySelectorAll('[required]').forEach(function(el){if(!el.value.trim())valid=false;});
-    // Access named controls explicitly: HTMLFormElement properties can collide with native methods.
+    if(!form.checkValidity()){form.reportValidity();return;}
     var field=function(name){return form.elements.namedItem(name);};
-    var resumeFile=field('resume').files[0],coverFile=field('coverLetter').files[0]||null;
-    if(!valid||!resumeFile){alert('Please fill in all required fields and attach your resume.');return;}
-    if(resumeFile.size>MAX_FILE_BYTES||(coverFile&&coverFile.size>MAX_FILE_BYTES)){alert('Resume and cover letter must each be under 5 MB.');return;}
+    var resumeFile=field('resume').files[0];
+    var coverFile=field('coverLetter').files[0]||null;
+    if(!resumeFile){alert('Please attach your resume.');return;}
     var allowedExt=/\.(pdf|doc|docx)$/i;
     if(!allowedExt.test(resumeFile.name)||(coverFile&&!allowedExt.test(coverFile.name))){
-      alert('Please upload PDF or Word files only.');return;
+      alert('Please use PDF or Word files.');return;
     }
-    if(!sb){alert('Application system is temporarily unavailable. Please email us directly instead.');return;}
-
-    var submitBtn=form.querySelector('.cf-submit');
-    var originalHTML=submitBtn.innerHTML;
-    submitBtn.disabled=true;
-    submitBtn.innerHTML='Submitting…';
-
-    var stamp=randomStamp();
-    var safeName=function(file){return file.name.replace(/[^a-zA-Z0-9._-]/g,'_').slice(-100);};
-    var resumePath=stamp+'/resume-'+safeName(resumeFile);
-    var coverPath=coverFile?stamp+'/cover-letter-'+safeName(coverFile):null;
-    var gradDateVal=field('gradDate').value?field('gradDate').value+'-01':null;
-    var stage='resume upload';
-
-    function checked(result){
-      if(result.error)throw result.error;
-      return result;
+    if(resumeFile.size>MAX_FILE_BYTES||(coverFile&&coverFile.size>MAX_FILE_BYTES)){
+      alert('Files must each be under 5 MB.');return;
     }
 
-    sb.storage.from('resumes').upload(resumePath,resumeFile,{upsert:false})
-      .then(function(res){
-        checked(res);
-        if(!coverFile)return null;
-        stage='cover letter upload';
-        return sb.storage.from('resumes').upload(coverPath,coverFile,{upsert:false}).then(checked);
-      })
-      .then(function(){
-        stage='application record';
-        return sb.from('applicants').insert({
-          full_name:field('fullName').value.trim(),
-          email:field('email').value.trim(),
-          phone:field('phone').value.trim(),
-          college:field('college').value.trim(),
-          grad_date:gradDateVal,
-          position:field('position').value||null,
-          linkedin:field('linkedin').value.trim()||null,
-          experience:field('experience').value.trim()||null,
-          resume_path:resumePath,
-          cover_letter_path:coverPath
-        }).then(checked);
-      })
-      .then(function(){
-        form.style.display='none';
-        document.getElementById('cfSuccess').style.display='block';
-      })
-      .catch(function(err){
-        console.error('Careers form submission failed at '+stage+':',err);
-        var code=err&&(err.code||err.statusCode||err.status);
-        var reason=code?' (error '+String(code)+')':'';
-        alert('We could not complete your '+stage+reason+'. Your application has NOT been confirmed. Please email hello@kenwerdrones.com or contact us with this error.');
-        submitBtn.disabled=false;
-        submitBtn.innerHTML=originalHTML;
-      });
+    var btn=form.querySelector('.cf-submit'),originalHTML=btn.innerHTML;
+    btn.disabled=true;
+    btn.innerHTML='Submitting…';
+    try{
+      if(!careersSubmissionId)throw new Error('Secure submission is not supported in this browser.');
+      var data=new FormData(form);
+      data.append('submissionId',careersSubmissionId);
+      var controller=new AbortController();
+      var timeout=setTimeout(function(){controller.abort();},45000);
+      var res;
+      try{
+        res=await fetch(CAREERS_ENDPOINT,{method:'POST',body:data,signal:controller.signal});
+      }finally{
+        clearTimeout(timeout);
+      }
+      var payload=await res.json().catch(function(){return {};});
+      if(!res.ok||payload.success!==true){
+        throw new Error(payload.error||'The application service did not accept the submission.');
+      }
+      form.style.display='none';
+      document.getElementById('cfSuccess').style.display='block';
+    }catch(err){
+      console.error('Careers submission failed:',err);
+      alert(err.name==='AbortError'
+        ? 'The upload timed out. Please try again or email hello@kenwerdrones.com.'
+        : 'Application could not be completed: '+(err.message||'Network issue')+
+          '. Please contact hello@kenwerdrones.com if the problem continues.');
+    }finally{
+      btn.disabled=false;
+      btn.innerHTML=originalHTML;
+    }
   });
 })();
 
