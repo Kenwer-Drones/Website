@@ -86,6 +86,14 @@ Deno.serve(async (req: Request) => {
       return response(400,{error:"The uploaded file does not match its PDF or Word extension."},origin);
     }
 
+    const submissionId=val(data,"submissionId",36);
+    if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(submissionId)) {
+      return response(400,{error:"Invalid submission ID. Please refresh and try again."},origin);
+    }
+    const {data:prior,error:priorError}=await sb.from("applicants").select("id").eq("submission_id",submissionId).maybeSingle();
+    if(priorError) throw new Error("Application lookup failed");
+    if(prior) return response(200,{success:true,duplicate:true},origin);
+
     const fingerprint=await ipFingerprint(req);
     const {data:allowed,error:limitError}=await sb.rpc("consume_careers_limit",{p_fingerprint:fingerprint});
     if (limitError) {
@@ -94,7 +102,7 @@ Deno.serve(async (req: Request) => {
     }
     if (!allowed) return response(429,{error:"Too many submissions. Please try again later."},origin);
 
-    const unique=crypto.randomUUID();
+    const unique=submissionId;
     const resumePath=unique+"/resume."+resume.ext;
     const coverPath=cover?unique+"/cover."+cover.ext:null;
     const {error:resumeError}=await sb.storage.from("resumes").upload(resumePath,resume.file,{
@@ -115,10 +123,14 @@ Deno.serve(async (req: Request) => {
       }
     }
     const {error:dbError}=await sb.from("applicants").insert({
-      full_name,email,phone,college,grad_date:gradMonth+"-01",
+      submission_id:submissionId,full_name,email,phone,college,grad_date:gradMonth+"-01",
       position,linkedin,experience,resume_path:resumePath,cover_letter_path:coverPath
     });
     if (dbError) {
+      if(dbError.code==="23505"){
+        const {data:existing}=await sb.from("applicants").select("id").eq("submission_id",submissionId).maybeSingle();
+        if(existing) return response(200,{success:true,duplicate:true},origin);
+      }
       await sb.storage.from("resumes").remove([resumePath,...(coverPath?[coverPath]:[])]);
       console.error("careers database insert",dbError.code);
       return response(502,{error:"Could not save application details. Please try again."},origin);
