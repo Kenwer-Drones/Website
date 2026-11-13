@@ -1325,6 +1325,8 @@ function skyfield(id,alpha){
   /* ---- Careers: single secure submission via Supabase Edge Function ---- */
   var CAREERS_ENDPOINT='https://imoulrezdhgbqtzfvsxx.supabase.co/functions/v1/careers-submit';
   var MAX_FILE_BYTES=5*1024*1024;
+  var careersSubmissionId=(window.crypto&&window.crypto.randomUUID)
+    ?window.crypto.randomUUID():null;
 
   document.getElementById('careersForm').addEventListener('submit',async function(e){
     e.preventDefault();
@@ -1346,7 +1348,9 @@ function skyfield(id,alpha){
     btn.disabled=true;
     btn.innerHTML='Submitting…';
     try{
+      if(!careersSubmissionId)throw new Error('Secure submission is not supported in this browser.');
       var data=new FormData(form);
+      data.append('submissionId',careersSubmissionId);
       var controller=new AbortController();
       var timeout=setTimeout(function(){controller.abort();},45000);
       var res;
