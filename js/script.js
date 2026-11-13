@@ -216,7 +216,7 @@ tick();setInterval(tick,1000);
   let lift=0;
 
   const FLOW_SUPABASE_URL='https://imoulrezdhgbqtzfvsxx.supabase.co';
-  const FLOW_SUPABASE_KEY='REPLACE_WITH_NEW_SUPABASE_PUBLISHABLE_KEY';
+  const FLOW_SUPABASE_KEY='sb_publishable_hSq1LL7o__E8lPPEEa1pJQ_Z8VnZc2V';
   const flowDb=(window.supabase&&window.supabase.createClient)
     ?window.supabase.createClient(FLOW_SUPABASE_URL,FLOW_SUPABASE_KEY)
     :null;
