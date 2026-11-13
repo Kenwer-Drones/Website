@@ -1296,7 +1296,10 @@ function skyfield(id,alpha){
           <span class="cf-hint">PDF or Word · Max 5 MB · Optional</span>
         </div>
       </div>
-      <div class="cf-group"><div id="careersTurnstile" aria-label="Spam protection verification"></div></div>
+      <div style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden" aria-hidden="true">
+        <label for="cfCompanyWebsite">Leave this field blank</label>
+        <input id="cfCompanyWebsite" name="companyWebsite" type="text" tabindex="-1" autocomplete="off">
+      </div>
       <button type="submit" class="cf-submit">Submit Application <span class="sq">→</span></button>
     </form>
     <div class="cf-success" id="cfSuccess">
@@ -1319,39 +1322,9 @@ function skyfield(id,alpha){
   if(footLink)footLink.addEventListener('click',function(e){e.preventDefault();openCareers();});
   /* removed: click-outside-to-close — only the X button closes the careers modal */
 
-  /* ---- Careers: private server endpoint + signed Supabase uploads ---- */
-  var SUPABASE_URL='https://imoulrezdhgbqtzfvsxx.supabase.co';
-  var SUPABASE_KEY='sb_publishable_hSq1LL7o__E8lPPEEa1pJQ_Z8VnZc2V';
-  var TURNSTILE_SITE_KEY='REPLACE_WITH_TURNSTILE_SITE_KEY';
-  var sb=(window.supabase&&window.supabase.createClient)
-    ?window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}})
-    :null;
-  var turnstileWidgetId=null;
+  /* ---- Careers: single secure submission via Supabase Edge Function ---- */
+  var CAREERS_ENDPOINT='https://imoulrezdhgbqtzfvsxx.supabase.co/functions/v1/careers-submit';
   var MAX_FILE_BYTES=5*1024*1024;
-
-  function initCareersTurnstile(){
-    if(turnstileWidgetId!==null||!window.turnstile||TURNSTILE_SITE_KEY.startsWith('REPLACE_'))return;
-    turnstileWidgetId=window.turnstile.render('#careersTurnstile',{sitekey:TURNSTILE_SITE_KEY});
-  }
-  var oldOpenCareers=openCareers;
-  openCareers=function(){
-    oldOpenCareers();
-    initCareersTurnstile();
-  };
-  window.initCareersTurnstile=initCareersTurnstile;
-  window.addEventListener('load',initCareersTurnstile);
-
-  async function careersRequest(data){
-    var response=await fetch('/api/careers',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(data)
-    });
-    var payload=await response.json().catch(function(){return {};});
-    if(!response.ok)throw Error(payload.error||'Submission service unavailable');
-    return payload;
-  }
-  function fileMeta(file){return file?{name:file.name,size:file.size}:null;}
 
   document.getElementById('careersForm').addEventListener('submit',async function(e){
     e.preventDefault();
@@ -1368,49 +1341,32 @@ function skyfield(id,alpha){
     if(resumeFile.size>MAX_FILE_BYTES||(coverFile&&coverFile.size>MAX_FILE_BYTES)){
       alert('Files must each be under 5 MB.');return;
     }
-    if(!sb){alert('Application service is unavailable.');return;}
-    var captchaToken=turnstileWidgetId!==null&&window.turnstile
-      ?window.turnstile.getResponse(turnstileWidgetId):'';
-    if(!captchaToken){alert('Please complete the security verification.');return;}
 
     var btn=form.querySelector('.cf-submit'),originalHTML=btn.innerHTML;
     btn.disabled=true;
     btn.innerHTML='Submitting…';
     try{
-      var applicant={
-        full_name:field('fullName').value.trim(),
-        email:field('email').value.trim(),
-        phone:field('phone').value.trim(),
-        college:field('college').value.trim(),
-        grad_date:field('gradDate').value?field('gradDate').value+'-01':null,
-        position:field('position').value||null,
-        linkedin:field('linkedin').value.trim()||null,
-        experience:field('experience').value.trim()||null
-      };
-      var start=await careersRequest({
-        action:'start',applicant,resume:fileMeta(resumeFile),
-        cover:fileMeta(coverFile),turnstileToken:captchaToken
-      });
-      var uploaded=await sb.storage.from('resumes').uploadToSignedUrl(
-        start.uploads.resume.path,start.uploads.resume.token,resumeFile,
-        {contentType:resumeFile.type||undefined}
-      );
-      if(uploaded.error)throw uploaded.error;
-      if(coverFile){
-        uploaded=await sb.storage.from('resumes').uploadToSignedUrl(
-          start.uploads.cover.path,start.uploads.cover.token,coverFile,
-          {contentType:coverFile.type||undefined}
-        );
-        if(uploaded.error)throw uploaded.error;
+      var data=new FormData(form);
+      var controller=new AbortController();
+      var timeout=setTimeout(function(){controller.abort();},45000);
+      var res;
+      try{
+        res=await fetch(CAREERS_ENDPOINT,{method:'POST',body:data,signal:controller.signal});
+      }finally{
+        clearTimeout(timeout);
       }
-      await careersRequest({action:'complete',receipt:start.receipt});
+      var payload=await res.json().catch(function(){return {};});
+      if(!res.ok||payload.success!==true){
+        throw new Error(payload.error||'The application service did not accept the submission.');
+      }
       form.style.display='none';
       document.getElementById('cfSuccess').style.display='block';
     }catch(err){
       console.error('Careers submission failed:',err);
-      alert('Application could not be completed: '+(err.message||'Unknown error')+
-        '. Please contact hello@kenwerdrones.com if the problem continues.');
-      if(turnstileWidgetId!==null&&window.turnstile)window.turnstile.reset(turnstileWidgetId);
+      alert(err.name==='AbortError'
+        ? 'The upload timed out. Please try again or email hello@kenwerdrones.com.'
+        : 'Application could not be completed: '+(err.message||'Network issue')+
+          '. Please contact hello@kenwerdrones.com if the problem continues.');
     }finally{
       btn.disabled=false;
       btn.innerHTML=originalHTML;
