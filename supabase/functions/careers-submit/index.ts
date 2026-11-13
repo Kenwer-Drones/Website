@@ -72,8 +72,8 @@ Deno.serve(async (req: Request) => {
     if (!serviceKey || !base) throw new Error("Backend configuration missing");
     const sb = createClient(base, serviceKey, {auth:{autoRefreshToken:false,persistSession:false}});
     const data = await req.formData();
-    // A hidden honeypot field stops simple automated form submissions.
-    if (val(data,"companyWebsite",150)) return response(400,{error:"Submission rejected"},origin);
+    // Browser autofill can populate hidden fields. Rely on server-side rate
+    // limiting, file validation and idempotency rather than a honeypot.
     const full_name = val(data,"fullName",160);
     const email = val(data,"email",254);
     const phone = val(data,"phone",60);
