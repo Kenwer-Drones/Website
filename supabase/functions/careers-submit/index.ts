@@ -49,6 +49,71 @@ async function ipFingerprint(req: Request): Promise<string> {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(secret + ":" + ip));
   return Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2,"0")).join("");
 }
+// An optional, server-side notification. Applicant data is saved even when
+// mail delivery is unconfigured or the email service is temporarily down.
+async function encodeAttachment(file: File): Promise<string> {
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  // Use chunks to avoid stack overflows with 5 MB files.
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += 8192) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + 8192));
+  }
+  return btoa(binary);
+}
+async function notifyRecruiting(
+  fullName: string, email: string, phone: string, college: string,
+  graduation: string, position: string | null, linkedin: string | null,
+  experience: string | null, resume: File, cover: File | null,
+  submissionId: string
+): Promise<{ id: string } | null> {
+  const apiKey = Deno.env.get("RESEND_API_KEY");
+  if (!apiKey) return null;
+  const attachments = [
+    { filename: resume.name.replace(/[^a-zA-Z0-9._ -]/g, "_").slice(-120), content: await encodeAttachment(resume) }
+  ];
+  if (cover) attachments.push({
+    filename: cover.name.replace(/[^a-zA-Z0-9._ -]/g, "_").slice(-120),
+    content: await encodeAttachment(cover)
+  });
+  const textBody = [
+    "New Kenwer Drones career application",
+    "",
+    "Name: " + fullName,
+    "Email: " + email,
+    "Phone: " + phone,
+    "College/University: " + college,
+    "Graduation: " + graduation,
+    "Position: " + (position || "Not specified"),
+    "LinkedIn: " + (linkedin || "Not provided"),
+    "",
+    "Previous experience:",
+    experience || "Not provided",
+    "",
+    "Resume attached" + (cover ? " (cover letter also attached)." : "."),
+    "Submission ID: " + submissionId
+  ].join("\n");
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer " + apiKey,
+      "Content-Type": "application/json",
+      "Idempotency-Key": "kenwer-careers-" + submissionId
+    },
+    body: JSON.stringify({
+      from: "Kenwer Careers <careers@kenwerdrones.com>",
+      to: ["hello@kenwerdrones.com"],
+      reply_to: email,
+      subject: "[Kenwer Careers] New application - " + (position || "General") + " - " + fullName,
+      text: textBody,
+      attachments
+    }),
+    signal: AbortSignal.timeout(15000)
+  });
+  const payload = await res.json().catch(() => ({}));
+  if (!res.ok || !payload.id) throw Error("Email provider rejected the request (HTTP " + res.status + ")");
+  return { id: payload.id };
+}
+
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get("origin");
   if (req.method === "OPTIONS") {
@@ -131,7 +196,8 @@ Deno.serve(async (req: Request) => {
     }
     const {error:dbError}=await sb.from("applicants").insert({
       submission_id:submissionId,full_name,email,phone,college,grad_date:gradMonth+"-01",
-      position,linkedin,experience,resume_path:resumePath,cover_letter_path:coverPath
+      position,linkedin,experience,resume_path:resumePath,cover_letter_path:coverPath,
+      notification_status:"pending"
     });
     if (dbError) {
       if(dbError.code==="23505"){
@@ -141,6 +207,26 @@ Deno.serve(async (req: Request) => {
       await sb.storage.from("resumes").remove([resumePath,...(coverPath?[coverPath]:[])]);
       console.error("careers database insert",dbError.code);
       return response(502,{error:"Could not save application details. Please try again."},origin);
+    }
+    // Email delivery failure must never discard a valid applicant record.
+    if (Deno.env.get("RESEND_API_KEY")) {
+      try {
+        const sent = await notifyRecruiting(
+          full_name,email,phone,college,gradMonth,position,linkedin,experience,
+          resume.file,cover?.file ?? null,submissionId
+        );
+        if (sent) {
+          const {error:statusError}=await sb.from("applicants")
+            .update({notification_status:"sent",notification_sent_at:new Date().toISOString(),
+                     notification_provider_id:sent.id})
+            .eq("submission_id",submissionId);
+          if (statusError) console.error("careers notification status update failed",statusError.code);
+        }
+      } catch (notifyError) {
+        console.error("careers email notification failed",
+          notifyError instanceof Error ? notifyError.message : "unknown");
+        await sb.from("applicants").update({notification_status:"failed"}).eq("submission_id",submissionId);
+      }
     }
     return response(201,{success:true},origin);
   } catch (error) {
