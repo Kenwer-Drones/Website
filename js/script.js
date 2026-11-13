@@ -1296,6 +1296,7 @@ function skyfield(id,alpha){
           <span class="cf-hint">PDF or Word · Max 5 MB · Optional</span>
         </div>
       </div>
+      <div class="cf-group"><div id="careersTurnstile" aria-label="Spam protection verification"></div></div>
       <button type="submit" class="cf-submit">Submit Application <span class="sq">→</span></button>
     </form>
     <div class="cf-success" id="cfSuccess">
@@ -1318,87 +1319,101 @@ function skyfield(id,alpha){
   if(footLink)footLink.addEventListener('click',function(e){e.preventDefault();openCareers();});
   /* removed: click-outside-to-close — only the X button closes the careers modal */
 
-  /* ---- Supabase: stores the application row + uploads the two files ---- */
-  var SUPABASE_URL='https://rgevwosnbeglfsagfqpk.supabase.co';
-  var SUPABASE_KEY='sb_publishable_npilwVrdEihiu09ks9a0qQ_XomiqUFr';
+  /* ---- Careers: private server endpoint + signed Supabase uploads ---- */
+  var SUPABASE_URL='https://imoulrezdhgbqtzfvsxx.supabase.co';
+  var SUPABASE_KEY='sb_publishable_hSq1LL7o__E8lPPEEa1pJQ_Z8VnZc2V';
+  var TURNSTILE_SITE_KEY='REPLACE_WITH_TURNSTILE_SITE_KEY';
   var sb=(window.supabase&&window.supabase.createClient)
-    ?window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY)
+    ?window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}})
     :null;
-
+  var turnstileWidgetId=null;
   var MAX_FILE_BYTES=5*1024*1024;
 
-  function randomStamp(){
-    return Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8);
+  function initCareersTurnstile(){
+    if(turnstileWidgetId!==null||!window.turnstile||TURNSTILE_SITE_KEY.startsWith('REPLACE_'))return;
+    turnstileWidgetId=window.turnstile.render('#careersTurnstile',{sitekey:TURNSTILE_SITE_KEY});
   }
+  var oldOpenCareers=openCareers;
+  openCareers=function(){
+    oldOpenCareers();
+    initCareersTurnstile();
+  };
+  window.addEventListener('load',initCareersTurnstile);
 
-  document.getElementById('careersForm').addEventListener('submit',function(e){
+  async function careersRequest(data){
+    var response=await fetch('/api/careers',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(data)
+    });
+    var payload=await response.json().catch(function(){return {};});
+    if(!response.ok)throw Error(payload.error||'Submission service unavailable');
+    return payload;
+  }
+  function fileMeta(file){return file?{name:file.name,size:file.size}:null;}
+
+  document.getElementById('careersForm').addEventListener('submit',async function(e){
     e.preventDefault();
     var form=this;
-
-    var valid=true;
-    form.querySelectorAll('[required]').forEach(function(el){if(!el.value.trim())valid=false;});
-    // Access named controls explicitly: HTMLFormElement properties can collide with native methods.
+    if(!form.checkValidity()){form.reportValidity();return;}
     var field=function(name){return form.elements.namedItem(name);};
-    var resumeFile=field('resume').files[0],coverFile=field('coverLetter').files[0]||null;
-    if(!valid||!resumeFile){alert('Please fill in all required fields and attach your resume.');return;}
-    if(resumeFile.size>MAX_FILE_BYTES||(coverFile&&coverFile.size>MAX_FILE_BYTES)){alert('Resume and cover letter must each be under 5 MB.');return;}
-    var allowedExt=/\.(pdf|doc|docx)$/i;
+    var resumeFile=field('resume').files[0];
+    var coverFile=field('coverLetter').files[0]||null;
+    if(!resumeFile){alert('Please attach your resume.');return;}
+    var allowedExt=/\\.(pdf|doc|docx)$/i;
     if(!allowedExt.test(resumeFile.name)||(coverFile&&!allowedExt.test(coverFile.name))){
-      alert('Please upload PDF or Word files only.');return;
+      alert('Please use PDF or Word files.');return;
     }
-    if(!sb){alert('Application system is temporarily unavailable. Please email us directly instead.');return;}
-
-    var submitBtn=form.querySelector('.cf-submit');
-    var originalHTML=submitBtn.innerHTML;
-    submitBtn.disabled=true;
-    submitBtn.innerHTML='Submitting…';
-
-    var stamp=randomStamp();
-    var safeName=function(file){return file.name.replace(/[^a-zA-Z0-9._-]/g,'_').slice(-100);};
-    var resumePath=stamp+'/resume-'+safeName(resumeFile);
-    var coverPath=coverFile?stamp+'/cover-letter-'+safeName(coverFile):null;
-    var gradDateVal=field('gradDate').value?field('gradDate').value+'-01':null;
-    var stage='resume upload';
-
-    function checked(result){
-      if(result.error)throw result.error;
-      return result;
+    if(resumeFile.size>MAX_FILE_BYTES||(coverFile&&coverFile.size>MAX_FILE_BYTES)){
+      alert('Files must each be under 5 MB.');return;
     }
+    if(!sb){alert('Application service is unavailable.');return;}
+    var captchaToken=turnstileWidgetId!==null&&window.turnstile
+      ?window.turnstile.getResponse(turnstileWidgetId):'';
+    if(!captchaToken){alert('Please complete the security verification.');return;}
 
-    sb.storage.from('resumes').upload(resumePath,resumeFile,{upsert:false})
-      .then(function(res){
-        checked(res);
-        if(!coverFile)return null;
-        stage='cover letter upload';
-        return sb.storage.from('resumes').upload(coverPath,coverFile,{upsert:false}).then(checked);
-      })
-      .then(function(){
-        stage='application record';
-        return sb.from('applicants').insert({
-          full_name:field('fullName').value.trim(),
-          email:field('email').value.trim(),
-          phone:field('phone').value.trim(),
-          college:field('college').value.trim(),
-          grad_date:gradDateVal,
-          position:field('position').value||null,
-          linkedin:field('linkedin').value.trim()||null,
-          experience:field('experience').value.trim()||null,
-          resume_path:resumePath,
-          cover_letter_path:coverPath
-        }).then(checked);
-      })
-      .then(function(){
-        form.style.display='none';
-        document.getElementById('cfSuccess').style.display='block';
-      })
-      .catch(function(err){
-        console.error('Careers form submission failed at '+stage+':',err);
-        var code=err&&(err.code||err.statusCode||err.status);
-        var reason=code?' (error '+String(code)+')':'';
-        alert('We could not complete your '+stage+reason+'. Your application has NOT been confirmed. Please email hello@kenwerdrones.com or contact us with this error.');
-        submitBtn.disabled=false;
-        submitBtn.innerHTML=originalHTML;
+    var btn=form.querySelector('.cf-submit'),originalHTML=btn.innerHTML;
+    btn.disabled=true;
+    btn.innerHTML='Submitting…';
+    try{
+      var applicant={
+        full_name:field('fullName').value.trim(),
+        email:field('email').value.trim(),
+        phone:field('phone').value.trim(),
+        college:field('college').value.trim(),
+        grad_date:field('gradDate').value?field('gradDate').value+'-01':null,
+        position:field('position').value||null,
+        linkedin:field('linkedin').value.trim()||null,
+        experience:field('experience').value.trim()||null
+      };
+      var start=await careersRequest({
+        action:'start',applicant,resume:fileMeta(resumeFile),
+        cover:fileMeta(coverFile),turnstileToken:captchaToken
       });
+      var uploaded=await sb.storage.from('resumes').uploadToSignedUrl(
+        start.uploads.resume.path,start.uploads.resume.token,resumeFile,
+        {contentType:resumeFile.type||undefined}
+      );
+      if(uploaded.error)throw uploaded.error;
+      if(coverFile){
+        uploaded=await sb.storage.from('resumes').uploadToSignedUrl(
+          start.uploads.cover.path,start.uploads.cover.token,coverFile,
+          {contentType:coverFile.type||undefined}
+        );
+        if(uploaded.error)throw uploaded.error;
+      }
+      await careersRequest({action:'complete',receipt:start.receipt});
+      form.style.display='none';
+      document.getElementById('cfSuccess').style.display='block';
+    }catch(err){
+      console.error('Careers submission failed:',err);
+      alert('Application could not be completed: '+(err.message||'Unknown error')+
+        '. Please contact hello@kenwerdrones.com if the problem continues.');
+      if(turnstileWidgetId!==null&&window.turnstile)window.turnstile.reset(turnstileWidgetId);
+    }finally{
+      btn.disabled=false;
+      btn.innerHTML=originalHTML;
+    }
   });
 })();
 
