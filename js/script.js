@@ -215,8 +215,8 @@ tick();setInterval(tick,1000);
   const LIFT_MIN=-30,LIFT_MAX=30;
   let lift=0;
 
-  const FLOW_SUPABASE_URL='https://rgevwosnbeglfsagfqpk.supabase.co';
-  const FLOW_SUPABASE_KEY='sb_publishable_npilwVrdEihiu09ks9a0qQ_XomiqUFr';
+  const FLOW_SUPABASE_URL='https://imoulrezdhgbqtzfvsxx.supabase.co';
+  const FLOW_SUPABASE_KEY='REPLACE_WITH_NEW_SUPABASE_PUBLISHABLE_KEY';
   const flowDb=(window.supabase&&window.supabase.createClient)
     ?window.supabase.createClient(FLOW_SUPABASE_URL,FLOW_SUPABASE_KEY)
     :null;
