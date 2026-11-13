@@ -51,7 +51,14 @@ async function ipFingerprint(req: Request): Promise<string> {
 }
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get("origin");
-  if (req.method === "OPTIONS") return response(204, {}, origin);
+  if (req.method === "OPTIONS") {
+    return new Response(null, {status:204,headers:{
+      "access-control-allow-origin":origin && ORIGINS.has(origin)?origin:"https://www.kenwerdrones.com",
+      "access-control-allow-methods":"POST, OPTIONS",
+      "access-control-allow-headers":"content-type",
+      "vary":"Origin"
+    }});
+  }
   if (req.method !== "POST") return response(405, {error:"Method not allowed"},origin);
   if (!origin || !ORIGINS.has(origin)) return response(403, {error:"Origin not allowed"},origin);
   const contentType = req.headers.get("content-type") || "";
