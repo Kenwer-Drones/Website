@@ -1296,10 +1296,6 @@ function skyfield(id,alpha){
           <span class="cf-hint">PDF or Word · Max 5 MB · Optional</span>
         </div>
       </div>
-      <div style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden" aria-hidden="true">
-        <label for="cfCompanyWebsite">Leave this field blank</label>
-        <input id="cfCompanyWebsite" name="companyWebsite" type="text" tabindex="-1" autocomplete="off">
-      </div>
       <button type="submit" class="cf-submit">Submit Application <span class="sq">→</span></button>
     </form>
     <div class="cf-success" id="cfSuccess">
