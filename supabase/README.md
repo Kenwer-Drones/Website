@@ -3,10 +3,10 @@
 **Project:** `imoulrezdhgbqtzfvsxx` (`https://imoulrezdhgbqtzfvsxx.supabase.co`).
 
 ## Status
-Staged in draft PR #4. **Do not merge before completing setup and a successful test.** The private database/storage are not provisioned automatically by these GitHub commits.
+Staged in draft PR #4. **Do not merge before completing setup and a successful test.** The database and storage have now been provisioned in the new Supabase project via the connected Supabase app on November 13, 2026. The live upload endpoint is NOT yet deployed or tested.
 
 ## Setup
-1. Run `supabase/careers-schema.sql` in the **new project's** Supabase SQL Editor. The bucket remains private and RLS is enabled without anonymous write or read policies.
+1. **Completed November 13, 2026:** Applied the applicant schema and private `resumes` bucket. Verified RLS, anonymous access restrictions and a rolled-back sample database INSERT. No applicant records were left by the test.
 2. In Vercel project settings → Environment Variables, configure:
    - `SUPABASE_SECRET_KEY`: a **newly rotated** Supabase secret key for this project, accessible **server-side only**. Do not put it in the repository, browser, screenshots or chat.
    - `CAREERS_SIGNING_SECRET`: a random secret of at least 32 bytes, accessible server-side only, e.g. generated on your own machine with `openssl rand -hex 32`.
@@ -23,4 +23,4 @@ The browser sends metadata and a Turnstile challenge to `POST /api/careers` with
 - No public storage bucket or anonymous INSERT policy. Never expose secret keys.
 - Turnstile reduces but does not eliminate abuse. Add server-side IP throttling and monitoring before high-volume public recruitment.
 - The serverless function assumes a Node.js environment and Supabase's current signed-upload API.
-- No direct Supabase project access was available from this session, so SQL and production credentials have not been applied or validated.
+- Supabase project access is available and the schema was applied and checked. Vercel production environment variables have not been configured and the complete browser upload flow has not been validated.
